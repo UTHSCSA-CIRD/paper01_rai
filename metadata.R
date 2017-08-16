@@ -18,6 +18,25 @@
 #' of codes. These should be character vectors either of column names or of grep
 #' patterns for selecting those names.  
 
+dmrn <- c()
+dcasnum <- c()
+dvisnum <- c()
+dlmrnvis <- c()
+
+
+dcptcols <-c()
+
+
+dhtunit <- c()
+dhtunknwn <- c()
+
+
+dwtunit <- c()
+dwtunknwn <- c()
+
+
+danesth <-
+
 
 
 #' ## Column-names that may need to be transformed
@@ -108,8 +127,32 @@ vhisp <- '';
 #' Income
 vinc <- '';
 #' Patient ID (for grouping)
-vid <- '';
+#vid <- '';
 #' Date of surgery
 vdts <- '';
 #' Date of birth
 vdob <- '';
+#' Sex
+vsex <- '';
+#' Race
+vrace <- '';
+#' InPatient vs Outpatient
+vpatstat <- '';
+#' Elective Surgery
+velectsurg <- '';
+#' Origin Status
+vpatstat <- '';
+#' Diabetes Status
+vdiab <- '';
+#' Smoking Status
+vsmoke <- '';
+#' Vent Dependent
+vvent <- '';
+#' COPD Status
+vcopd <- '';
+#' Care Status
+vindepn <- '';
+#' Hypertension Status
+vhbld <- '';
+#' Sepsis Status
+vsepsis <- '';
