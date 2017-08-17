@@ -33,3 +33,7 @@ vignettes/*.pdf
 *.knit.md
 .Rproj.user
 *.Rproj
+
+# Local configuration
+config.R
+

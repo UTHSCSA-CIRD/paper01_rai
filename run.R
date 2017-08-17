@@ -9,11 +9,11 @@
 #' 
 #' ## Load libraries
 #+ warning=FALSE, message=FALSE
-rq_libs <- c('compiler'                            # just-in-time compilation
-             ,'survival','MASS','Hmisc','zoo'      # various analysis methods
-             ,'readr','dplyr','stringr','magrittr' # data manipulation & piping
-             ,'ggplot2','ggfortify','grid','GGally'# plotting
-             ,'stargazer','broom');                # table formatting
+rq_libs <- c('compiler'                              # just-in-time compilation
+             ,'survival','MASS','Hmisc','zoo'        # various analysis methods
+             ,'readr','dplyr','stringr','magrittr'  # data manipulation & piping
+             ,'ggplot2','ggfortify','grid','GGally'  # plotting
+             ,'stargazer','broom');                  # table formatting
 rq_installed <- sapply(rq_libs,require,character.only=T);
 rq_need <- names(rq_installed[!rq_installed]);
 if(length(rq_need)>0) install.packages(rq_need,repos='https://cran.rstudio.com/',dependencies = T);
@@ -41,14 +41,15 @@ session <- 'session.rdata';
 if(session %in% list.files()) load(session);
 #' Load your data. Notice that we're using `read_csv()` from the readr library.
 #' It is a little smarter than the built-in `read.csv()`
-dat0 <- read_csv(inputdata,na='');
+dat0 <- read_delim(inputdata,na='(null)', delim="\t");
+colnames(dat0) <- tolower(colnames(dat0));
 #' ## Create the groups of exact column names for this dataset
 #' 
 #' Any vector in `metadata.R` that is composed of regexps should get
 #' resolved here to a vector of literal names using this expression as
 #' an example:
 #' 
-carepatos <- grepor(dat0,gpatos);
+carepatos <- grepor(dat0,garepatos);
 
 #' If you need to modify lists of column names using `gsub()` or if you
 #' need to dynamically generate lists of column names using something
@@ -79,7 +80,7 @@ dat1 <- dat0;
 
 
 #' Create binned versions of certain numeric vars.
-dat1[,paste0('a_bin_',cnum2bin)] <- sapply(dat1[,cnum2bin],function(ii){
+dat1[,paste0('bin_',cnum2bin)] <- sapply(dat1[,cnum2bin],function(ii){
   qii <- c(0,quantile(ii,seq(.25,.5,.75)),Inf);
   cut(ii,breaks = qii);
 })
