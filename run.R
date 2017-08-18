@@ -86,6 +86,17 @@ dat1[dat0$weight_unit=='lbs','weight'] <- dat1[dat0$weight_unit=='lbs','weight']
 #' the original `chavepatos` columns with these
 
 
+#' getting rid of the 2's in the column:
+firstidx <- which(dat1[,cnopatos[1]] > 1);
+secondidx <- which(dat1[,cnopatos[7]] > 1);
+dat1[firstidx,cnopatos[1]]  <- 1;
+dat1[secondidx,cnopatos[7]]  <- 1;
+
+#' creating modified cnopatos columns:
+dat1[,paste0('mod_',cnopatos)] <- mapply(function(xx,yy){ifelse(xx,0,yy)}, dat1[carepatos], dat1[,cnopatos])
+
+#' counting all complications after surgery in the "mod_" columns:
+sumnopatos <- rowSums(dat1[,paste0('mod_',cnopatos)])
 
 #' Create binned versions of certain numeric vars.
 dat1[,paste0('bin_',cnum2bin)] <- sapply(dat1[,cnum2bin],function(ii){

@@ -108,7 +108,10 @@ cintgr <- c();
 #'
 #' ### Clavien-Dindo 4 column names
 #' 
-ccd4 <- c();
+ccd4 <- c('sepsis_sirs_sepsis_sepshk_48h', 'postop_pulmonary_embolism'
+          ,'postop_vent_48_hr', 'postop_cva', 'postop_cardiac_arrest_req_cpr'
+          ,'postop_mi', 'postop_sepshk', 'first_unp_ret_or'
+         );
 
 
 #' ### All Complications column names
