@@ -50,7 +50,6 @@ colnames(dat0) <- tolower(colnames(dat0));
 #' an example:
 #' 
 carepatos <- grepor(dat0,garepatos);
-cnopatos <- sub('_patos','',carepatos);
 
 #' If you need to modify lists of column names using `gsub()` or if you
 #' need to dynamically generate lists of column names using something
@@ -67,7 +66,7 @@ dat1 <- dat0;
 #' Convert appropriate columns to factor
 # Example only, doesn't run, you need to actually populate `cfactr` with
 # names of columns for it to work
-#dat1[,cfactr] <- sapply(dat1[,cfactr],factor,simplify = F);
+dat1[,cfactr] <- sapply(dat1[,cfactr],factor,simplify = F);
 
 #' Normalize weight units
 #' 
@@ -75,9 +74,8 @@ dat1 <- dat0;
 dat1[dat0$weight_unit=='lbs','weight'] <- dat1[dat0$weight_unit=='lbs','weight']*0.453592;
 #' Similarly for height...
 
-#' -Do likewise for dates, factors, maybe logicals, maybe numerics-
-#' Turns out `read_delim()` is good at recognizing dates and numerics 
-#' on its own.
+#' Do likewise for dates, factors, maybe logicals, maybe numerics
+#' Turns out read_
 
 
 #' For each column in `chavepatos` create a column that is true only 
