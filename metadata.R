@@ -121,7 +121,7 @@ ccomp <- c();
 
 #' ### Complications to exclude column names (2)
 #' 
-ccompexc <- c();
+ccompexc <- c('postop_si_ssi','postop_uti');
 
 #' ### Serious complications
 #' 
@@ -167,7 +167,7 @@ vinc <- '';
 #' Patient ID (for grouping)
 #vid <- '';
 #' Date of surgery
-vdts <- '';
+#vdts <- '';
 #' Date of birth
 vdob <- '';
 #' Sex

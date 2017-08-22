@@ -113,3 +113,26 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     }
   }
 } 
+
+#' ### Specific to RAI-A
+#' 
+
+raiscore <- function(xx){
+  with(xx,
+       rep(0,nrow(xx)) +
+         ifelse(gender=='Male',5,0) +
+         ifelse(vent_dependent=='Yes',1,0) +
+         ifelse(currently_dialysis=='Yes'|acute_renal_failure=='Yes',6,0) +
+         ifelse(chr_30_dy_prior_surg=='Yes',4,0) +
+         ifelse(x_loss_bw_6_months_prior_surg=='Yes',5,0) +
+         ifelse(dyspnea == 'At Rest',8,0) +
+         ifelse(preop_tnsf_rbc_72h_prior_surg=='Yes',8,0) +
+         ifelse(functnal_heath_status=='Independent',-2,0) +
+         ifelse(functnal_heath_status=='Partially Dependent',10,0) +
+         ifelse(functnal_heath_status=='Totally Dependent',21,0) +
+         ifelse(disseminated_cancer=='Yes'
+                ,as.numeric(cut(dat1$age_at_time_surg,breaks = c(0,69,74,79,84,89,99,Inf),labels = c(20,19,18,17,15,14,13)))
+                ,as.numeric(cut(dat1$age_at_time_surg,breaks = c(0,69,74,79,84,89,94,99,Inf),labels = 2:9))
+                )
+       );
+}

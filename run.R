@@ -41,7 +41,7 @@ session <- 'session.rdata';
 if(session %in% list.files()) load(session);
 #' Load your data. Notice that we're using `read_csv()` from the readr library.
 #' It is a little smarter than the built-in `read.csv()`
-dat0 <- read_delim(inputdata,na='(null)', delim="\t");
+dat0 <- read_csv(inputdata,na='(null)');
 colnames(dat0) <- tolower(colnames(dat0));
 #' ## Create the groups of exact column names for this dataset
 #' 
@@ -87,16 +87,16 @@ dat1[dat0$weight_unit=='lbs','weight'] <- dat1[dat0$weight_unit=='lbs','weight']
 
 
 #' getting rid of the 2's in the column:
-firstidx <- which(dat1[,cnopatos[1]] > 1);
-secondidx <- which(dat1[,cnopatos[7]] > 1);
-dat1[firstidx,cnopatos[1]]  <- 1;
-dat1[secondidx,cnopatos[7]]  <- 1;
+# firstidx <- which(dat1[,cnopatos[1]] > 1);
+# secondidx <- which(dat1[,cnopatos[7]] > 1);
+# dat1[firstidx,cnopatos[1]]  <- 1;
+# dat1[secondidx,cnopatos[7]]  <- 1;
+dat1[,cnopatos] <- sapply(dat1[,cnopatos],function(xx) xx>0,simplify=F);
 
-#' creating modified cnopatos columns:
-dat1[,paste0('mod_',cnopatos)] <- mapply(function(xx,yy){ifelse(xx,0,yy)}, dat1[carepatos], dat1[,cnopatos])
-
-#' counting all complications after surgery in the "mod_" columns:
-sumnopatos <- rowSums(dat1[,paste0('mod_',cnopatos)])
+#' Backup up the modified cnopatos column
+#' ...because it's easier if patos-subtracted columns are modified in place
+dat1[,paste0('bak_',cnopatos)] <- dat1[,cnopatos];
+dat1[,cnopatos] <- mapply(function(xx,yy){ifelse(xx,0,yy)}, dat1[,carepatos], dat1[,cnopatos]);
 
 #' Create binned versions of certain numeric vars.
 dat1[,paste0('bin_',cnum2bin)] <- sapply(dat1[,cnum2bin],function(ii){
@@ -110,31 +110,37 @@ dat1[,paste0('bin_',cnum2bin)] <- sapply(dat1[,cnum2bin],function(ii){
 #' created colums with an `a_` prefix. This way you could make it binary
 #' via `dat1$a_allcomp > 0` or leave it as an integer and use number of 
 #' different complications as a proxy for severity of outcome.
-dat1$a_allcomp <- rowSums(dat1[,csrscomp]);
+#dat1$a_allcomp <- rowSums(dat1[,csrscomp]);
+dat1$a_postop <- rowSums(dat1[,setdiff(cnopatos,ccompexc)])
+
+#' Hack the values of these variables to be binary for now.
+dat1$sepsis_sirs_sepsis_sepshk_48h <- dat1$sepsis_sirs_sepsis_sepshk_48h != 'None';
+dat1$first_unp_ret_or <- dat1$first_unp_ret_or == 'Yes';
+dat1$hisp <- dat1$hispanic_ethnicity == 'Yes';
+
 
 #' Do the same as above but just for the `ccd4` complications
-dat1$a_cd4comp <- rowSums(dat1[,ccd4]);
+dat1$a_cd4 <- rowSums(dat1[,ccd4]);
 
 
 #' ## Transform Rows
 #'
 #' ### Sort the rows by patient ID and then by date of surgery, ascending
 #' 
-dat1 <- dat1[order(dat1[[vdts]]),];
+dat1 <- dat1[order(dat1$proc_surg_start),];
 #' 
 #' ### Drop patients without an income
-dat1 <- dat1[!is.na(dat1[[vinc]]),]
+#dat1 <- dat1[!is.na(dat1$income_final),];
 
 #' ### Create a version of the dataset that only has each patient's 1st encounter
 #' 
 #' (you need to have specified the name of the ID column in `metadata.R`)
-dat2[['vid']] <- dat2[[vid]]
-dat2 <- group_by(dat1,vid) %>% summarise_all(dat1,first);
+dat2 <- group_by(dat1,idn_mrn) %>% summarise_all(first);
 
 #' ### Create your random sample
 .Random.seed <- 20170816;
-pat_samp <- sample(dat2$vid,1000,rep=T);
-dat3 <- subset(dat2,vid %in% pat_samp);
+pat_samp <- sample(dat2$idn_mrn,1000,rep=T);
+dat3 <- subset(dat2,idn_mrn %in% pat_samp);
 
 #' ## Exploration
 #' 
@@ -146,8 +152,8 @@ dat3 <- subset(dat2,vid %in% pat_samp);
 #' non-quoted names separated by commas. This can go in your abstract!
 #' 
 #' Try plotting a hist on each numeric value...
-layout(matrix(25,nrow=5));
-.junk<-sapply(c(cnum,cintgr),function(ii) hist(ii,breaks=100,main=ii));
+layout(matrix(1:25,nrow=5));
+.junk<-sapply(union(cnum,cintgr),function(ii) hist(dat1[[ii]],main=ii));
 #' You will probably need to adjust the nrow/ncol for the `layout()`
 #' command, and probably plot some of them individually so you 
 #' can adjust the `xlim`, `breaks`, etc. The goal is to look for
@@ -155,9 +161,9 @@ layout(matrix(25,nrow=5));
 
 #' Try using `ggduo()` to plot all predictors vs all 
 #' responses.
-resps <- c('a_allcomp','a_cd4comp');
-ggduo(dat3,c(cnum,cintgr),resps);
-ggduo(dat3,c(ctf,cfactr),resps);
+resps <- c('a_postop','a_cd4');
+ggduo(dat3,union(cnum,cintgr),resps);
+#ggduo(dat3,union(ctf,cfactr),resps);
 #' The goal is to find the most obvious relationships beteen
 #' predictors and variables.
 
