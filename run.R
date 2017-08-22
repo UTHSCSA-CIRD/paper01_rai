@@ -92,18 +92,116 @@ secondidx <- which(dat1[,cnopatos[7]] > 1);
 dat1[firstidx,cnopatos[1]]  <- 1;
 dat1[secondidx,cnopatos[7]]  <- 1;
 
+
 #' creating modified cnopatos columns:
-dat1[,paste0('mod_',cnopatos)] <- mapply(function(xx,yy){ifelse(xx,0,yy)}, dat1[carepatos], dat1[,cnopatos])
+dat1[,paste0('mod_',cnopatos)] <- mapply(function(xx,yy){ifelse(xx,0,yy)}, xx=dat1[carepatos], yy=dat1[,cnopatos]);
+
 
 #' counting all complications after surgery in the "mod_" columns:
-sumnopatos <- rowSums(dat1[,paste0('mod_',cnopatos)])
+sumnopatos <- rowSums(dat1[,paste0('mod_',cnopatos)]);
+sumnopatostf <- ifelse(sumnopatos>0, 1, 0);
 
+#' creating sum ccd4 column:
+one <- as.numeric(ifelse(unlist(dat1[,ccd4[1]])=="None", 1, 0));
+two <- as.numeric(ifelse(unlist(dat1[,ccd4[2]])>0, 1, 0));
+three <- as.numeric(unlist(dat1[,ccd4[3]]));
+four <- as.numeric(unlist(dat1[,ccd4[4]]));
+five <- as.numeric(ifelse(unlist(dat1[,ccd4[5]])>0, 1, 0));
+six <- as.numeric(unlist(dat1[,ccd4[6]]));
+seven <- as.numeric(unlist(dat1[,ccd4[7]]));
+eight <- as.numeric(ifelse(unlist(dat1[,ccd4[5]])>0, 1, 0));
+
+sumccd4 <-rowSums(cbind(one, two, three, four, five, six, seven, eight));
+sumccd4tf <- ifelse(sumccd4 > 0, 1, 0);
+dat2 <- cbind(dat1, hisp, sumccd4tf, sumnopatostf);
+hisp <- unlist(dat1[,'hispanic_ethnicity']);
+hispfactor <- hisp;
+
+dat2 %>% 
+    select('income_final', 'gender', 'hispanic_ethnicity', 'sumccd4tf', 'sumnopatostf') %>% 
+    group_by('sumccd4tf', 'sumnopatostf', 'gender', 'hispanic_ethnicity','income_final') %>%
+    summarise(N=length("gender"));
+
+#' creating a box plot for 'sepsis_sirs_sepsis_sepshk_48h' as a
+#' predictor variable for sumnopatos:
+hisp <- unlist(dat1[,'hispanic_ethnicity']);
+hispfactor <- hisp;
+table(sumnopatos, hisp);
+table(sumnopatostf, hisp);
+levels(hispfactor) <- c("No", "Yes", "Unknown");
+boxplot(sumnopatos ~ as.factor(hispfactor));
+chiSquare(sumnopatostf ~ hispfactor);
+#'results here are interesting. There's significance but I think this is the wrong model
+
+glm(sumnopatostf ~ hispfactor); #negative coefficient; appears being hispanic is protective
+coef(summary(glm(sumnopatostf ~ hispfactor)));
+#all of the p-values are significantly associated with sumnopatostf
+#as a matter of fact, the odds ratio for being hispanic and having
+#a sumnopatos score greater that 0 is 0.827 (not including unknowns)
+table(cut(dat1$age_at_time_surg, breaks=c(25,45,65,130), right = FALSE), hisp);
+
+#Dr. Bokov's tasks:
+boxplot(unlist(dat1[,ccd4[1]]) ~ hispfactor, main=ccd4[1]); #error
+boxplot(unlist(dat1[,ccd4[2]]) ~ hispfactor, main=ccd4[2]);  #looks weird
+boxplot(unlist(dat1[,ccd4[3]]) ~ hispfactor, main=ccd4[3]);  #looks weird
+boxplot(unlist(dat1[,ccd4[4]]) ~ hispfactor, main=ccd4[4]);  #looks weird
+boxplot(unlist(dat1[,ccd4[5]]) ~ hispfactor, main=ccd4[5]);  #looks weird
+boxplot(unlist(dat1[,ccd4[6]]) ~ hispfactor, main=ccd4[6]);  #looks weird
+boxplot(unlist(dat1[,ccd4[7]]) ~ hispfactor, main=ccd4[7]);  #looks weird
+boxplot(unlist(dat1[,ccd4[8]]) ~ hispfactor, main=ccd4[8]);  #error
+
+boxplot(sumnopatos ~ hispfactor, main='SumComplicationScore'); #looks weird
+boxplot(sumnopatostf ~ hispfactor, main='SumComplicationScore'); #looks weird
+
+plot(unlist(dat1[,ccd4[1]]) ~ dat1$income_final, main=ccd4[1]); #error
+plot(unlist(dat1[,ccd4[2]]) ~ dat1$income_final, main=ccd4[2]);  #looks weird
+plot(unlist(dat1[,ccd4[3]]) ~ dat1$income_final, main=ccd4[3]);  #looks weird
+plot(unlist(dat1[,ccd4[4]]) ~ dat1$income_final, main=ccd4[4]);  #looks weird
+plot(unlist(dat1[,ccd4[5]]) ~ dat1$income_final, main=ccd4[5]);  #looks weird
+plot(unlist(dat1[,ccd4[6]]) ~ dat1$income_final, main=ccd4[6]);  #looks weird
+plot(unlist(dat1[,ccd4[7]]) ~ dat1$income_final, main=ccd4[7]);  #looks weird
+plot(unlist(dat1[,ccd4[8]]) ~ dat1$income_final, main=ccd4[8]);  #error
+
+plot(sumnopatos ~ dat1$income_final, main='SumComplicationScore', las=2); #looks weird
+boxplot()
+
+typeof(dat1[,ccd4])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+boxplot(log(dat1$income_final) ~ sumnopatos+hispfactor, las=2); #this log fxn is ln (natural log)
+#hispanics with complications slightly more likely to be poor compared to others?????
+#bit of a stretch...
+boxplot(log(dat1$income_final) ~ sumnopatostf+hispfactor, las=2); #this log fxn is ln (natural log)
+
+
+boxplot(sumnopatos ~ cut(log(dat1$income_final), 5) + hispfactor, las=2); #this log fxn is ln (natural log)
+table(sumnopatos, cut(log(dat1$income_final), 5), hispfactor, las=2); #this log fxn is ln (natural log)
+
+
+boxplot(unlist(dat1[,ccd4[2]]) ~ hispfactor, main=ccd4[2], las=2);
+
+
+
+boxplot(unlist(dat1[,ccd4[3]]) ~ unlist(dat1[,'hispanic_ethnicity']))
 #' Create binned versions of certain numeric vars.
 dat1[,paste0('bin_',cnum2bin)] <- sapply(dat1[,cnum2bin],function(ii){
   qii <- c(0,quantile(ii,seq(.25,.5,.75)),Inf);
   cut(ii,breaks = qii);
 })
-
+head(dat1[,paste0('bin_',cnum2bin)])
 #' ## Create response variables
 #' 
 #' Create a column that is sum of all complications. Lets name analytically
