@@ -122,6 +122,8 @@ dat1$hisp <- dat1$hispanic_ethnicity == 'Yes';
 #' Do the same as above but just for the `ccd4` complications
 dat1$a_cd4 <- rowSums(dat1[,ccd4]);
 
+#' Obtain the RAI score
+dat1$a_rai <- raiscore(dat1);
 
 #' ## Transform Rows
 #'
