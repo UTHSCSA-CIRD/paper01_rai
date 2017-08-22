@@ -42,6 +42,8 @@ if(session %in% list.files()) load(session);
 #' Load your data. Notice that we're using `read_csv()` from the readr library.
 #' It is a little smarter than the built-in `read.csv()`
 dat0 <- read_csv(inputdata,na='(null)');
+#' Read in the data dictionary
+dct0 <- read_csv(dctfile);
 colnames(dat0) <- tolower(colnames(dat0));
 #' ## Create the groups of exact column names for this dataset
 #' 

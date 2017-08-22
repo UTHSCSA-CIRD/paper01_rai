@@ -9,6 +9,9 @@
 #' that are not specific to your own computer (those go into `config.R`). Also
 #' do not create functions here. Those go into `functions.R`
 #' 
+#' Name of data dictionary:
+dctfile <- 'VariableNamesFromUHSNSQIP.csv';
+
 #' ## Non-analytic column names or regexps
 #' 
 #' Please create below as many lines as you need to for the the code you 
