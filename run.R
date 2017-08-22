@@ -100,7 +100,7 @@ dat1[,cnopatos] <- mapply(function(xx,yy){ifelse(xx,0,yy)}, dat1[,carepatos], da
 
 #' Create binned versions of certain numeric vars.
 dat1[,paste0('bin_',cnum2bin)] <- sapply(dat1[,cnum2bin],function(ii){
-  qii <- c(0,quantile(ii,seq(.25,.5,.75)),Inf);
+  qii <- c(0,quantile(ii,c(.25,.5,.75),na.rm=T),Inf);
   cut(ii,breaks = qii);
 })
 
@@ -138,6 +138,22 @@ dat1 <- dat1[order(dat1$proc_surg_start),];
 #' 
 #' (you need to have specified the name of the ID column in `metadata.R`)
 dat2 <- group_by(dat1,idn_mrn) %>% summarise_all(first);
+
+#' ### Summary counts
+subset(dat2,race=='White'|hispanic_ethnicity=='Yes') %>% 
+  mutate(hisp=hispanic_ethnicity=='Yes') %>% 
+  group_by(gender,hisp) %>% 
+  summarise(
+    age=paste0(round(mean(age_at_time_surg,na.rm=T),1),' (',round(sd(age_at_time_surg,na.rm=T),1),')')
+    ,no_complications=sum((a_cd4+a_postop)==0)
+    ,income_nocomp=paste0(round(median(income_final[!(a_cd4|a_postop)],na.rm=T)/1000,1),' (',paste0(round(quantile(income_final[!(a_cd4|a_postop)],c(.25,.75),na.rm=T)/1000,1),collapse=','),')')
+    ,income_comp=paste0(round(median(income_final[a_cd4|a_postop],na.rm=T)/1000,1),' (',paste0(round(quantile(income_final[a_cd4|a_postop],c(.25,.75),na.rm=T)/1000,1),collapse=','),')')
+    ,n_cd4=sum(a_cd4>0)
+    , n_postop=sum(a_postop>0)) %>% 
+  mutate(hisp=ifelse(hisp,'Yes','No')) %>% 
+  setNames(c('Sex','Hispanic','Age (SD)','No Comp (N)','Income No Comp (IQR)','Income Comp (IQR)','CvDn4 (N)','Postop (N)')) ->   summary_counts;
+
+write_tsv(summary_counts,'summary_counts.tsv');
 
 #' ### Create your random sample
 .Random.seed <- 20170816;
