@@ -41,7 +41,9 @@ session <- 'session.rdata';
 if(session %in% list.files()) load(session);
 #' Load your data. Notice that we're using `read_csv()` from the readr library.
 #' It is a little smarter than the built-in `read.csv()`
-dat0 <- read_csv(inputdata,na='(null)');
+dat0 <- read_csv(inputdata,na=c('(null)',''));
+#' Read in the data dictionary
+dct0 <- read_csv(dctfile,na = '');
 colnames(dat0) <- tolower(colnames(dat0));
 #' ## Create the groups of exact column names for this dataset
 #' 
@@ -49,8 +51,11 @@ colnames(dat0) <- tolower(colnames(dat0));
 #' resolved here to a vector of literal names using this expression as
 #' an example:
 #' 
-carepatos <- grepor(dat0,garepatos);
-cnopatos <- sub('_patos','',carepatos);
+#carepatos <- grepor(dat0,garepatos);
+#cnopatos <- sub('_patos','',carepatos);
+#' We have a new way to get column names whenever we need them:
+#' `v(c_cd4)` . To see what other groups of column names are currently available
+#' do `names(dct0)[-(1:2)]`
 
 #' If you need to modify lists of column names using `gsub()` or if you
 #' need to dynamically generate lists of column names using something
@@ -91,18 +96,25 @@ dat1[dat0$weight_unit=='lbs','weight'] <- dat1[dat0$weight_unit=='lbs','weight']
 # secondidx <- which(dat1[,cnopatos[7]] > 1);
 # dat1[firstidx,cnopatos[1]]  <- 1;
 # dat1[secondidx,cnopatos[7]]  <- 1;
-dat1[,cnopatos] <- sapply(dat1[,cnopatos],function(xx) xx>0,simplify=F);
+#' The below was wrong! Thes columns are counts, so can occur more than once.
+#dat1[,cnopatos] <- sapply(dat1[,cnopatos],function(xx) xx>0,simplify=F);
 
 #' Backup up the modified cnopatos column
 #' ...because it's easier if patos-subtracted columns are modified in place
-dat1[,paste0('bak_',cnopatos)] <- dat1[,cnopatos];
-dat1[,cnopatos] <- mapply(function(xx,yy){ifelse(xx,0,yy)}, dat1[,carepatos], dat1[,cnopatos]);
+c_canbepatos <- v(c_canbepatos);
+c_patos <- v(c_patos);
+dat1[,paste0('bak_',c_canbepatos)] <- dat1[,c_canbepatos];
+#' Since the postop & accompanying columns are counts, we just subtract patos
+#' from their postop counterparts.
+#dat1[,c_canbepatos] <- mapply(function(xx,yy){ifelse(xx,0,yy)}, dat1[,carepatos], dat1[,cnopatos]);
+dat1[,c_canbepatos] <- dat1[,c_canbepatos] - dat1[,c_patos];
 
 #' Create binned versions of certain numeric vars.
-dat1[,paste0('bin_',cnum2bin)] <- sapply(dat1[,cnum2bin],function(ii){
-  qii <- c(0,quantile(ii,c(.25,.5,.75),na.rm=T),Inf);
-  cut(ii,breaks = qii);
-})
+#' (commented out until we can put a c_num2bin or something into dct0)
+# dat1[,paste0('bin_',cnum2bin)] <- sapply(dat1[,cnum2bin],function(ii){
+#   qii <- c(0,quantile(ii,c(.25,.5,.75),na.rm=T),Inf);
+#   cut(ii,breaks = qii);
+# })
 
 #' ## Create response variables
 #' 
@@ -111,16 +123,22 @@ dat1[,paste0('bin_',cnum2bin)] <- sapply(dat1[,cnum2bin],function(ii){
 #' via `dat1$a_allcomp > 0` or leave it as an integer and use number of 
 #' different complications as a proxy for severity of outcome.
 #dat1$a_allcomp <- rowSums(dat1[,csrscomp]);
-dat1$a_postop <- rowSums(dat1[,setdiff(cnopatos,ccompexc)])
+c_postop_yesno <- setdiff(v(c_postop),v(c_count));
+c_postop_count <- intersect(v(c_postop),v(c_count));
+dat1$a_postop <- rowSums(dat1[,c_postop_count]) +
+  apply(dat1[,c_postop_yesno],1,function(xx) sum(na.omit(xx %in% c('Yes','Positive'))));
 
-#' Hack the values of these variables to be binary for now.
-dat1$sepsis_sirs_sepsis_sepshk_48h <- dat1$sepsis_sirs_sepsis_sepshk_48h != 'None';
-dat1$first_unp_ret_or <- dat1$first_unp_ret_or == 'Yes';
-dat1$hisp <- dat1$hispanic_ethnicity == 'Yes';
-
+#' -Hack the values of these variables to be binary for now.-
+#dat1$sepsis_sirs_sepsis_sepshk_48h <- dat1$sepsis_sirs_sepsis_sepshk_48h != 'None';
+#dat1$first_unp_ret_or <- dat1$first_unp_ret_or == 'Yes';
+#dat1$hisp <- dat1$hispanic_ethnicity == 'Yes';
+c_cd4_yesno <- setdiff(v(c_cd4),v(c_count));
+c_cd4_count <- intersect(v(c_cd4),v(c_count));
 
 #' Do the same as above but just for the `ccd4` complications
-dat1$a_cd4 <- rowSums(dat1[,ccd4]);
+#dat1$a_cd4 <- rowSums(dat1[,c_cd4]);
+dat1$a_cd4 <- rowSums(dat1[,c_cd4_count]) + 
+  apply(dat1[,c_cd4_yesno],1,function(xx) sum(na.omit(xx=='Yes')));
 
 #' Obtain the RAI score
 dat1$a_rai <- raiscore(dat1);

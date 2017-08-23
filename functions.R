@@ -117,6 +117,7 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 #' ### Specific to RAI-A
 #' 
 
+#' Calculates the RAI score
 raiscore <- function(xx){
   with(xx,
        rep(0,nrow(xx)) +
@@ -136,3 +137,8 @@ raiscore <- function(xx){
                 )
        );
 }
+
+#' Returns a list of column names from the data dictionary for which the column
+#' named in the first argument is true. The first arg can be either a string or 
+#' a name. The second must be a data.frame
+v <- function(var,dictionary=dct0) {cc<-substitute(var);na.omit(dictionary[dictionary[[as.character(cc)]],'dataset_column_names'])[[1]]}
