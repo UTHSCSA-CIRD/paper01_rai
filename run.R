@@ -187,6 +187,7 @@ dat3 <- subset(dat2,idn_mrn %in% pat_samp);
 #' Filter down to only NHW and hispanic
 dat4<-subset(dat3,hispanic_ethnicity!='Unknown'&(hispanic_ethnicity=='Yes'|race=='White'));
 dat4$hispanic_ethnicity<-factor(dat4$hispanic_ethnicity);
+dat4$a_transfer <- dat4$origin_status!='Not transferred (admitted from home)';
 #' ## Exploration
 #' 
 #' Try making pivot tables...
@@ -221,4 +222,22 @@ summary(glmpostopaic);
 glmcd4 <- glm(a_cd4~1,dat4,family='poisson');
 glmcd4aic <- stepAIC(update(glmcd4,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+income_final)^3),direction='both');
 summary(glmcd4aic);
+#' BUt this is kind of a waste of time because RAI-A was never properly weighted. Let's fix that...
+glmp_cd4<-glm(a_cd4~gender+x_loss_bw_6_months_prior_surg+dyspnea+currently_dialysis+chr_30_dy_prior_surg+functnal_heath_status+disseminated_cancer*age_at_time_surg+serum_creatinine+a_transfer
+              ,dat4,subset=!is.na(serum_creatinine)&dyspnea!='At Rest'&functnal_heath_status!='Unknown',family='poisson');
+#' Can we improve on RAI by adding the above fitted model?
+anova(update(glmp_cd4,.~a_rai),update(glmp_cd4,.~.+a_rai),test='LRT');
+#' Yes
 #' 
+#' How about in reverse? Can we improve on the model by adding RAI?
+anova(glmp_cd4,update(glmp_cd4,.~.+a_rai),test='LRT');
+#' Yes also
+#' 
+#' Now let's do stepwise regression to see what really needs to be in the model
+glmp_cd4_aic <- stepAIC(glmp_cd4,scope=list(lower=~1,upper=~(.)^2),direction='both');
+#' Now can this be improved with original RAI?
+#' Can we improve on RAI by adding the above fitted model?
+anova(update(glmp_cd4_aic,.~a_rai),update(glmp_cd4_aic,.~.+a_rai),test='LRT');
+#' And does RAI improve it?
+anova(glmp_cd4_aic,update(glmp_cd4_aic,.~.+a_rai),test='LRT');
+#' A little
