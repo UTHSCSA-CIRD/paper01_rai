@@ -10,7 +10,7 @@
 #' ## Load libraries
 #+ warning=FALSE, message=FALSE
 rq_libs <- c('compiler'                              # just-in-time compilation
-             ,'survival','MASS','Hmisc','zoo'        # various analysis methods
+             ,'survival','MASS','Hmisc','zoo','coin' # various analysis methods
              ,'readr','dplyr','stringr','magrittr'   # data manipulation & piping
              ,'ggplot2','ggfortify','grid','GGally'  # plotting
              ,'stargazer','broom');                  # table formatting
@@ -31,8 +31,14 @@ source('./metadata.R');
 #' This file has some possible useful functions. You might not need to edit
 #' it but should read it.
 source('./functions.R');
+
+
 #'
 #' ## Set generic variables
+#' 
+#' data dictionary:
+dctfile = 'VariableNamesFromUHSNSQIP.csv';
+#' saved session data (not used right now)
 session <- 'session.rdata';
 
 #' ## Load data if it exists 
@@ -41,7 +47,7 @@ session <- 'session.rdata';
 if(session %in% list.files()) load(session);
 #' Load your data. Notice that we're using `read_csv()` from the readr library.
 #' It is a little smarter than the built-in `read.csv()`
-dat0 <- read_csv(inputdata,na=c('(null)',''));
+dat0 <- read_tsv(inputdata,na=c('(null)',''));
 #' Read in the data dictionary
 dct0 <- read_csv(dctfile,na = '');
 colnames(dat0) <- tolower(colnames(dat0));
@@ -178,6 +184,9 @@ write_tsv(summary_counts,'summary_counts.tsv');
 pat_samp <- sample(dat2$idn_mrn,1000,rep=T);
 dat3 <- subset(dat2,idn_mrn %in% pat_samp);
 
+#' Filter down to only NHW and hispanic
+dat4<-subset(dat3,hispanic_ethnicity!='Unknown'&(hispanic_ethnicity=='Yes'|race=='White'));
+dat4$hispanic_ethnicity<-factor(dat4$hispanic_ethnicity);
 #' ## Exploration
 #' 
 #' Try making pivot tables...
@@ -198,12 +207,18 @@ layout(matrix(1:25,nrow=5));
 #' Try using `ggduo()` to plot all predictors vs all 
 #' responses.
 resps <- c('a_postop','a_cd4');
-ggduo(dat3,union(cnum,cintgr),resps);
+ggduo(dat4,union(cnum,cintgr),resps);
 #ggduo(dat3,union(ctf,cfactr),resps);
 #' The goal is to find the most obvious relationships beteen
 #' predictors and variables.
 
 #' NOW you have probed your data in a sufficiently deep and 
 #' methodical way that you can start making decisions about how
-#' to analyze it.
+#' to analyze it. For example...
+glmpostop <- glm(a_postop~1,dat4,family='poisson');
+glmpostopaic <- stepAIC(update(glmpostop,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+income_final)^3),direction='both');
+summary(glmpostopaic);
+glmcd4 <- glm(a_cd4~1,dat4,family='poisson');
+glmcd4aic <- stepAIC(update(glmcd4,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+income_final)^3),direction='both');
+summary(glmcd4aic);
 #' 

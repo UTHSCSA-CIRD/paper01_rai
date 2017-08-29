@@ -118,7 +118,41 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 #' 
 
 #' Calculates the RAI score
+#' 
 raiscore <- function(xx){
+  with(xx, 5*(gender=='Male') +
+    # note that there are two different multipliers for body weight loss
+    (5+4)*(x_loss_bw_6_months_prior_surg=='Yes') +
+    6*(currently_dialysis=='Yes'|isTRUE(serum_creatinine>3)) +
+    4*(chr_30_dy_prior_surg=='Yes') +
+    8*(dyspnea == 'At Rest') +
+    # Points to addres: 
+    # 1. We do not have impaired sensorium or other cog decline 
+    # available. Do we assume NO cognitive decline?  Or do we 
+    # take a weighted average of the two health status scores 
+    # based on the population average expected for cognitive 
+    # decline?
+    # 2. How do we treat unknown functional status? Currently treated as independent.
+    as.numeric(
+      as.character(
+        factor(functnal_heath_status
+               ,levels=c('Independent','Partially Dependent','Totally Dependent','Unknown')
+               # with cognitive decline the labels would have been...
+               #,labels=c(-2,10,21,'0.0')
+               ,labels=c(0,8,16,'0.0')
+               ))) +
+    # 3. We do not have impaired sensorium or other cog decline here
+    # transfer status
+    8*(origin_status!='Not transferred (admitted from home)') +
+    ifelse(disseminated_cancer=='Yes'
+           # scoring for age when there is cancer
+           ,as.numeric(cut(dat1$age_at_time_surg,breaks = c(0,69,74,79,84,89,99,Inf),labels = c(20,19,18,17,15,14,13)))
+           # scoring for age when there is no cancer
+           ,as.numeric(cut(dat1$age_at_time_surg,breaks = c(0,69,74,79,84,89,94,99,Inf),labels = 2:9))
+    ))
+  }
+  
+raiscore.bak <- function(xx){
   with(xx,
        rep(0,nrow(xx)) +
          ifelse(gender=='Male',5,0) +
