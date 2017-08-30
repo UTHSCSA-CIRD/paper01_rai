@@ -10,7 +10,7 @@
 #' ## Load libraries
 #+ warning=FALSE, message=FALSE
 rq_libs <- c('compiler'                              # just-in-time compilation
-             ,'survival','MASS','Hmisc','zoo'        # various analysis methods
+             ,'survival','MASS','Hmisc','zoo','coin' # various analysis methods
              ,'readr','dplyr','stringr','magrittr'   # data manipulation & piping
              ,'ggplot2','ggfortify','grid','GGally'  # plotting
              ,'stargazer','broom');                  # table formatting
@@ -31,8 +31,14 @@ source('./metadata.R');
 #' This file has some possible useful functions. You might not need to edit
 #' it but should read it.
 source('./functions.R');
+
+
 #'
 #' ## Set generic variables
+#' 
+#' data dictionary:
+dctfile = 'VariableNamesFromUHSNSQIP.csv';
+#' saved session data (not used right now)
 session <- 'session.rdata';
 
 #' ## Load data if it exists 
@@ -41,7 +47,7 @@ session <- 'session.rdata';
 if(session %in% list.files()) load(session);
 #' Load your data. Notice that we're using `read_csv()` from the readr library.
 #' It is a little smarter than the built-in `read.csv()`
-dat0 <- read_csv(inputdata,na=c('(null)',''));
+dat0 <- read_tsv(inputdata,na=c('(null)',''));
 #' Read in the data dictionary
 dct0 <- read_csv(dctfile,na = '');
 colnames(dat0) <- tolower(colnames(dat0));
@@ -178,6 +184,10 @@ write_tsv(summary_counts,'summary_counts.tsv');
 pat_samp <- sample(dat2$idn_mrn,1000,rep=T);
 dat3 <- subset(dat2,idn_mrn %in% pat_samp);
 
+#' Filter down to only NHW and hispanic
+dat4<-subset(dat3,hispanic_ethnicity!='Unknown'&(hispanic_ethnicity=='Yes'|race=='White'));
+dat4$hispanic_ethnicity<-factor(dat4$hispanic_ethnicity);
+dat4$a_transfer <- dat4$origin_status!='Not transferred (admitted from home)';
 #' ## Exploration
 #' 
 #' Try making pivot tables...
@@ -188,8 +198,8 @@ dat3 <- subset(dat2,idn_mrn %in% pat_samp);
 #' non-quoted names separated by commas. This can go in your abstract!
 #' 
 #' Try plotting a hist on each numeric value...
-layout(matrix(1:25,nrow=5));
-.junk<-sapply(union(cnum,cintgr),function(ii) hist(dat1[[ii]],main=ii));
+#layout(matrix(1:25,nrow=5));
+#.junk<-sapply(union(cnum,cintgr),function(ii) hist(dat1[[ii]],main=ii));
 #' You will probably need to adjust the nrow/ncol for the `layout()`
 #' command, and probably plot some of them individually so you 
 #' can adjust the `xlim`, `breaks`, etc. The goal is to look for
@@ -198,12 +208,36 @@ layout(matrix(1:25,nrow=5));
 #' Try using `ggduo()` to plot all predictors vs all 
 #' responses.
 resps <- c('a_postop','a_cd4');
-ggduo(dat3,union(cnum,cintgr),resps);
+ggduo(dat4,union(cnum,cintgr),resps);
 #ggduo(dat3,union(ctf,cfactr),resps);
 #' The goal is to find the most obvious relationships beteen
 #' predictors and variables.
 
 #' NOW you have probed your data in a sufficiently deep and 
 #' methodical way that you can start making decisions about how
-#' to analyze it.
+#' to analyze it. For example...
+glmpostop <- glm(a_postop~1,dat4,family='poisson');
+glmpostopaic <- stepAIC(update(glmpostop,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+income_final)^3),direction='both');
+summary(glmpostopaic);
+glmcd4 <- glm(a_cd4~1,dat4,family='poisson');
+glmcd4aic <- stepAIC(update(glmcd4,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+income_final)^3),direction='both');
+summary(glmcd4aic);
+#' BUt this is kind of a waste of time because RAI-A was never properly weighted. Let's fix that...
+glmp_cd4<-glm(a_cd4~gender+x_loss_bw_6_months_prior_surg+dyspnea+currently_dialysis+chr_30_dy_prior_surg+functnal_heath_status+disseminated_cancer*age_at_time_surg+serum_creatinine+a_transfer
+              ,dat4,subset=!is.na(serum_creatinine)&dyspnea!='At Rest'&functnal_heath_status!='Unknown',family='poisson');
+#' Can we improve on RAI by adding the above fitted model?
+anova(update(glmp_cd4,.~a_rai),update(glmp_cd4,.~.+a_rai),test='LRT');
+#' Yes
 #' 
+#' How about in reverse? Can we improve on the model by adding RAI?
+anova(glmp_cd4,update(glmp_cd4,.~.+a_rai),test='LRT');
+#' Yes also
+#' 
+#' Now let's do stepwise regression to see what really needs to be in the model
+glmp_cd4_aic <- stepAIC(glmp_cd4,scope=list(lower=~1,upper=~(.)^2),direction='both');
+#' Now can this be improved with original RAI?
+#' Can we improve on RAI by adding the above fitted model?
+anova(update(glmp_cd4_aic,.~a_rai),update(glmp_cd4_aic,.~.+a_rai),test='LRT');
+#' And does RAI improve it?
+anova(glmp_cd4_aic,update(glmp_cd4_aic,.~.+a_rai),test='LRT');
+#' A little
