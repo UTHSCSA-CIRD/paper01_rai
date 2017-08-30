@@ -198,8 +198,8 @@ dat4$a_transfer <- dat4$origin_status!='Not transferred (admitted from home)';
 #' non-quoted names separated by commas. This can go in your abstract!
 #' 
 #' Try plotting a hist on each numeric value...
-layout(matrix(1:25,nrow=5));
-.junk<-sapply(union(cnum,cintgr),function(ii) hist(dat1[[ii]],main=ii));
+#layout(matrix(1:25,nrow=5));
+#.junk<-sapply(union(cnum,cintgr),function(ii) hist(dat1[[ii]],main=ii));
 #' You will probably need to adjust the nrow/ncol for the `layout()`
 #' command, and probably plot some of them individually so you 
 #' can adjust the `xlim`, `breaks`, etc. The goal is to look for
