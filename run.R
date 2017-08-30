@@ -208,7 +208,7 @@ dat4$a_transfer <- dat4$origin_status!='Not transferred (admitted from home)';
 #' Try using `ggduo()` to plot all predictors vs all 
 #' responses.
 resps <- c('a_postop','a_cd4');
-ggduo(dat4,union(cnum,cintgr),resps);
+#ggduo(dat4,union(cnum,cintgr),resps);
 #ggduo(dat3,union(ctf,cfactr),resps);
 #' The goal is to find the most obvious relationships beteen
 #' predictors and variables.
