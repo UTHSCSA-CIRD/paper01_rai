@@ -13,7 +13,7 @@ rq_libs <- c('compiler'                              # just-in-time compilation
              ,'survival','MASS','Hmisc','zoo','coin' # various analysis methods
              ,'readr','dplyr','stringr','magrittr'   # data manipulation & piping
              ,'ggplot2','ggfortify','grid','GGally'  # plotting
-             ,'stargazer','broom');                  # table formatting
+             ,'stargazer','broom', 'tableone');                  # table formatting
 rq_installed <- sapply(rq_libs,require,character.only=T);
 rq_need <- names(rq_installed[!rq_installed]);
 if(length(rq_need)>0) install.packages(rq_need,repos='https://cran.rstudio.com/',dependencies = T);
@@ -104,6 +104,9 @@ dat1[dat0$weight_unit=='lbs','weight'] <- dat1[dat0$weight_unit=='lbs','weight']
 # dat1[secondidx,cnopatos[7]]  <- 1;
 #' The below was wrong! Thes columns are counts, so can occur more than once.
 #dat1[,cnopatos] <- sapply(dat1[,cnopatos],function(xx) xx>0,simplify=F);
+#'
+#' ## Column names of primary relevance
+modelvars <- c(v(c_rai),v(c_postop),'income_final','hispanic_ethnicity');
 
 #' Backup up the modified cnopatos column
 #' ...because it's easier if patos-subtracted columns are modified in place
@@ -114,6 +117,7 @@ dat1[,paste0('bak_',c_canbepatos)] <- dat1[,c_canbepatos];
 #' from their postop counterparts.
 #dat1[,c_canbepatos] <- mapply(function(xx,yy){ifelse(xx,0,yy)}, dat1[,carepatos], dat1[,cnopatos]);
 dat1[,c_canbepatos] <- dat1[,c_canbepatos] - dat1[,c_patos];
+
 
 #' Create binned versions of certain numeric vars.
 #' (commented out until we can put a c_num2bin or something into dct0)
@@ -141,10 +145,13 @@ dat1$a_postop <- rowSums(dat1[,c_postop_count]) +
 c_cd4_yesno <- setdiff(v(c_cd4),v(c_count));
 c_cd4_count <- intersect(v(c_cd4),v(c_count));
 
+
 #' Do the same as above but just for the `ccd4` complications
 #dat1$a_cd4 <- rowSums(dat1[,c_cd4]);
 dat1$a_cd4 <- rowSums(dat1[,c_cd4_count]) + 
   apply(dat1[,c_cd4_yesno],1,function(xx) sum(na.omit(xx=='Yes')));
+
+dat1$a_transfer <- dat1$origin_status!='Not transferred (admitted from home)';
 
 #' Obtain the RAI score
 dat1$a_rai <- raiscore(dat1);
@@ -163,31 +170,47 @@ dat1 <- dat1[order(dat1$proc_surg_start),];
 #' (you need to have specified the name of the ID column in `metadata.R`)
 dat2 <- group_by(dat1,idn_mrn) %>% summarise_all(first);
 
-#' ### Summary counts
-subset(dat2,race=='White'|hispanic_ethnicity=='Yes') %>% 
-  mutate(hisp=hispanic_ethnicity=='Yes') %>% 
-  group_by(gender,hisp) %>% 
-  summarise(
-    age=paste0(round(mean(age_at_time_surg,na.rm=T),1),' (',round(sd(age_at_time_surg,na.rm=T),1),')')
-    ,no_complications=sum((a_cd4+a_postop)==0)
-    ,income_nocomp=paste0(round(median(income_final[!(a_cd4|a_postop)],na.rm=T)/1000,1),' (',paste0(round(quantile(income_final[!(a_cd4|a_postop)],c(.25,.75),na.rm=T)/1000,1),collapse=','),')')
-    ,income_comp=paste0(round(median(income_final[a_cd4|a_postop],na.rm=T)/1000,1),' (',paste0(round(quantile(income_final[a_cd4|a_postop],c(.25,.75),na.rm=T)/1000,1),collapse=','),')')
-    ,n_cd4=sum(a_cd4>0)
-    , n_postop=sum(a_postop>0)) %>% 
-  mutate(hisp=ifelse(hisp,'Yes','No')) %>% 
-  setNames(c('Sex','Hispanic','Age (SD)','No Comp (N)','Income No Comp (IQR)','Income Comp (IQR)','CvDn4 (N)','Postop (N)')) ->   summary_counts;
-
-write_tsv(summary_counts,'summary_counts.tsv');
-
-#' ### Create your random sample
-.Random.seed <- 20170816;
-pat_samp <- sample(dat2$idn_mrn,1000,rep=T);
-dat3 <- subset(dat2,idn_mrn %in% pat_samp);
-
 #' Filter down to only NHW and hispanic
-dat4<-subset(dat3,hispanic_ethnicity!='Unknown'&(hispanic_ethnicity=='Yes'|race=='White'));
-dat4$hispanic_ethnicity<-factor(dat4$hispanic_ethnicity);
-dat4$a_transfer <- dat4$origin_status!='Not transferred (admitted from home)';
+dat3<-subset(dat2,hispanic_ethnicity!='Unknown'&(hispanic_ethnicity=='Yes'|race=='White'));
+dat3$hispanic_ethnicity<-factor(dat3$hispanic_ethnicity);
+#' creating a counts table of missingness for each variable:
+#' TODO: Fix these, to include the actual RAI components
+# misstable <- transform(dat3, missing_income=is.na(income_final)) %>%
+#   CreateTableOne(data=., vars= c(therai,c_cd4_count), strata='missing_income') %>%
+#   print;
+# misstable[,'p'] %>%  gsub("<","", x=.) %>% trimws() %>%
+#   as.numeric() %>% p.adjust() %>% cbind(misstable,padj=.) %>%
+#   data.frame %>% select(-test) -> misstable;
+# 
+# misstable2 <- CreateTableOne(data=., vars= c(therai,c_cd4_count), strata='gender');
+# newmisstable2 <- print(misstable2);
+# newmisstable2[,'p'] %>%  gsub("<","", x=.) %>% trimws() %>%
+#   as.numeric() %>% p.adjust() %>% cbind(newmisstable2,padj=.) %>%
+#   data.frame %>% select(-test) -> newmisstable2;
+
+foo<-sapply(foovars,function(ii) {try(eval(parse(text=sprintf("stratatable(dat3,foovars,str=is.na(%s)|%s=='Unknown')",ii,ii))))})
+test <- sapply(foovars, function(ii){table(dat3[,ii],useNA = 'always')})
+#' writing output to a 'Results' folder:
+variables <- rownames(newmisstable)
+newmisstable <- cbind(variables, newmisstable)
+write.table(x=newmisstable, file=paste(outputpath, 'IncomeMissingTable.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
+
+#' ### Summary counts
+# subset(dat3,race=='White'|hispanic_ethnicity=='Yes') %>% 
+#   mutate(hisp=hispanic_ethnicity=='Yes') %>% 
+#   group_by(gender,hisp) %>% 
+#   summarise(
+#     age=paste0(round(mean(age_at_time_surg,na.rm=T),1),' (',round(sd(age_at_time_surg,na.rm=T),1),')')
+#     ,no_complications=sum((a_cd4+a_postop)==0)
+#     ,income_nocomp=paste0(round(median(income_final[!(a_cd4|a_postop)],na.rm=T)/1000,1),' (',paste0(round(quantile(income_final[!(a_cd4|a_postop)],c(.25,.75),na.rm=T)/1000,1),collapse=','),')')
+#     ,income_comp=paste0(round(median(income_final[a_cd4|a_postop],na.rm=T)/1000,1),' (',paste0(round(quantile(income_final[a_cd4|a_postop],c(.25,.75),na.rm=T)/1000,1),collapse=','),')')
+#     ,n_cd4=sum(a_cd4>0)
+#     , n_postop=sum(a_postop>0)) %>% 
+#   mutate(hisp=ifelse(hisp,'Yes','No')) %>% 
+#   setNames(c('Sex','Hispanic','Age (SD)','No Comp (N)','Income No Comp (IQR)','Income Comp (IQR)','CvDn4 (N)','Postop (N)')) ->   summary_counts;
+# 
+# write_tsv(summary_counts,'summary_counts.tsv');
+
 #' ## Exploration
 #' 
 #' Try making pivot tables...
@@ -199,7 +222,7 @@ dat4$a_transfer <- dat4$origin_status!='Not transferred (admitted from home)';
 #' 
 #' Try plotting a hist on each numeric value...
 #layout(matrix(1:25,nrow=5));
-#.junk<-sapply(union(cnum,cintgr),function(ii) hist(dat1[[ii]],main=ii));
+#.junk<-sapply(union(cnum,cintgr),function(ii) hist(dat3[[ii]],main=ii));
 #' You will probably need to adjust the nrow/ncol for the `layout()`
 #' command, and probably plot some of them individually so you 
 #' can adjust the `xlim`, `breaks`, etc. The goal is to look for
@@ -208,8 +231,14 @@ dat4$a_transfer <- dat4$origin_status!='Not transferred (admitted from home)';
 #' Try using `ggduo()` to plot all predictors vs all 
 #' responses.
 resps <- c('a_postop','a_cd4');
-ggduo(dat4,union(cnum,cintgr),resps);
-#ggduo(dat3,union(ctf,cfactr),resps);
+
+#' ### Create your random sample
+.Random.seed <- 20170816;
+pat_samp <- sample(dat3$idn_mrn,1000,rep=T);
+dat4 <- subset(dat3,idn_mrn %in% pat_samp);
+
+#ggduo(dat4,union(cnum,cintgr),resps);
+#ggduo(dat4,union(ctf,cfactr),resps);
 #' The goal is to find the most obvious relationships beteen
 #' predictors and variables.
 

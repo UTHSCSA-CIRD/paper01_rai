@@ -117,6 +117,23 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 #' ### Specific to RAI-A
 #' 
 
+#' Return a tableone object formatted just the way we like it
+#' @param xx     A \code{data.frame} (required).
+#' @param vars   Vector of variable names to pass to \code{CreatTableOne} (optional)
+#' @param ...    Named expressions from which to create the strata variable
+#'               for \code{CreatTableOne} (only tested for one variable)
+stratatable <- function(xx,vars=NULL,...){
+  nmx <- names(xx);
+  xx <- transform(xx,...);
+  mystrata <- setdiff(names(xx),nmx);
+  res <- tableone::CreateTableOne(data=xx, vars= vars, strata=mystrata) %>% print;
+  res[,'p'] %>%  gsub("<","", x=.) %>% trimws() %>%
+    as.numeric() %>% p.adjust() %>% cbind(res,padj=.) %>%
+    data.frame %>% dplyr::select(-test) -> res;
+  return(res);
+}
+
+
 #' Calculates the RAI score
 #' 
 raiscore <- function(xx){
