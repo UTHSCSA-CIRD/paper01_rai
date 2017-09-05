@@ -194,24 +194,45 @@ dat3$hispanic_ethnicity<-factor(dat3$hispanic_ethnicity);
 
 modvarstrata <-sapply(modelvars,function(ii) {try(eval(parse(text=sprintf("stratatable(dat3,modelvars,str=is.na(%s)|%s=='Unknown')",ii,ii))))});
 modvarstrata <- modvarstrata[sapply(modvarstrata,class)=='matrix'];
-modvarsumtab <- sapply(modelvars, function(ii){table(dat3[,ii],useNA = 'always')});
-newmodvarstrata <- print(modvarstrata);
-newmodvarsumtab <- print(modvarsumtab);
+
+#' Let's treat the variables with more than 6 distinct values as continuous and
+#' the rest we tabulate whether or not they are factors. For this, 
+#' `modelvars_iscont`, a named vector of T/F values, is created. We really ought
+#' to just create a c_discrete column in dct0, but it might be out of date with 
+#' the latest version so we'll clean it up later and use this vector for now.
+modelvars_iscont<-sapply(dat3[,modelvars],function(xx) length(unique(xx))>6);
+#' Now we just first do the continuous ones with summary and then the discrete
+#' ones with table, and we `c()` them all together because when you do that to
+#' lists, you get a list as the result.
+modelvarsumtab <- c(sapply(dat3[,names(modelvars_iscont[modelvars_iscont])]
+                         ,function(xx) cbind(summary(xx))),
+                  sapply(dat3[,names(modelvars_iscont[!modelvars_iscont])]
+                         ,function(xx) cbind(table(xx,useNA='always'))));
+
+#modvarsumtab <- sapply(modelvars, function(ii){table(dat3[,ii],useNA = 'always')});
+#newmodvarstrata <- print(modvarstrata);
+#newmodvarsumtab <- print(modvarsumtab);
 
 modvarstratafile <- paste0(outputpath,'StrataComplicationsMissingTables.csv');
+modvartabfile <- paste0(outputpath,'SumComplicationsMissingTables.csv');
 sapply(names(modvarstrata), function(x) try({
   # this one just skips a few lines to make the output easier to read
-  write("\n\n",file=outfile,append=T);
+  write("\n\n",file=modvarstratafile,append=T);
   # this one writes the name of the table
-  write(x,file=outfile,append=T);
+  write(x,file=modvarstratafile,append=T);
   # this one writes the header manually because write.table is so dumb
-  write(",Present,Missing,p-adj",file=outfile,append=T);
+  write(",Present,Missing,p-adj",file=modvarstratafile,append=T);
   # writing the actual table
-  write.table( modvarstrata[[x]], file=outfile, na="", col.names=FALSE, row.names=TRUE
+  write.table( modvarstrata[[x]], file=modvarstratafile, na="", col.names=FALSE, row.names=TRUE
                , append= TRUE, sep=',' )
   }));
+sapply(names(modelvarstab),function(xx){
+  # Same as above
+  cat("\n\n",xx,"\n",file=modvartabfile,append=T);
+  write.table(modelvarsumtab[[xx]],file=modvartabfile,na="",col.names=F,row.names = T,append=T,sep=',');
+});
 #write.csv2(x=newmodvarstrata, file=paste(outputpath, 'StrataComplicationsMissingTables.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
-write.csv2(x=newmodvarsumtab, file=paste(outputpath, 'SumComplicationsMissingTables.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
+#write.csv2(x=newmodvarsumtab, file=paste(outputpath, 'SumComplicationsMissingTables.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
 
 #' ### Summary counts
 # subset(dat3,race=='White'|hispanic_ethnicity=='Yes') %>% 
