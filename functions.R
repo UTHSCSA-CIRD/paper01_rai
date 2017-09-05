@@ -127,9 +127,11 @@ stratatable <- function(xx,vars=NULL,...){
   xx <- transform(xx,...);
   mystrata <- setdiff(names(xx),nmx);
   res <- tableone::CreateTableOne(data=xx, vars= vars, strata=mystrata) %>% print;
+  # res[,'p'] %>%  gsub("<","", x=.) %>% trimws() %>%
+  #   as.numeric() %>% p.adjust() %>% cbind(res,padj=.) %>%
+  #   data.frame %>% dplyr::select(-test) -> res;
   res[,'p'] %>%  gsub("<","", x=.) %>% trimws() %>%
-    as.numeric() %>% p.adjust() %>% cbind(res,padj=.) %>%
-    data.frame %>% dplyr::select(-test) -> res;
+    as.numeric() %>% p.adjust() %>% cbind(res[,1:2],padj=.) -> res;
   return(res);
 }
 

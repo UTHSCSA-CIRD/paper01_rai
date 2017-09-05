@@ -193,12 +193,24 @@ dat3$hispanic_ethnicity<-factor(dat3$hispanic_ethnicity);
 # write.table(x=newmisstable, file=paste(outputpath, 'IncomeMissingTable.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
 
 modvarstrata <-sapply(modelvars,function(ii) {try(eval(parse(text=sprintf("stratatable(dat3,modelvars,str=is.na(%s)|%s=='Unknown')",ii,ii))))});
+modvarstrata <- modvarstrata[sapply(modvarstrata,class)=='matrix'];
 modvarsumtab <- sapply(modelvars, function(ii){table(dat3[,ii],useNA = 'always')});
 newmodvarstrata <- print(modvarstrata);
 newmodvarsumtab <- print(modvarsumtab);
 
-
-write.csv2(x=newmodvarstrata, file=paste(outputpath, 'StrataComplicationsMissingTables.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
+modvarstratafile <- paste0(outputpath,'StrataComplicationsMissingTables.csv');
+sapply(names(modvarstrata), function(x) try({
+  # this one just skips a few lines to make the output easier to read
+  write("\n\n",file=outfile,append=T);
+  # this one writes the name of the table
+  write(x,file=outfile,append=T);
+  # this one writes the header manually because write.table is so dumb
+  write(",Present,Missing,p-adj",file=outfile,append=T);
+  # writing the actual table
+  write.table( modvarstrata[[x]], file=outfile, na="", col.names=FALSE, row.names=TRUE
+               , append= TRUE, sep=',' )
+  }));
+#write.csv2(x=newmodvarstrata, file=paste(outputpath, 'StrataComplicationsMissingTables.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
 write.csv2(x=newmodvarsumtab, file=paste(outputpath, 'SumComplicationsMissingTables.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
 
 #' ### Summary counts
