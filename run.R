@@ -192,7 +192,11 @@ dat3$hispanic_ethnicity<-factor(dat3$hispanic_ethnicity);
 # newmisstable <- cbind(variables, newmisstable)
 # write.table(x=newmisstable, file=paste(outputpath, 'IncomeMissingTable.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
 
-modvarstrata <-sapply(modelvars,function(ii) {try(eval(parse(text=sprintf("stratatable(dat3,modelvars,str=is.na(%s)|%s=='Unknown')",ii,ii))))});
+modvarstrata <-sapply(modelvars,function(ii) {
+  try(
+    eval(
+      parse(text=sprintf("stratatable(dat3,modelvars,str=is.na(%s)|%s=='Unknown')",ii,ii))))
+  });
 modvarstrata <- modvarstrata[sapply(modvarstrata,class)=='matrix'];
 
 #' Let's treat the variables with more than 6 distinct values as continuous and
@@ -226,7 +230,7 @@ sapply(names(modvarstrata), function(x) try({
   write.table( modvarstrata[[x]], file=modvarstratafile, na="", col.names=FALSE, row.names=TRUE
                , append= TRUE, sep=',' )
   }));
-sapply(names(modelvarstab),function(xx){
+sapply(names(modelvarsumtab),function(xx){
   # Same as above
   cat("\n\n",xx,"\n",file=modvartabfile,append=T);
   write.table(modelvarsumtab[[xx]],file=modvartabfile,na="",col.names=F,row.names = T,append=T,sep=',');
