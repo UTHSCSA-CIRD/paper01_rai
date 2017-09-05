@@ -187,13 +187,19 @@ dat3$hispanic_ethnicity<-factor(dat3$hispanic_ethnicity);
 # newmisstable2[,'p'] %>%  gsub("<","", x=.) %>% trimws() %>%
 #   as.numeric() %>% p.adjust() %>% cbind(newmisstable2,padj=.) %>%
 #   data.frame %>% select(-test) -> newmisstable2;
-
-foo<-sapply(foovars,function(ii) {try(eval(parse(text=sprintf("stratatable(dat3,foovars,str=is.na(%s)|%s=='Unknown')",ii,ii))))})
-test <- sapply(foovars, function(ii){table(dat3[,ii],useNA = 'always')})
 #' writing output to a 'Results' folder:
-variables <- rownames(newmisstable)
-newmisstable <- cbind(variables, newmisstable)
-write.table(x=newmisstable, file=paste(outputpath, 'IncomeMissingTable.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
+# variables <- rownames(newmisstable)
+# newmisstable <- cbind(variables, newmisstable)
+# write.table(x=newmisstable, file=paste(outputpath, 'IncomeMissingTable.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
+
+modvarstrata <-sapply(modelvars,function(ii) {try(eval(parse(text=sprintf("stratatable(dat3,modelvars,str=is.na(%s)|%s=='Unknown')",ii,ii))))});
+modvarsumtab <- sapply(modelvars, function(ii){table(dat3[,ii],useNA = 'always')});
+newmodvarstrata <- print(modvarstrata);
+newmodvarsumtab <- print(modvarsumtab);
+
+
+write.csv2(x=newmodvarstrata, file=paste(outputpath, 'StrataComplicationsMissingTables.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
+write.csv2(x=newmodvarsumtab, file=paste(outputpath, 'SumComplicationsMissingTables.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
 
 #' ### Summary counts
 # subset(dat3,race=='White'|hispanic_ethnicity=='Yes') %>% 
