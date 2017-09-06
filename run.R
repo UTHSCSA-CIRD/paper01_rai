@@ -9,11 +9,12 @@
 #' 
 #' ## Load libraries
 #+ warning=FALSE, message=FALSE
-rq_libs <- c('compiler'                              # just-in-time compilation
-             ,'survival','MASS','Hmisc','zoo','coin' # various analysis methods
-             ,'readr','dplyr','stringr','magrittr'   # data manipulation & piping
-             ,'ggplot2','ggfortify','grid','GGally'  # plotting
-             ,'stargazer','broom', 'tableone');                  # table formatting
+rq_libs <- c('compiler'                                   # just-in-time compilation
+             ,'MatchIt','DHARMa'                          # propensity scores and glm residuals
+             ,'survival','MASS','Hmisc','zoo','coin'      # various analysis methods
+             ,'readr','dplyr','stringr','magrittr'        # data manipulation & piping
+             ,'ggplot2','ggfortify','grid','GGally'       # plotting
+             ,'stargazer','broom', 'tableone','janitor'); # table formatting
 rq_installed <- sapply(rq_libs,require,character.only=T);
 rq_need <- names(rq_installed[!rq_installed]);
 if(length(rq_need)>0) install.packages(rq_need,repos='https://cran.rstudio.com/',dependencies = T);
