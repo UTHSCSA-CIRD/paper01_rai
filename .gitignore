@@ -37,6 +37,7 @@ vignettes/*.pdf
 *.Rout
 
 # Local configuration
+local
 config.R
 
 # Other temp files
