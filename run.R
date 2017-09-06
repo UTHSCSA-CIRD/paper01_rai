@@ -314,3 +314,40 @@ anova(update(glmp_cd4_aic,.~a_rai),update(glmp_cd4_aic,.~.+a_rai),test='LRT');
 #' And does RAI improve it?
 anova(glmp_cd4_aic,update(glmp_cd4_aic,.~.+a_rai),test='LRT');
 #' A little
+#' 
+#' ## The Rockwood Scale
+#' 
+#' ...sounds crazy but it actually works. According to Mitnitski, Mogilner and 
+#' Rockwood The Scientific World 2001, you just add together a large number of 
+#' binary deficits and divide by the number of non-missing data elements for that
+#' patient and that's your score! Here I calculate it on every Yes/No preop risk
+#' except those whose time window is less than a week, plus creatinine > 30.
+#' 
+#' Lo and behold we get a distribution that looks a lot like what Mitnitski et al
+#' published, and a strong correlation with number of postop complications.
+rockwood <- with(dat4,(
+  as.numeric(bmi>=25)+
+    as.numeric(origin_status!='Not transferred (admitted from home)')+
+    as.numeric(diabetes_mellitus!='No')+
+    as.numeric(current_smoker_within_1_year=='Yes')+
+    as.numeric(dyspnea!='No')+
+    as.numeric(!functnal_heath_status%in%c('Independent','Unknown'))+
+    as.numeric(vent_dependent=='Yes')+
+    as.numeric(history_severe_copd=='Yes')+
+    as.numeric(ascites_30_dy_prior_surg=='Yes')+
+    as.numeric(hypertensn_req_medicatn=='Yes')+
+    as.numeric(acute_renal_failure=='Yes')+
+    as.numeric(currently_dialysis=='Yes')+
+    as.numeric(disseminated_cancer=='Yes')+
+    as.numeric(open_wound=='Yes')+
+    as.numeric(steroid_immunosupp=='Yes')+
+    as.numeric(x_loss_bw_6_months_prior_surg=='Yes')+
+    as.numeric(bleeding_disorder=='Yes')+
+    as.numeric(chr_30_dy_prior_surg=='Yes')+
+    as.numeric(isTRUE(serum_creatinine>3))
+)/(
+  19-
+    as.numeric(functnal_heath_status=='Unknown')-
+    as.numeric(is.na(serum_creatinine))
+  )
+);
