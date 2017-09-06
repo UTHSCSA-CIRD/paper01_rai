@@ -213,8 +213,10 @@ modelvarsumtab <- c(sapply(dat3[,names(modelvars_iscont[modelvars_iscont])]
 #newmodvarstrata <- print(modvarstrata);
 #newmodvarsumtab <- print(modvarsumtab);
 
-modvarstratafile <- paste0(outputpath,'StrataComplicationsMissingTables.csv');
-modvartabfile <- paste0(outputpath,'SumComplicationsMissingTables.csv');
+modvarstratafile <- paste0(outputpath,'StrataComplicationsMissingTables'
+                           ,gsub(" ","_",paste0(Sys.time(),'CDT.csv')));
+modvartabfile <- paste0(outputpath,'SumComplicationsMissingTables'
+                        ,gsub(" ","_",paste0(Sys.time(),'CDT.csv')));
 sapply(names(modvarstrata), function(x) try({
   # this one just skips a few lines to make the output easier to read
   write("\n\n",file=modvarstratafile,append=T);
@@ -226,7 +228,7 @@ sapply(names(modvarstrata), function(x) try({
   write.table( modvarstrata[[x]], file=modvarstratafile, na="", col.names=FALSE, row.names=TRUE
                , append= TRUE, sep=',' )
   }));
-sapply(names(modelvarstab),function(xx){
+sapply(names(modelvarsumtab),function(xx){
   # Same as above
   cat("\n\n",xx,"\n",file=modvartabfile,append=T);
   write.table(modelvarsumtab[[xx]],file=modvartabfile,na="",col.names=F,row.names = T,append=T,sep=',');
@@ -272,12 +274,26 @@ sapply(names(modelvarstab),function(xx){
 resps <- c('a_postop','a_cd4');
 
 #' ### Create your random sample
-.Random.seed <- 20170816;
+.Random.seed <- 20170816; #<= why do we have a '.' in front of 'Random.seed'?
 pat_samp <- sample(dat3$idn_mrn,1000,rep=T);
 dat4 <- subset(dat3,idn_mrn %in% pat_samp);
 
-#ggduo(dat4,union(cnum,cintgr),resps);
-#ggduo(dat4,union(ctf,cfactr),resps);
+#plotting graphs:
+cnum <- vartype(dat4, 'numeric'); #<= I created this function in 'functions.R' file
+cintgr <- vartype(dat4, 'integer');
+ctf <- vartype(dat4, 'logical');
+cfactr <- vartype(dat4, 'factor');
+ggduo(dat4,union(cnum[1:2],cintgr[1:2]),resps);
+ggduo(dat4,union(ctf,cfactr),resps);
+
+#the following plots are interesting:
+ggduo(dat4, columnsX='income_final', columnsY=c('a_postop','a_cd4'), resps);
+ggduo(dat4, columnsX='age_at_time_surg', columnsY=c('a_postop','a_cd4'), resps);
+ggduo(dat4, columnsY='age_at_time_surg', columnsX=c('hispanic_ethnicity'), resps);
+ggduo(dat4, columnsY='income_final', columnsX=c('hispanic_ethnicity'), resps);
+ggduo(dat4, columnsY='hispanic_ethnicity', columnsX=c('a_postop','a_cd4'), resps);
+
+
 #' The goal is to find the most obvious relationships beteen
 #' predictors and variables.
 
