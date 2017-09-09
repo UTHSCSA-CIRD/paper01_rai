@@ -290,7 +290,19 @@ dat4 <- subset(dat3,idn_mrn %in% pat_samp);
 #' methodical way that you can start making decisions about how
 #' to analyze it. For example...
 glmpostop <- glm(a_postop~1,dat4,family='poisson');
-glmpostopaic <- stepAIC(update(glmpostop,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+income_final)^3),direction='both');
+glmpostopaic <- stepAIC(
+  
+  update(glmpostop
+         ,data=mutate(dat4
+                      ,income_final=scale(income_final)
+                      ,age_at_time_surg=scale(age_at_time_surg))
+         ,subset=!is.na(income_final))
+  
+  ,scope=list(lower=.~1
+              ,upper=.~(a_rai+hispanic_ethnicity+income_final+age_at_time_surg)^3)
+  
+  ,direction='both');
+#glmpostopaic <- stepAIC(update(glmpostop,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+income_final+age_at_time_surg)^3),direction='both');
 summary(glmpostopaic);
 glmcd4 <- glm(a_cd4~1,dat4,family='poisson');
 glmcd4aic <- stepAIC(update(glmcd4,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+income_final)^3),direction='both');
