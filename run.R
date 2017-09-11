@@ -393,3 +393,28 @@ anova(update(glmp_cd4_aic,.~a_rai),update(glmp_cd4_aic,.~.+a_rai),test='LRT');
 anova(glmp_cd4_aic,update(glmp_cd4_aic,.~.+a_rai),test='LRT');
 #' A little
 #' 
+
+#' ## (yet another) summary demographic table for NSQIP
+#' 
+#' (with patients aged 60-89)
+#' 
+subset(dat2,between((Sys.time() - dt_birth)/365.25,60,89)) %>% 
+  mutate(income=income_final/1000
+         ,age=(Sys.time()-dt_birth)/365.25
+         ,ohw=(ifelse(hispanic_ethnicity=='Yes'
+                      ,'Hispanic'
+                      ,ifelse(race=='White'
+                              ,'White'
+                              ,'Other')))) %>% 
+  group_by(ohw,gender) %>% 
+  summarise(N=n()
+            ,mage=sprintf('%0.1f (%0.1f, %0.1f)'
+                          ,median(age,na.rm=T)
+                          ,quantile(age,.25,na.rm=T)
+                          ,quantile(age,.75,na.rm=T))
+            ,inc=sprintf('%0.0f (%0.0f, %0.0f)'
+                         ,median(income,na.rm=T)
+                         ,quantile(income,.25,na.rm=T)
+                         ,quantile(income,.75,na.rm=T))) %>%
+  View;
+
