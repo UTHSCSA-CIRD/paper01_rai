@@ -11,6 +11,7 @@
 #+ warning=FALSE, message=FALSE
 rq_libs <- c('compiler'                                   # just-in-time compilation
              ,'MatchIt','DHARMa'                          # propensity scores and glm residuals
+             ,'pscl'                                      # zero-inflated poisson, sigh
              ,'survival','MASS','Hmisc','zoo','coin'      # various analysis methods
              ,'readr','dplyr','stringr','magrittr'        # data manipulation & piping
              ,'ggplot2','ggfortify','grid','GGally'       # plotting
@@ -326,8 +327,8 @@ sapply(names(modelvarsumtab),function(xx){
 resps <- c('a_postop','a_cd4');
 
 #' ### Create your random sample
-.Random.seed <- 20170816;
-pat_samp <- sample(dat3$idn_mrn,1000,rep=T);
+source('random_seed.R');
+pat_samp <- sample(dat3$idn_mrn,1000,rep=F);
 dat4 <- subset(dat3,idn_mrn %in% pat_samp);
 
 #' How well does Rockwood correlate with RAI-A?
@@ -366,11 +367,11 @@ survfit(Surv.a_t..a_c.~.fitted>median(.fitted),data=augment(cxrck)) %>%
 #' to analyze it. For example...
 glmpostop <- glm(a_postop~1,dat4,family='poisson');
 glmpostopaic <- stepAIC(update(glmpostop,subset=!is.na(income_final))
-                        ,scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+income_final)^3)
+                        ,scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+age_at_time_surg+income_final)^3)
                         ,direction='both');
 summary(glmpostopaic);
 glmcd4 <- glm(a_cd4~1,dat4,family='poisson');
-glmcd4aic <- stepAIC(update(glmcd4,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+income_final)^3),direction='both');
+glmcd4aic <- stepAIC(update(glmcd4,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+age_at_time_surg+income_final)^3),direction='both');
 summary(glmcd4aic);
 #' BUt this is kind of a waste of time because RAI-A was never properly weighted.
 #' Let's fix that...
