@@ -336,6 +336,17 @@ smoothScatter(dat4$a_rockwood
               ,dat4$a_rai
               ,bandwidth = c(.03,.5)
               ,nrpoints = 0);
+#' ### Plot of percent having any complication versus ethnicity and RAI bin
+mutate(dat4,a_drai=cut(dat4$a_rai,c(0,15,21,Inf),right = F)) %>% 
+  # if you are grouping by something else, edit the next line
+  group_by(hispanic_ethnicity,a_drai) %>% 
+  # the mean of a T/F variable is the percent TRUE
+  summarise(a_postop=mean(a_postop>0)) %>% 
+  # if you are grouping by something else, update to match the group_by
+  ggplot(aes(x=a_drai,y=a_postop,fill=hispanic_ethnicity)) + 
+  geom_bar(stat='identity');
+
+
 tidy(lmrr<-lm(a_rockwood~a_rai,dat4));
 glance(lmrr);
 cxbase<-coxph(Surv(a_t,a_c)~1,dat4);
