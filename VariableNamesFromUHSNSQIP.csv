@@ -1,6 +1,6 @@
 dataset_column_names,NSQIP_NAMES,c_cd4,c_postop,c_canbepatos,c_patos,c_date,c_rai,c_noyes,c_count,c_num,c_tabsie
 idn_mrn,,,,,,,,,,,
-income_final,,,,,,,,,,,
+income_final,,,,,,,,,,,T
 age_at_time_surg,Age at Time of Surgery,,,,,,T,,,T,T
 gender,Gender,,,,,,T,,,,T
 race,Race,,,,,,,,,,T
