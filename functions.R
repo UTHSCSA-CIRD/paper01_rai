@@ -209,3 +209,13 @@ raiscore.bak <- function(xx){
 #' named in the first argument is true. The first arg can be either a string or 
 #' a name. The second must be a data.frame
 v <- function(var,dictionary=dct0) {cc<-substitute(var);na.omit(dictionary[dictionary[[as.character(cc)]],'dataset_column_names'])[[1]]}
+
+#' Returns a vector of column names that contain data elements of a particular type
+#' as specified by the user: "integer","POSIXct" "POSIXt", "numeric", "character", 
+#' "factor" and "logical". 
+vartype <- function(dat, ctype) {
+  xx <- unlist(sapply(dat, class));
+  idx <- which(xx %in% ctype);
+  res <- names(xx)[idx];
+  return(res)
+}

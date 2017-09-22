@@ -281,8 +281,10 @@ modelvarsumtab <- c(sapply(dat3[,names(modelvars_iscont[modelvars_iscont])]
 #newmodvarstrata <- print(modvarstrata);
 #newmodvarsumtab <- print(modvarsumtab);
 
-modvarstratafile <- paste0(outputpath,'StrataComplicationsMissingTables.csv');
-modvartabfile <- paste0(outputpath,'SumComplicationsMissingTables.csv');
+modvarstratafile <- paste0(outputpath,'StrataComplicationsMissingTables'
+                           ,gsub(" ","_",paste0(Sys.time(),'CDT.csv')));
+modvartabfile <- paste0(outputpath,'SumComplicationsMissingTables'
+                        ,gsub(" ","_",paste0(Sys.time(),'CDT.csv')));
 sapply(names(modvarstrata), function(x) try({
   # this one just skips a few lines to make the output easier to read
   write("\n\n",file=modvarstratafile,append=T);
@@ -317,6 +319,40 @@ sapply(names(modelvarsumtab),function(xx){
 #   setNames(c('Sex','Hispanic','Age (SD)','No Comp (N)','Income No Comp (IQR)','Income Comp (IQR)','CvDn4 (N)','Postop (N)')) ->   summary_counts;
 # 
 # write_tsv(summary_counts,'summary_counts.tsv');
+
+
+#'  creating tables similar to the tables that Dan MacCarthy creates for the VASQIP data:
+dat3$rai_range <- cut(dat3$a_rai, breaks=c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55));
+
+dat3 %>% group_by(rai_range) %>% 
+summarize(`RAI Range` = n(), `Non-Elective Surgery` = sum(elective_surg=='No')
+          ,`Non-Elective Surgery Fraction` = mean(elective_surg=='No')
+          ,`Emergency Case N` = sum(emergency_case=='Yes')
+          ,`Emergency Case Fraction` = mean(emergency_case=='Yes')
+          ,`Died 30days N` = sum(postop_death_30_dy_proc =='Yes') 
+          ,`Died 30days Fraction` = mean(postop_death_30_dy_proc =='Yes')
+          ,`Complications 30days N` = sum(a_any_postop=='TRUE')
+          ,`Complications 30days Fraction` = mean(a_any_postop=='TRUE')
+          ,`Clavien-Dindo Grade4 30days N` = sum(a_any_cd4=='TRUE')
+          ,`Clavien-Dindo Grade4 30days Fraction` = mean(a_any_cd4=='TRUE')
+          ) %>% 
+  mutate(`Cumulative Count`=cumsum(`RAI Range`)) %>% View();
+          
+
+
+# reminder: you can sum over T/F values (and average over them too)
+# 
+# if it's not T/F, this might not always be reliable... foo == bar
+# ...if NAs exist... so for a strictly T/F output use isTRUE(foo == bar)
+# 
+# Second sheet, as you said, is a job for table(...)
+# 
+# Ditto third sheet.
+# 
+# Done!
+# 
+# (don't forget to commit your changes)
+# 
 
 #' ## Exploration
 #' 
@@ -360,12 +396,12 @@ group_by(dat4,hispanic_ethnicity,a_discrete_rai) %>%
   geom_bar(stat='identity');
 
 # create tabsie dataset for visualization
-mktabsie(dat4
-         ,c(Full=T,OnlyPostop=bquote(a_postop!=0),OnlyNoPostop=bquote(a_postop==0))
-         ,pw=shinypw
-         ,serverTitle = 'RAI Pilot Project'
-         ,serverStatement = bquote(h4("Now we can each see the data. Please note, only pairwise comparisons are available with this tool."))
-         ,vars=tabsievars);
+# mktabsie(dat4
+#          ,c(Full=T,OnlyPostop=bquote(a_postop!=0),OnlyNoPostop=bquote(a_postop==0))
+#          ,pw=shinypw
+#          ,serverTitle = 'RAI Pilot Project'
+#          ,serverStatement = bquote(h4("Now we can each see the data. Please note, only pairwise comparisons are available with this tool."))
+#          ,vars=tabsievars);
 
 tidy(lmrr<-lm(a_rockwood~a_rai,dat4));
 glance(lmrr);
@@ -390,6 +426,23 @@ survfit(Surv.a_t..a_c.~.fitted>median(.fitted),data=augment(cxrck)) %>%
   ggtitle('Rockwood Index as Predictor of 30 Mortality or Readmission');
 #ggduo(dat4,union(cnum,cintgr),resps);
 #ggduo(dat4,union(ctf,cfactr),resps);
+
+#plotting graphs:
+cnum <- vartype(dat4, 'numeric'); #<= I created this function in 'functions.R' file
+cintgr <- vartype(dat4, 'integer');
+ctf <- vartype(dat4, 'logical');
+cfactr <- vartype(dat4, 'factor');
+ggduo(dat4,union(cnum[1:2],cintgr[1:2]),resps);
+ggduo(dat4,union(ctf,cfactr),resps);
+
+#the following plots are interesting:
+ggduo(dat4, columnsX='income_final', columnsY=c('a_postop','a_cd4'), resps);
+ggduo(dat4, columnsX='age_at_time_surg', columnsY=c('a_postop','a_cd4'), resps);
+ggduo(dat4, columnsY='age_at_time_surg', columnsX=c('hispanic_ethnicity'), resps);
+ggduo(dat4, columnsY='income_final', columnsX=c('hispanic_ethnicity'), resps);
+ggduo(dat4, columnsY='hispanic_ethnicity', columnsX=c('a_postop','a_cd4'), resps);
+
+
 #' The goal is to find the most obvious relationships beteen
 #' predictors and variables.
 
