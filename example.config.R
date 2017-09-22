@@ -17,3 +17,4 @@
 workdir <- '/tmp/paper01_rai/';
 #' ## Used by run.R. Please put a path to your nsqip CSV file here.
 inputdata <- '/home/a/dx/16_rai.shireman/in/PHI_170817_NSQIP.csv';
+shinypw <- '';

@@ -113,6 +113,20 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     }
   }
 } 
+#' ### Specific to UT Health, for now...
+mktabsie <- function(data,subsets=list(Full=T),pw
+                     ,vars
+                     ,filepath='.'
+                     ,filename='survSave.rdata'
+                     ,serverTitle='TABSIE'
+                     ,serverStatement=bquote(h4("Welcome to TABSIE"))){
+  serverData <- sapply(subsets,function(ii) subset(data[,vars],eval(ii)),simplify=F);
+  browser();
+  serverDataDic <- names(serverData);
+  serverHash <- digest::digest(pw,algo='sha512',ascii=TRUE);
+  save(serverStatement,serverData,serverDataDic,serverTitle,serverHash
+       ,file=paste0(filepath,'/',filename));
+}
 
 #' ### Specific to RAI-A
 #' 

@@ -153,7 +153,13 @@ c_cd4_count <- intersect(v(c_cd4),v(c_count));
 dat1$a_cd4 <- rowSums(dat1[,c_cd4_count]) + 
   apply(dat1[,c_cd4_yesno],1,function(xx) sum(na.omit(xx=='Yes')));
 
+#' TRUE/FALSE variables for postop and cd4 in both cases
+#' indicating whether or not the patient had _any_ complications
+dat1$a_any_cd4 <- factor(dat1$a_cd4>0);
+dat1$a_any_postop <- factor(dat1$a_postop>0);
+
 dat1$a_transfer <- dat1$origin_status!='Not transferred (admitted from home)';
+
 
 #' Time from surgery to adverse outcome if any
 dat1$a_t <- with(dat1
@@ -170,6 +176,10 @@ dat1$a_t[is.na(dat1$a_t)] <- 30;
 dat1$a_c <- dat1$a_t!=30;
 #' Obtain the RAI score
 dat1$a_rai <- raiscore(dat1);
+dat1$a_discrete_rai <- cut(dat1$a_rai
+                           ,c(0,15,21,Inf)
+                           ,right = F
+                           ,labels = c('Non Frail','Pre Frail','Frail'));
 
 #' ## The Rockwood Scale
 #' 
@@ -207,6 +217,9 @@ dat1$a_rockwood <- with(dat1,(
     as.numeric(is.na(serum_creatinine))
 ));
 
+tabsievars <- c(v('c_tabsie')
+                ,'a_postop','a_any_postop','a_cd4','a_any_cd4'
+                ,'a_rai','a_discrete_rai','a_rockwood');
 #' ## Transform Rows
 #'
 #' ### Sort the rows by patient ID and then by date of surgery, ascending
@@ -364,11 +377,29 @@ source('random_seed.R');
 pat_samp <- sample(dat3$idn_mrn,1000,rep=F);
 dat4 <- subset(dat3,idn_mrn %in% pat_samp);
 
+#' Create a tabsie object for visualization
 #' How well does Rockwood correlate with RAI-A?
 smoothScatter(dat4$a_rockwood
               ,dat4$a_rai
               ,bandwidth = c(.03,.5)
               ,nrpoints = 0);
+#' ### Plot of percent having any complication versus ethnicity and RAI bin
+# if you are grouping by something else, edit the next line
+group_by(dat4,hispanic_ethnicity,a_discrete_rai) %>% 
+  # the mean of a T/F variable is the percent TRUE
+  summarise(a_any_postop=mean(a_any_postop)) %>% 
+  # if you are grouping by something else, update to match the group_by
+  ggplot(aes(x=a_discrete_rai,y=a_any_postop,fill=hispanic_ethnicity)) + 
+  geom_bar(stat='identity');
+
+# create tabsie dataset for visualization
+mktabsie(dat4
+         ,c(Full=T,OnlyPostop=bquote(a_postop!=0),OnlyNoPostop=bquote(a_postop==0))
+         ,pw=shinypw
+         ,serverTitle = 'RAI Pilot Project'
+         ,serverStatement = bquote(h4("Now we can each see the data. Please note, only pairwise comparisons are available with this tool."))
+         ,vars=tabsievars);
+
 tidy(lmrr<-lm(a_rockwood~a_rai,dat4));
 glance(lmrr);
 cxbase<-coxph(Surv(a_t,a_c)~1,dat4);
