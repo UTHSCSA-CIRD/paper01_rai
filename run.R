@@ -9,11 +9,13 @@
 #' 
 #' ## Load libraries
 #+ warning=FALSE, message=FALSE
-rq_libs <- c('compiler'                              # just-in-time compilation
-             ,'survival','MASS','Hmisc','zoo','coin' # various analysis methods
-             ,'readr','dplyr','stringr','magrittr'   # data manipulation & piping
-             ,'ggplot2','ggfortify','grid','GGally'  # plotting
-             ,'stargazer','broom', 'tableone');                  # table formatting
+rq_libs <- c('compiler'                                   # just-in-time compilation
+             ,'MatchIt','DHARMa'                          # propensity scores and glm residuals
+             ,'pscl'                                      # zero-inflated poisson, sigh
+             ,'survival','MASS','Hmisc','zoo','coin'      # various analysis methods
+             ,'readr','dplyr','stringr','magrittr'        # data manipulation & piping
+             ,'ggplot2','ggfortify','grid','GGally'       # plotting
+             ,'stargazer','broom', 'tableone','janitor'); # table formatting
 rq_installed <- sapply(rq_libs,require,character.only=T);
 rq_need <- names(rq_installed[!rq_installed]);
 if(length(rq_need)>0) install.packages(rq_need,repos='https://cran.rstudio.com/',dependencies = T);
@@ -153,8 +155,57 @@ dat1$a_cd4 <- rowSums(dat1[,c_cd4_count]) +
 
 dat1$a_transfer <- dat1$origin_status!='Not transferred (admitted from home)';
 
+#' Time from surgery to adverse outcome if any
+dat1$a_t <- with(dat1
+                 ,pmin(
+                   dt_death
+                   ,dt_first_readm
+                   ,dt_first_unpl_ret_or
+                   ,dt_second_unp_ret,na.rm = T) %>% 
+                   difftime(proc_surg_finish,units='days') %>%
+                   as.numeric());
+#' Censor the variables at 30 days
+dat1$a_t[dat1$a_t>30] <- 30;
+dat1$a_t[is.na(dat1$a_t)] <- 30;
+dat1$a_c <- dat1$a_t!=30;
 #' Obtain the RAI score
 dat1$a_rai <- raiscore(dat1);
+
+#' ## The Rockwood Scale
+#' 
+#' ...sounds crazy but it actually works. According to Mitnitski, Mogilner and 
+#' Rockwood The Scientific World 2001, you just add together a large number of 
+#' binary deficits and divide by the number of non-missing data elements for that
+#' patient and that's your score! Here I calculate it on every Yes/No preop risk
+#' except those whose time window is less than a week, plus creatinine > 30.
+#' 
+#' Lo and behold we get a distribution that looks a lot like what Mitnitski et al
+#' published, and a strong correlation with number of postop complications.
+dat1$a_rockwood <- with(dat1,(
+  as.numeric(bmi>=25)+
+    as.numeric(origin_status!='Not transferred (admitted from home)')+
+    as.numeric(diabetes_mellitus!='No')+
+    as.numeric(current_smoker_within_1_year=='Yes')+
+    as.numeric(dyspnea!='No')+
+    as.numeric(!functnal_heath_status%in%c('Independent','Unknown'))+
+    as.numeric(vent_dependent=='Yes')+
+    as.numeric(history_severe_copd=='Yes')+
+    as.numeric(ascites_30_dy_prior_surg=='Yes')+
+    as.numeric(hypertensn_req_medicatn=='Yes')+
+    as.numeric(acute_renal_failure=='Yes')+
+    as.numeric(currently_dialysis=='Yes')+
+    as.numeric(disseminated_cancer=='Yes')+
+    as.numeric(open_wound=='Yes')+
+    as.numeric(steroid_immunosupp=='Yes')+
+    as.numeric(x_loss_bw_6_months_prior_surg=='Yes')+
+    as.numeric(bleeding_disorder=='Yes')+
+    as.numeric(chr_30_dy_prior_surg=='Yes')+
+    as.numeric(isTRUE(serum_creatinine>3))
+)/(
+  19-
+    as.numeric(functnal_heath_status=='Unknown')-
+    as.numeric(is.na(serum_creatinine))
+));
 
 #' ## Transform Rows
 #'
@@ -192,7 +243,11 @@ dat3$hispanic_ethnicity<-factor(dat3$hispanic_ethnicity);
 # newmisstable <- cbind(variables, newmisstable)
 # write.table(x=newmisstable, file=paste(outputpath, 'IncomeMissingTable.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
 
-modvarstrata <-sapply(modelvars,function(ii) {try(eval(parse(text=sprintf("stratatable(dat3,modelvars,str=is.na(%s)|%s=='Unknown')",ii,ii))))});
+modvarstrata <-sapply(modelvars,function(ii) {
+  try(
+    eval(
+      parse(text=sprintf("stratatable(dat3,modelvars,str=is.na(%s)|%s=='Unknown')",ii,ii))))
+  });
 modvarstrata <- modvarstrata[sapply(modvarstrata,class)=='matrix'];
 
 #' Let's treat the variables with more than 6 distinct values as continuous and
@@ -274,9 +329,38 @@ sapply(names(modelvarsumtab),function(xx){
 resps <- c('a_postop','a_cd4');
 
 #' ### Create your random sample
-.Random.seed <- 20170816; #<= why do we have a '.' in front of 'Random.seed'?
-pat_samp <- sample(dat3$idn_mrn,1000,rep=T);
+source('random_seed.R');
+pat_samp <- sample(dat3$idn_mrn,1000,rep=F);
 dat4 <- subset(dat3,idn_mrn %in% pat_samp);
+
+#' How well does Rockwood correlate with RAI-A?
+smoothScatter(dat4$a_rockwood
+              ,dat4$a_rai
+              ,bandwidth = c(.03,.5)
+              ,nrpoints = 0);
+tidy(lmrr<-lm(a_rockwood~a_rai,dat4));
+glance(lmrr);
+cxbase<-coxph(Surv(a_t,a_c)~1,dat4);
+#' How predictive is RAI of deaths and readmissions?
+tidy(cxrai <- update(cxbase,.~a_rai));
+glance(cxrai);
+survfit(Surv.a_t..a_c.~.fitted>median(.fitted),data=augment(cxrai)) %>% 
+  autoplot(ylim=c(.75,1)) +
+  labs(x='Time in Days', y = 'Event-Free') +
+  scale_fill_discrete('RAI-A   ',labels=c('Low','High')) +
+  scale_color_discrete('RAI-A   ',labels=c('Low','High')) +
+  ggtitle('RAI-A as Predictor of 30 Mortality or Readmission');
+#' How predictive is Rockwood of deaths and readmissions?
+tidy(cxrck <- update(cxbase,.~a_rockwood));
+glance(cxrck);
+survfit(Surv.a_t..a_c.~.fitted>median(.fitted),data=augment(cxrck)) %>% 
+  autoplot(ylim=c(.75,1)) +
+  labs(x='Time in Days', y = 'Event-Free') +
+  scale_fill_discrete('Rockwood',labels=c('Low','High')) +
+  scale_color_discrete('Rockwood',labels=c('Low','High')) +
+  ggtitle('Rockwood Index as Predictor of 30 Mortality or Readmission');
+#ggduo(dat4,union(cnum,cintgr),resps);
+#ggduo(dat4,union(ctf,cfactr),resps);
 
 #plotting graphs:
 cnum <- vartype(dat4, 'numeric'); #<= I created this function in 'functions.R' file
@@ -301,12 +385,15 @@ ggduo(dat4, columnsY='hispanic_ethnicity', columnsX=c('a_postop','a_cd4'), resps
 #' methodical way that you can start making decisions about how
 #' to analyze it. For example...
 glmpostop <- glm(a_postop~1,dat4,family='poisson');
-glmpostopaic <- stepAIC(update(glmpostop,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+income_final)^3),direction='both');
+glmpostopaic <- stepAIC(update(glmpostop,subset=!is.na(income_final))
+                        ,scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+age_at_time_surg+income_final)^3)
+                        ,direction='both');
 summary(glmpostopaic);
 glmcd4 <- glm(a_cd4~1,dat4,family='poisson');
-glmcd4aic <- stepAIC(update(glmcd4,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+income_final)^3),direction='both');
+glmcd4aic <- stepAIC(update(glmcd4,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+age_at_time_surg+income_final)^3),direction='both');
 summary(glmcd4aic);
-#' BUt this is kind of a waste of time because RAI-A was never properly weighted. Let's fix that...
+#' BUt this is kind of a waste of time because RAI-A was never properly weighted.
+#' Let's fix that...
 glmp_cd4<-glm(a_cd4~gender+x_loss_bw_6_months_prior_surg+dyspnea+currently_dialysis+chr_30_dy_prior_surg+functnal_heath_status+disseminated_cancer*age_at_time_surg+serum_creatinine+a_transfer
               ,dat4,subset=!is.na(serum_creatinine)&dyspnea!='At Rest'&functnal_heath_status!='Unknown',family='poisson');
 #' Can we improve on RAI by adding the above fitted model?
@@ -325,3 +412,29 @@ anova(update(glmp_cd4_aic,.~a_rai),update(glmp_cd4_aic,.~.+a_rai),test='LRT');
 #' And does RAI improve it?
 anova(glmp_cd4_aic,update(glmp_cd4_aic,.~.+a_rai),test='LRT');
 #' A little
+#' 
+
+#' ## (yet another) summary demographic table for NSQIP
+#' 
+#' (with patients aged 60-89)
+#' 
+subset(dat2,between((Sys.time() - dt_birth)/365.25,60,89)) %>% 
+  mutate(income=income_final/1000
+         ,age=(Sys.time()-dt_birth)/365.25
+         ,ohw=(ifelse(hispanic_ethnicity=='Yes'
+                      ,'Hispanic'
+                      ,ifelse(race=='White'
+                              ,'White'
+                              ,'Other')))) %>% 
+  group_by(ohw,gender) %>% 
+  summarise(N=n()
+            ,mage=sprintf('%0.1f (%0.1f, %0.1f)'
+                          ,median(age,na.rm=T)
+                          ,quantile(age,.25,na.rm=T)
+                          ,quantile(age,.75,na.rm=T))
+            ,inc=sprintf('%0.0f (%0.0f, %0.0f)'
+                         ,median(income,na.rm=T)
+                         ,quantile(income,.25,na.rm=T)
+                         ,quantile(income,.75,na.rm=T))) %>%
+  View;
+
