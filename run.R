@@ -307,6 +307,37 @@ sapply(names(modelvarsumtab),function(xx){
 # 
 # write_tsv(summary_counts,'summary_counts.tsv');
 
+
+#'  creating tables similar to the tables that Dan MacCarthy creates for the VASQIP data:
+dat3$rai_range <- cut(dat3$a_rai, breaks=c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55));
+
+dat3 %>% group_by(rai_range) %>% 
+summarize(`RAI Range` = n(), `Elective Surgery Yes` = sum(elective_surg=='Yes')
+          ,`Elective Surgery No` = sum(elective_surg=='No')
+          ,`Elective Surgery Unknow` = sum(elective_surg=='Unknown')
+          ,`Died 30days N` = sum(postop_death_30_dy_proc =='Yes') 
+          ,`Died 30days Fraction` = mean(postop_death_30_dy_proc =='Yes')
+          ,`Complications 30days N` = sum(a_any_postop)
+          ,`Complications 30days Fraction` = mean(a_any_postop)
+          ,`Clavien-Dindo Grade4 30days N` = sum(a_any_cd4)
+          ,`Clavien-Dindo Grade4 30days Fraction` = mean(a_any_cd4)) %>% View();
+          
+
+
+reminder: you can sum over T/F values (and average over them too)
+
+if it's not T/F, this might not always be reliable... foo == bar
+...if NAs exist... so for a strictly T/F output use isTRUE(foo == bar)
+
+Second sheet, as you said, is a job for table(...)
+
+Ditto third sheet.
+
+Done!
+
+(don't forget to commit your changes)
+
+
 #' ## Exploration
 #' 
 #' Try making pivot tables...
