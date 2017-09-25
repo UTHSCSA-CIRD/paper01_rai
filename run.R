@@ -390,10 +390,10 @@ smoothScatter(dat4$a_rockwood
 # if you are grouping by something else, edit the next line
 group_by(dat4,hispanic_ethnicity,a_discrete_rai) %>% 
   # the mean of a T/F variable is the percent TRUE
-  summarise(a_any_postop=mean(a_any_postop)) %>% 
+  summarise(a_any_postop=mean(a_any_postop=='TRUE')) %>% 
   # if you are grouping by something else, update to match the group_by
   ggplot(aes(x=a_discrete_rai,y=a_any_postop,fill=hispanic_ethnicity)) + 
-  geom_bar(stat='identity');
+  geom_bar(stat='identity',position='dodge') -> plot_anypostop;
 
 # create tabsie dataset for visualization
 # mktabsie(dat4
