@@ -323,8 +323,16 @@ sapply(names(modelvarsumtab),function(xx){
 
 #'  creating tables similar to the tables that Dan MacCarthy creates for the VASQIP data:
 dat3$rai_range <- cut(dat3$a_rai, breaks=c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55));
+dat3$readm_tf <- ifelse(dat3$readm_30_dy==0, 'FALSE', 'TRUE') 
 
-dat3 %>% group_by(rai_range) %>% 
+#used for pulling out 'colectomy' and 'laparoscopy' procedures:
+surg <- c("laparoscopy", "colectomy")
+
+#dat3 %>% group_by(rai_range) %>% # <= this tabulates everything
+#dat3[grep(surg[2],dat3$cpt_descriptn, ignore.case=TRUE),] %>% group_by(rai_range) %>% # <= this tabulates all colectomy procedures
+dat3[grep(paste(surg, collapse = ".*"),dat3$cpt_descriptn, ignore.case=TRUE),] %>% 
+  group_by(rai_range) %>% # <= this tabulates all laparoscopic colectomy procedures
+
 summarize(`RAI Range` = n(), `Non-Elective Surgery` = sum(elective_surg=='No')
           ,`Non-Elective Surgery Fraction` = mean(elective_surg=='No')
           ,`Emergency Case N` = sum(emergency_case=='Yes')
@@ -335,8 +343,8 @@ summarize(`RAI Range` = n(), `Non-Elective Surgery` = sum(elective_surg=='No')
           ,`Complications 30days Fraction` = mean(a_any_postop=='TRUE')
           ,`Clavien-Dindo Grade4 30days N` = sum(a_any_cd4=='TRUE')
           ,`Clavien-Dindo Grade4 30days Fraction` = mean(a_any_cd4=='TRUE')
-          ) %>% 
-  mutate(`Cumulative Count`=cumsum(`RAI Range`)) %>% View();
+          ,`30day Readmission` = sum(readm_tf=='TRUE')) %>% 
+  mutate(`Cumulative Count`=rev(cumsum(rev(`RAI Range`)))) %>% View();
           
 
 
