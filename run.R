@@ -328,11 +328,12 @@ dat3$readm_tf <- ifelse(dat3$readm_30_dy==0, 'FALSE', 'TRUE')
 #used for pulling out 'colectomy' and 'laparoscopy' procedures:
 surg <- c("laparoscopy", "colectomy")
 
-#dat3 %>% group_by(rai_range) %>% # <= this tabulates everything
-#dat3[grep(surg[2],dat3$cpt_descriptn, ignore.case=TRUE),] %>% group_by(rai_range) %>% # <= this tabulates all colectomy procedures
-dat3[grep(paste(surg, collapse = ".*"),dat3$cpt_descriptn, ignore.case=TRUE),] %>% 
-  group_by(rai_range) %>% # <= this tabulates all laparoscopic colectomy procedures
+#dat3 %>% # <= this tabulates everything; there are 5386 records
+#dat3[grep(surg[2],dat3$cpt_descriptn, ignore.case=TRUE),] %>% # <= this tabulates all colectomy procedures; there are 451 records
+#dat3[grep(paste(surg, collapse = ".*"),dat3$cpt_descriptn, ignore.case=TRUE),] %>% # <= this tabulates all laparoscopic colectomy procedures; there are 183 records
+dat3[grep(paste0('^(?!.*', surg[1], ').*', surg[2]),dat3$cpt_descriptn, ignore.case=TRUE, perl=TRUE),] %>% # <= this tabulates all open colectomy; there are 268 records 
 
+group_by(rai_range) %>% 
 summarize(`RAI Range` = n(), `Non-Elective Surgery` = sum(elective_surg=='No')
           ,`Non-Elective Surgery Fraction` = mean(elective_surg=='No')
           ,`Emergency Case N` = sum(emergency_case=='Yes')
