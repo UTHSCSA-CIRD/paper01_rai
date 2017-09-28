@@ -323,30 +323,49 @@ sapply(names(modelvarsumtab),function(xx){
 
 #'  creating tables similar to the tables that Dan MacCarthy creates for the VASQIP data:
 dat3$rai_range <- cut(dat3$a_rai, breaks=c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55));
-dat3$readm_tf <- ifelse(dat3$readm_30_dy==0, 'FALSE', 'TRUE') 
+
+dat3$readm_tf <- ifelse(dat3$readm_30_dy==0, 'FALSE', 'TRUE'); 
 
 #used for pulling out 'colectomy' and 'laparoscopy' procedures:
 surg <- c("laparoscopy", "colectomy")
 
+## all surgeries ##
 #dat3 %>% # <= this tabulates everything; there are 5386 records
-#dat3[grep(surg[2],dat3$cpt_descriptn, ignore.case=TRUE),] %>% # <= this tabulates all colectomy procedures; there are 451 records
-#dat3[grep(paste(surg, collapse = ".*"),dat3$cpt_descriptn, ignore.case=TRUE),] %>% # <= this tabulates all laparoscopic colectomy procedures; there are 183 records
-dat3[grep(paste0('^(?!.*', surg[1], ').*', surg[2]),dat3$cpt_descriptn, ignore.case=TRUE, perl=TRUE),] %>% # <= this tabulates all open colectomy; there are 268 records 
+#dat3[which(grepl("Yes",dat3$elective_surg, ignore.case=TRUE)==TRUE),] %>% #<= this tabulates all Elective Yes surgeries; there are 2926 records
+#dat3[which((grepl("No", dat3$elective_surg, ignore.case=TRUE) & grepl("No",dat3$emergency_case, ignore.case=TRUE))==TRUE),] %>% #<= this tabulates all Elective No AND Emergency No surgeries; there are 1974 records
+#dat3[which(grepl("Yes", dat3$emergency_case, ignore.case=TRUE)==TRUE),] %>% #<= this tabulates all Emergency Yes surgeries; there are 489 records
 
-group_by(rai_range) %>% 
-summarize(`RAI Range` = n(), `Non-Elective Surgery` = sum(elective_surg=='No')
-          ,`Non-Elective Surgery Fraction` = mean(elective_surg=='No')
-          ,`Emergency Case N` = sum(emergency_case=='Yes')
-          ,`Emergency Case Fraction` = mean(emergency_case=='Yes')
+## all colectomies ##
+#dat3[which(grepl(surg[2],dat3$cpt_descriptn, ignore.case=TRUE)==TRUE),] %>% # <= this tabulates all colectomy procedures; there are 451 records
+
+## open colectomies ##
+#dat3[which(grepl(paste0('^(?!.*', surg[1], ').*', surg[2]),dat3$cpt_descriptn, ignore.case=TRUE, perl=TRUE)==TRUE),] %>% # <= this tabulates all open colectomies; there are 268 records 
+#dat3[which((grepl(paste0('^(?!.*', surg[1], ').*', surg[2]),dat3$cpt_descriptn, ignore.case=TRUE, perl=TRUE) & grepl("Yes",dat3$elective_surg, ignore.case=TRUE))==TRUE),] %>% # <= this tabulates all open colectomy Elective Yes surgeries; there are 112 records 
+#dat3[which((grepl(paste0('^(?!.*', surg[1], ').*', surg[2]),dat3$cpt_descriptn, ignore.case=TRUE, perl=TRUE) & grepl("No", dat3$elective_surg, ignore.case=TRUE) & grepl("No",dat3$emergency_case, ignore.case=TRUE))==TRUE),] %>% # <= this tabulates all open colectomy Elective No AND Emergency No surgeries; there are 110 records 
+#dat3[which((grepl(paste0('^(?!.*', surg[1], ').*', surg[2]),dat3$cpt_descriptn, ignore.case=TRUE, perl=TRUE) & grepl("Yes",dat3$emergency_case, ignore.case=TRUE))==TRUE),] %>% # <= this tabulates all open colectomy Emergency Yes surgeries; there are ... records 
+
+## all laparoscopic colectomies ##
+#dat3[which(grepl(paste(surg, collapse = ".*"),dat3$cpt_descriptn, ignore.case=TRUE)==TRUE),] %>% # <= this tabulates all laparoscopic colectomy procedures; there are 183 records
+#dat3[which((grepl(paste(surg, collapse = ".*"),dat3$cpt_descriptn, ignore.case=TRUE) & grepl("Yes",dat3$elective_surg, ignore.case=TRUE))==TRUE),] %>% # <= this tabulates all open colectomy Elective Yes surgeries; there are 112 records 
+#dat3[which((grepl(paste(surg, collapse = ".*"),dat3$cpt_descriptn, ignore.case=TRUE) & grepl("No", dat3$elective_surg, ignore.case=TRUE) & grepl("No",dat3$emergency_case, ignore.case=TRUE))==TRUE),] %>% # <= this tabulates all open colectomy Elective No AND Emergency No surgeries; there are 110 records 
+dat3[which((grepl(paste(surg, collapse = ".*"),dat3$cpt_descriptn, ignore.case=TRUE) & grepl("Yes",dat3$emergency_case, ignore.case=TRUE))==TRUE),] %>% # <= this tabulates all open colectomy Emergency Yes surgeries; there are ... records 
+
+group_by(`RAI-A Range` = rai_range) %>% 
+summarize(`RAI-A Score N` = n()
+          ,`Cumulative Count`=cumsum(n())
           ,`Died 30days N` = sum(postop_death_30_dy_proc =='Yes') 
           ,`Died 30days Fraction` = mean(postop_death_30_dy_proc =='Yes')
           ,`Complications 30days N` = sum(a_any_postop=='TRUE')
           ,`Complications 30days Fraction` = mean(a_any_postop=='TRUE')
           ,`Clavien-Dindo Grade4 30days N` = sum(a_any_cd4=='TRUE')
           ,`Clavien-Dindo Grade4 30days Fraction` = mean(a_any_cd4=='TRUE')
-          ,`30day Readmission` = sum(readm_tf=='TRUE')) %>% 
-  mutate(`Cumulative Count`=rev(cumsum(rev(`RAI Range`)))) %>% View();
-          
+          ,`30day Readmission N` = sum(readm_tf=='TRUE')
+          ,`30day Readmission Fraction` = mean(readm_tf=='TRUE')
+          ) %>% 
+  mutate(`Cumulative Count`=rev(cumsum(rev(`RAI-A Score N`)))) %>% 
+  arrange(desc(`RAI-A Range`)) -> footable;
+
+write.table(footable, file=paste0(outputpath, 'footable.csv'), row.names=FALSE, sep=',')
 
 
 # reminder: you can sum over T/F values (and average over them too)
