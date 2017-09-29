@@ -15,7 +15,7 @@ rq_libs <- c('compiler'                                   # just-in-time compila
              ,'survival','MASS','Hmisc','zoo','coin'      # various analysis methods
              ,'readr','dplyr','stringr','magrittr'        # data manipulation & piping
              ,'ggplot2','ggfortify','grid','GGally'       # plotting
-             ,'stargazer','broom', 'tableone','janitor'); # table formatting
+             ,'xtable','stargazer','broom', 'tableone','janitor'); # table formatting
 rq_installed <- sapply(rq_libs,require,character.only=T);
 rq_need <- names(rq_installed[!rq_installed]);
 if(length(rq_need)>0) install.packages(rq_need,repos='https://cran.rstudio.com/',dependencies = T);
@@ -232,6 +232,7 @@ dat1 <- dat1[order(dat1$proc_surg_start),];
 #' ### Create a version of the dataset that only has each patient's 1st encounter
 #' 
 #' (you need to have specified the name of the ID column in `metadata.R`)
+#+ cache=TRUE
 dat2 <- group_by(dat1,idn_mrn) %>% summarise_all(first);
 
 #' Filter down to only NHW and hispanic
@@ -364,6 +365,10 @@ summarize(`RAI-A Score N` = n()
           ) %>% 
   mutate(`Cumulative Count`=rev(cumsum(rev(`RAI-A Score N`)))) %>% 
   arrange(desc(`RAI-A Range`)) -> footable;
+#' Example of how to render this table in markdown
+#+ results="asis",echo=FALSE,warning=FALSE,message=FALSE
+xtable(footable) %>%  
+  print(type='html',html.table.attributes="border=1 cellspacing=3");
 
 write.table(footable, file=paste0(outputpath, 'footable.csv'), row.names=FALSE, sep=',')
 
