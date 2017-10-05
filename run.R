@@ -245,11 +245,11 @@ dat2 <- group_by(dat1,idn_mrn) %>% summarise_all(first);
   # write.table( modvarstrata[[x]], file=modvarstratafile, na="", col.names=FALSE, row.names=TRUE
   #              , append= TRUE, sep=',' )
   # }));
-sapply(names(modelvarsumtab),function(xx){
-  # Same as above
-  cat("\n\n",xx,"\n",file=modvartabfile,append=T);
-  write.table(modelvarsumtab[[xx]],file=modvartabfile,na="",col.names=F,row.names = T,append=T,sep=',');
-});
+# sapply(names(modelvarsumtab),function(xx){
+#   # Same as above
+#   cat("\n\n",xx,"\n",file=modvartabfile,append=T);
+#   write.table(modelvarsumtab[[xx]],file=modvartabfile,na="",col.names=F,row.names = T,append=T,sep=',');
+# });
 #write.csv2(x=newmodvarstrata, file=paste(outputpath, 'StrataComplicationsMissingTables.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
 #write.csv2(x=newmodvarsumtab, file=paste(outputpath, 'SumComplicationsMissingTables.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
 
@@ -265,7 +265,7 @@ sapply(names(modelvarsumtab),function(xx){
 #     ,n_cd4=sum(a_cd4>0)
 #     , n_postop=sum(a_postop>0)) %>% 
 #   mutate(hisp=ifelse(hisp,'Yes','No')) %>% 
-   setNames(c('Sex','Hispanic','Age (SD)','No Comp (N)','Income No Comp (IQR)','Income Comp (IQR)','CvDn4 (N)','Postop (N)')) ->   summary_counts;
+   # setNames(c('Sex','Hispanic','Age (SD)','No Comp (N)','Income No Comp (IQR)','Income Comp (IQR)','CvDn4 (N)','Postop (N)')) ->   summary_counts;
 # 
 # write_tsv(summary_counts,'summary_counts.tsv');
 
