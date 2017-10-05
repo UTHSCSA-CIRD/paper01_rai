@@ -12,7 +12,7 @@
 
 #+ cache=TRUE, echo=FALSE
 if(!'dat4' %in% ls()) source('run.R');
-#+ echo=FALSE, asis=TRUE
+#+ echo=FALSE, results='asis'
 cat('\nGit commit number:',gitstamp(),'\n');
 cat('Data file:',inputdata,'\n');
 
