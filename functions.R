@@ -140,7 +140,7 @@ vartype <- function(dat, ctype) {
 #' Return a commit hash (for inclusion in reports for example) after first making
 #' sure all changes are committed and pushed
 gitstamp <- function() system("git commit -a -m 'auto commit changes I forgot to commit manually' > /dev/null && git push; 
-                              git log --pretty=format:'%h' -n 1");
+                              git log --pretty=format:'%h' -n 1",intern=T);
 
 
 #' ### Specific to RAI-A
