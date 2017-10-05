@@ -13,6 +13,8 @@
 #+ cache=TRUE
 if(!'dat4' %in% ls()) source('run.R');
 #+ echo=FALSE
+cat('\nGit commit number:',gitstamp(),'\n');
+cat('Data file:',inputdata,'\n');
 
 #' #' Filter down to only NHW and hispanic
 #' dat3<-subset(dat2,hispanic_ethnicity!='Unknown'&(hispanic_ethnicity=='Yes'|race=='White'));
