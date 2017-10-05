@@ -236,6 +236,8 @@ dat1 <- dat1[order(dat1$proc_surg_start),];
 #' (you need to have specified the name of the ID column in `metadata.R`)
 dat2 <- group_by(dat1,idn_mrn) %>% summarise_all(first);
 
+dat3<-subset(dat2,hispanic_ethnicity!='Unknown'&(hispanic_ethnicity=='Yes'|race=='White'));
+dat3$hispanic_ethnicity<-factor(dat3$hispanic_ethnicity);
 
   # # this one writes the name of the table
   # write(x,file=modvarstratafile,append=T);
