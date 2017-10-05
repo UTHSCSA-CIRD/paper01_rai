@@ -40,6 +40,7 @@ source('./functions.R');
 #' 
 #' data dictionary:
 dctfile = 'VariableNamesFromUHSNSQIP.csv';
+cptfile = 'cpt_dictionary.csv';
 #' saved session data (not used right now)
 session <- 'session.rdata';
 
@@ -52,6 +53,7 @@ if(session %in% list.files()) load(session);
 dat0 <- read_tsv(inputdata,na=c('(null)',''));
 #' Read in the data dictionary
 dct0 <- read_csv(dctfile,na = '');
+dct1 <- read_csv(cptfile,na='');
 colnames(dat0) <- tolower(colnames(dat0));
 #' ## Create the groups of exact column names for this dataset
 #' 
@@ -235,14 +237,14 @@ dat1 <- dat1[order(dat1$proc_surg_start),];
 dat2 <- group_by(dat1,idn_mrn) %>% summarise_all(first);
 
 
-  # this one writes the name of the table
-  write(x,file=modvarstratafile,append=T);
-  # this one writes the header manually because write.table is so dumb
-  write(",Present,Missing,p-adj",file=modvarstratafile,append=T);
-  # writing the actual table
-  write.table( modvarstrata[[x]], file=modvarstratafile, na="", col.names=FALSE, row.names=TRUE
-               , append= TRUE, sep=',' )
-  }));
+  # # this one writes the name of the table
+  # write(x,file=modvarstratafile,append=T);
+  # # this one writes the header manually because write.table is so dumb
+  # write(",Present,Missing,p-adj",file=modvarstratafile,append=T);
+  # # writing the actual table
+  # write.table( modvarstrata[[x]], file=modvarstratafile, na="", col.names=FALSE, row.names=TRUE
+  #              , append= TRUE, sep=',' )
+  # }));
 sapply(names(modelvarsumtab),function(xx){
   # Same as above
   cat("\n\n",xx,"\n",file=modvartabfile,append=T);
