@@ -13,7 +13,7 @@
 #+ cache=TRUE, echo=FALSE
 if(!'dat4' %in% ls()) source('run.R');
 #+ echo=FALSE, results='asis'
-cat('\nGit commit number:',gitstamp(),'\n');
+cat('\nGit commit number:',gitstamp(),'<br/>');
 #+ echo=FALSE, results='asis'
 cat('Data file:',inputdata,'\n');
 
