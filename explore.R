@@ -10,9 +10,9 @@
 #' care of by `run.R`
 #if('clearenv'%in% ls()) clearenv():
 
-#+ cache=TRUE
+#+ cache=TRUE, echo=FALSE
 if(!'dat4' %in% ls()) source('run.R');
-#+ echo=FALSE
+#+ echo=FALSE, asis=TRUE
 cat('\nGit commit number:',gitstamp(),'\n');
 cat('Data file:',inputdata,'\n');
 
