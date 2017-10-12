@@ -39,8 +39,8 @@ source('./functions.R');
 #' ## Set generic variables
 #' 
 #' data dictionary:
-dctfile = 'VariableNamesFromUHSNSQIP.csv';
-cptfile = 'cpt_dictionary.csv';
+dctfile <- 'VariableNamesFromUHSNSQIP.csv';
+cptfile <- 'cpt_dictionary.csv';
 #' saved session data (not used right now)
 session <- 'session.rdata';
 
@@ -57,21 +57,12 @@ dct1 <- read_csv(cptfile,na='');
 colnames(dat0) <- tolower(colnames(dat0));
 #' ## Create the groups of exact column names for this dataset
 #' 
-#' Any vector in `metadata.R` that is composed of regexps should get
-#' resolved here to a vector of literal names using this expression as
-#' an example:
-#' 
-#carepatos <- grepor(dat0,garepatos);
-#cnopatos <- sub('_patos','',carepatos);
 #' We have a new way to get column names whenever we need them:
 #' `v(c_cd4)` . To see what other groups of column names are currently available
 #' do `names(dct0)[-(1:2)]`
 
-#' If you need to modify lists of column names using `gsub()` or if you
-#' need to dynamically generate lists of column names using something
-#' other than `grepor()` put the code for doing so here. Might want to
-#' find columns with all/almost-all missing values, or ones with a value that
-#' is always the same for all rows.
+#' Might want to find columns with all/almost-all missing values, or ones with a
+#' value that is always the same for all rows.
 
 
 
@@ -95,22 +86,8 @@ dat1[dat0$weight_unit=='lbs','weight'] <- dat1[dat0$weight_unit=='lbs','weight']
 #' on its own.
 
 
-#' For each column in `chavepatos` create a column that is true only 
-#' if that column is true and the corresponding column in `carepatos`
-#' is false. Hint: use `mapply()` or `sapply()` for this and replace
-#' the original `chavepatos` columns with these
-
-
-#' getting rid of the 2's in the column:
-# firstidx <- which(dat1[,cnopatos[1]] > 1);
-# secondidx <- which(dat1[,cnopatos[7]] > 1);
-# dat1[firstidx,cnopatos[1]]  <- 1;
-# dat1[secondidx,cnopatos[7]]  <- 1;
-#' The below was wrong! Thes columns are counts, so can occur more than once.
-#dat1[,cnopatos] <- sapply(dat1[,cnopatos],function(xx) xx>0,simplify=F);
-#'
 #' ## Column names of primary relevance
-modelvars <- c(v(c_rai),v(c_postop),'income_final','hispanic_ethnicity');
+c_modelvars <- c(v(c_rai),v(c_postop),'income_final','hispanic_ethnicity');
 
 #' Backup up the modified cnopatos column
 #' ...because it's easier if patos-subtracted columns are modified in place

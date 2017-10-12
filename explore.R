@@ -127,10 +127,10 @@ dat3 %>% group_by(rai_range) %>%
 #' # newmisstable <- cbind(variables, newmisstable)
 #' # write.table(x=newmisstable, file=paste(outputpath, 'IncomeMissingTable.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
 #' 
-#' modvarstrata <-sapply(modelvars,function(ii) {
+#' modvarstrata <-sapply(c_modelvars,function(ii) {
 #'   try(
 #'     eval(
-#'       parse(text=sprintf("stratatable(dat3,modelvars,str=is.na(%s)|%s=='Unknown')",ii,ii))))
+#'       parse(text=sprintf("stratatable(dat3,c_modelvars,str=is.na(%s)|%s=='Unknown')",ii,ii))))
 #'   });
 #' modvarstrata <- modvarstrata[sapply(modvarstrata,class)=='matrix'];
 #' 
@@ -139,7 +139,7 @@ dat3 %>% group_by(rai_range) %>%
 #' #' `modelvars_iscont`, a named vector of T/F values, is created. We really ought
 #' #' to just create a c_discrete column in dct0, but it might be out of date with 
 #' #' the latest version so we'll clean it up later and use this vector for now.
-#' modelvars_iscont<-sapply(dat3[,modelvars],function(xx) length(unique(xx))>6);
+#' modelvars_iscont<-sapply(dat3[,c_modelvars],function(xx) length(unique(xx))>6);
 #' #' Now we just first do the continuous ones with summary and then the discrete
 #' #' ones with table, and we `c()` them all together because when you do that to
 #' #' lists, you get a list as the result.
@@ -148,7 +148,7 @@ dat3 %>% group_by(rai_range) %>%
 #'                   sapply(dat3[,names(modelvars_iscont[!modelvars_iscont])]
 #'                          ,function(xx) cbind(table(xx,useNA='always'))));
 #' 
-#' #modvarsumtab <- sapply(modelvars, function(ii){table(dat3[,ii],useNA = 'always')});
+#' #modvarsumtab <- sapply(c_modelvars, function(ii){table(dat3[,ii],useNA = 'always')});
 #' #newmodvarstrata <- print(modvarstrata);
 #' #newmodvarsumtab <- print(modvarsumtab);
 #' 
