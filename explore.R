@@ -181,7 +181,7 @@ dat3 %>% group_by(rai_range) %>%
 #' #          ,pw=shinypw
 #' #          ,serverTitle = 'RAI Pilot Project'
 #' #          ,serverStatement = bquote(h4("Now we can each see the data. Please note, only pairwise comparisons are available with this tool."))
-#' #          ,vars=tabsievars);
+#' #          ,vars=c_tabsievars);
 #' 
 #' tidy(lmrr<-lm(a_rockwood~a_rai,dat4));
 #' glance(lmrr);
@@ -204,23 +204,23 @@ dat3 %>% group_by(rai_range) %>%
 #'   scale_fill_discrete('Rockwood',labels=c('Low','High')) +
 #'   scale_color_discrete('Rockwood',labels=c('Low','High')) +
 #'   ggtitle('Rockwood Index as Predictor of 30 Mortality or Readmission');
-#' #ggduo(dat4,union(cnum,cintgr),resps);
-#' #ggduo(dat4,union(ctf,cfactr),resps);
+#' #ggduo(dat4,union(cnum,cintgr),c_resps);
+#' #ggduo(dat4,union(ctf,cfactr),c_resps);
 #' 
 #' #plotting graphs:
 #' cnum <- vartype(dat4, 'numeric'); #<= I created this function in 'functions.R' file
 #' cintgr <- vartype(dat4, 'integer');
 #' ctf <- vartype(dat4, 'logical');
 #' cfactr <- vartype(dat4, 'factor');
-#' ggduo(dat4,union(cnum[1:2],cintgr[1:2]),resps);
-#' ggduo(dat4,union(ctf,cfactr),resps);
+#' ggduo(dat4,union(cnum[1:2],cintgr[1:2]),c_resps);
+#' ggduo(dat4,union(ctf,cfactr),c_resps);
 #' 
 #' #the following plots are interesting:
-#' ggduo(dat4, columnsX='income_final', columnsY=c('a_postop','a_cd4'), resps);
-#' ggduo(dat4, columnsX='age_at_time_surg', columnsY=c('a_postop','a_cd4'), resps);
-#' ggduo(dat4, columnsY='age_at_time_surg', columnsX=c('hispanic_ethnicity'), resps);
-#' ggduo(dat4, columnsY='income_final', columnsX=c('hispanic_ethnicity'), resps);
-#' ggduo(dat4, columnsY='hispanic_ethnicity', columnsX=c('a_postop','a_cd4'), resps);
+#' ggduo(dat4, columnsX='income_final', columnsY=c('a_postop','a_cd4'), c_resps);
+#' ggduo(dat4, columnsX='age_at_time_surg', columnsY=c('a_postop','a_cd4'), c_resps);
+#' ggduo(dat4, columnsY='age_at_time_surg', columnsX=c('hispanic_ethnicity'), c_resps);
+#' ggduo(dat4, columnsY='income_final', columnsX=c('hispanic_ethnicity'), c_resps);
+#' ggduo(dat4, columnsY='hispanic_ethnicity', columnsX=c('a_postop','a_cd4'), c_resps);
 #' 
 #' 
 #' #' The goal is to find the most obvious relationships beteen

@@ -219,7 +219,7 @@ dat1$a_rockwood <- with(dat1,(
     as.numeric(is.na(serum_creatinine))
 ));
 
-tabsievars <- c(v('c_tabsie')
+c_tabsievars <- c(v('c_tabsie')
                 ,'a_postop','a_any_postop','a_cd4','a_any_cd4'
                 ,'a_rai','a_discrete_rai','a_rockwood');
 #' ## Transform Rows
@@ -242,8 +242,8 @@ dat3$hispanic_ethnicity<-factor(dat3$hispanic_ethnicity);
 dat3$rai_range <- cut(dat3$a_rai, breaks=c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55));
 
 
-
-resps <- c('a_postop','a_cd4');
+#' Both of our main non time-to-event responses
+c_resps <- c('a_postop','a_cd4');
 
 #' ### Create your random sample
 source('random_seed.R');
