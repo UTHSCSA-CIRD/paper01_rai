@@ -105,7 +105,6 @@ dat3 %>% group_by(rai_range) %>%
 
 
 
-#' #' Filter down to only NHW and hispanic
 #' dat3<-subset(dat2,hispanic_ethnicity!='Unknown'&(hispanic_ethnicity=='Yes'|race=='White'));
 #' dat3$hispanic_ethnicity<-factor(dat3$hispanic_ethnicity);
 #' #' creating a counts table of missingness for each variable:
