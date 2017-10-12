@@ -114,10 +114,33 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 } 
 
+mktabsie <- function(data,subsets=list(Full=T),pw
+                     ,vars
+                     ,filepath='.'
+                     ,filename='survSave.rdata'
+                     ,serverTitle='TABSIE'
+                     ,serverStatement=bquote(h4("Welcome to TABSIE"))){
+  serverData <- sapply(subsets,function(ii) subset(data[,vars],eval(ii)),simplify=F);
+  serverDataDic <- names(serverData);
+  serverHash <- digest::digest(pw,algo='sha512',ascii=TRUE);
+  save(serverStatement,serverData,serverDataDic,serverTitle,serverHash
+       ,file=paste0(filepath,'/',filename));
+}
+
+#' Returns a vector of column names that contain data elements of a particular type
+#' as specified by the user: "integer","POSIXct" "POSIXt", "numeric", "character", 
+#' "factor" and "logical". 
+vartype <- function(dat, ctype) {
+  xx <- unlist(sapply(dat, class));
+  idx <- which(xx %in% ctype);
+  res <- names(xx)[idx];
+  return(res)
+}
+
 #' Return a commit hash (for inclusion in reports for example) after first making
 #' sure all changes are committed and pushed
 gitstamp <- function() system("git commit -a -m 'auto commit changes I forgot to commit manually' > /dev/null && git push; 
-                              git log --pretty=format:'%h' -n 1");
+                              git log --pretty=format:'%h' -n 1",intern=T);
 
 
 #' ### Specific to RAI-A
