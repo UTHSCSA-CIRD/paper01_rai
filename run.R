@@ -9,13 +9,11 @@
 #' 
 #' ## Load libraries
 #+ warning=FALSE, message=FALSE
-rq_libs <- c('compiler'                                   # just-in-time compilation
-             ,'MatchIt','DHARMa'                          # propensity scores and glm residuals
-             ,'pscl'                                      # zero-inflated poisson, sigh
-             ,'survival','MASS','Hmisc','zoo','coin'      # various analysis methods
-             ,'readr','dplyr','stringr','magrittr'        # data manipulation & piping
-             ,'ggplot2','ggfortify','grid','GGally'       # plotting
-             ,'stargazer','broom', 'tableone','janitor'); # table formatting
+rq_libs <- c('compiler'                              # just-in-time compilation
+             ,'survival','MASS','Hmisc','zoo','coin' # various analysis methods
+             ,'readr','dplyr','stringr','magrittr'   # data manipulation & piping
+             ,'ggplot2','ggfortify','grid','GGally'  # plotting
+             ,'stargazer','broom', 'tableone');                  # table formatting
 rq_installed <- sapply(rq_libs,require,character.only=T);
 rq_need <- names(rq_installed[!rq_installed]);
 if(length(rq_need)>0) install.packages(rq_need,repos='https://cran.rstudio.com/',dependencies = T);
@@ -153,73 +151,11 @@ c_cd4_count <- intersect(v(c_cd4),v(c_count));
 dat1$a_cd4 <- rowSums(dat1[,c_cd4_count]) + 
   apply(dat1[,c_cd4_yesno],1,function(xx) sum(na.omit(xx=='Yes')));
 
-#' TRUE/FALSE variables for postop and cd4 in both cases
-#' indicating whether or not the patient had _any_ complications
-dat1$a_any_cd4 <- factor(dat1$a_cd4>0);
-dat1$a_any_postop <- factor(dat1$a_postop>0);
-
 dat1$a_transfer <- dat1$origin_status!='Not transferred (admitted from home)';
 
-
-#' Time from surgery to adverse outcome if any
-dat1$a_t <- with(dat1
-                 ,pmin(
-                   dt_death
-                   ,dt_first_readm
-                   ,dt_first_unpl_ret_or
-                   ,dt_second_unp_ret,na.rm = T) %>% 
-                   difftime(proc_surg_finish,units='days') %>%
-                   as.numeric());
-#' Censor the variables at 30 days
-dat1$a_t[dat1$a_t>30] <- 30;
-dat1$a_t[is.na(dat1$a_t)] <- 30;
-dat1$a_c <- dat1$a_t!=30;
 #' Obtain the RAI score
 dat1$a_rai <- raiscore(dat1);
-dat1$a_discrete_rai <- cut(dat1$a_rai
-                           ,c(0,15,21,Inf)
-                           ,right = F
-                           ,labels = c('Non Frail','Pre Frail','Frail'));
 
-#' ## The Rockwood Scale
-#' 
-#' ...sounds crazy but it actually works. According to Mitnitski, Mogilner and 
-#' Rockwood The Scientific World 2001, you just add together a large number of 
-#' binary deficits and divide by the number of non-missing data elements for that
-#' patient and that's your score! Here I calculate it on every Yes/No preop risk
-#' except those whose time window is less than a week, plus creatinine > 30.
-#' 
-#' Lo and behold we get a distribution that looks a lot like what Mitnitski et al
-#' published, and a strong correlation with number of postop complications.
-dat1$a_rockwood <- with(dat1,(
-  as.numeric(bmi>=25)+
-    as.numeric(origin_status!='Not transferred (admitted from home)')+
-    as.numeric(diabetes_mellitus!='No')+
-    as.numeric(current_smoker_within_1_year=='Yes')+
-    as.numeric(dyspnea!='No')+
-    as.numeric(!functnal_heath_status%in%c('Independent','Unknown'))+
-    as.numeric(vent_dependent=='Yes')+
-    as.numeric(history_severe_copd=='Yes')+
-    as.numeric(ascites_30_dy_prior_surg=='Yes')+
-    as.numeric(hypertensn_req_medicatn=='Yes')+
-    as.numeric(acute_renal_failure=='Yes')+
-    as.numeric(currently_dialysis=='Yes')+
-    as.numeric(disseminated_cancer=='Yes')+
-    as.numeric(open_wound=='Yes')+
-    as.numeric(steroid_immunosupp=='Yes')+
-    as.numeric(x_loss_bw_6_months_prior_surg=='Yes')+
-    as.numeric(bleeding_disorder=='Yes')+
-    as.numeric(chr_30_dy_prior_surg=='Yes')+
-    as.numeric(isTRUE(serum_creatinine>3))
-)/(
-  19-
-    as.numeric(functnal_heath_status=='Unknown')-
-    as.numeric(is.na(serum_creatinine))
-));
-
-tabsievars <- c(v('c_tabsie')
-                ,'a_postop','a_any_postop','a_cd4','a_any_cd4'
-                ,'a_rai','a_discrete_rai','a_rockwood');
 #' ## Transform Rows
 #'
 #' ### Sort the rows by patient ID and then by date of surgery, ascending
@@ -281,10 +217,8 @@ modelvarsumtab <- c(sapply(dat3[,names(modelvars_iscont[modelvars_iscont])]
 #newmodvarstrata <- print(modvarstrata);
 #newmodvarsumtab <- print(modvarsumtab);
 
-modvarstratafile <- paste0(outputpath,'StrataComplicationsMissingTables'
-                           ,gsub(" ","_",paste0(Sys.time(),'CDT.csv')));
-modvartabfile <- paste0(outputpath,'SumComplicationsMissingTables'
-                        ,gsub(" ","_",paste0(Sys.time(),'CDT.csv')));
+modvarstratafile <- paste0(outputpath,'StrataComplicationsMissingTables.csv');
+modvartabfile <- paste0(outputpath,'SumComplicationsMissingTables.csv');
 sapply(names(modvarstrata), function(x) try({
   # this one just skips a few lines to make the output easier to read
   write("\n\n",file=modvarstratafile,append=T);
@@ -320,40 +254,6 @@ sapply(names(modelvarsumtab),function(xx){
 # 
 # write_tsv(summary_counts,'summary_counts.tsv');
 
-
-#'  creating tables similar to the tables that Dan MacCarthy creates for the VASQIP data:
-dat3$rai_range <- cut(dat3$a_rai, breaks=c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55));
-
-dat3 %>% group_by(rai_range) %>% 
-summarize(`RAI Range` = n(), `Non-Elective Surgery` = sum(elective_surg=='No')
-          ,`Non-Elective Surgery Fraction` = mean(elective_surg=='No')
-          ,`Emergency Case N` = sum(emergency_case=='Yes')
-          ,`Emergency Case Fraction` = mean(emergency_case=='Yes')
-          ,`Died 30days N` = sum(postop_death_30_dy_proc =='Yes') 
-          ,`Died 30days Fraction` = mean(postop_death_30_dy_proc =='Yes')
-          ,`Complications 30days N` = sum(a_any_postop=='TRUE')
-          ,`Complications 30days Fraction` = mean(a_any_postop=='TRUE')
-          ,`Clavien-Dindo Grade4 30days N` = sum(a_any_cd4=='TRUE')
-          ,`Clavien-Dindo Grade4 30days Fraction` = mean(a_any_cd4=='TRUE')
-          ) %>% 
-  mutate(`Cumulative Count`=cumsum(`RAI Range`)) %>% View();
-          
-
-
-# reminder: you can sum over T/F values (and average over them too)
-# 
-# if it's not T/F, this might not always be reliable... foo == bar
-# ...if NAs exist... so for a strictly T/F output use isTRUE(foo == bar)
-# 
-# Second sheet, as you said, is a job for table(...)
-# 
-# Ditto third sheet.
-# 
-# Done!
-# 
-# (don't forget to commit your changes)
-# 
-
 #' ## Exploration
 #' 
 #' Try making pivot tables...
@@ -376,73 +276,12 @@ summarize(`RAI Range` = n(), `Non-Elective Surgery` = sum(elective_surg=='No')
 resps <- c('a_postop','a_cd4');
 
 #' ### Create your random sample
-source('random_seed.R');
-pat_samp <- sample(dat3$idn_mrn,1000,rep=F);
+.Random.seed <- 20170816;
+pat_samp <- sample(dat3$idn_mrn,1000,rep=T);
 dat4 <- subset(dat3,idn_mrn %in% pat_samp);
 
-#' Create a tabsie object for visualization
-#' How well does Rockwood correlate with RAI-A?
-smoothScatter(dat4$a_rockwood
-              ,dat4$a_rai
-              ,bandwidth = c(.03,.5)
-              ,nrpoints = 0);
-#' ### Plot of percent having any complication versus ethnicity and RAI bin
-# if you are grouping by something else, edit the next line
-group_by(dat4,hispanic_ethnicity,a_discrete_rai) %>% 
-  # the mean of a T/F variable is the percent TRUE
-  summarise(a_any_postop=mean(a_any_postop=='TRUE')) %>% 
-  # if you are grouping by something else, update to match the group_by
-  ggplot(aes(x=a_discrete_rai,y=a_any_postop,fill=hispanic_ethnicity)) + 
-  geom_bar(stat='identity',position='dodge') -> plot_anypostop;
-
-# create tabsie dataset for visualization
-# mktabsie(dat4
-#          ,c(Full=T,OnlyPostop=bquote(a_postop!=0),OnlyNoPostop=bquote(a_postop==0))
-#          ,pw=shinypw
-#          ,serverTitle = 'RAI Pilot Project'
-#          ,serverStatement = bquote(h4("Now we can each see the data. Please note, only pairwise comparisons are available with this tool."))
-#          ,vars=tabsievars);
-
-tidy(lmrr<-lm(a_rockwood~a_rai,dat4));
-glance(lmrr);
-cxbase<-coxph(Surv(a_t,a_c)~1,dat4);
-#' How predictive is RAI of deaths and readmissions?
-tidy(cxrai <- update(cxbase,.~a_rai));
-glance(cxrai);
-survfit(Surv.a_t..a_c.~.fitted>median(.fitted),data=augment(cxrai)) %>% 
-  autoplot(ylim=c(.75,1)) +
-  labs(x='Time in Days', y = 'Event-Free') +
-  scale_fill_discrete('RAI-A   ',labels=c('Low','High')) +
-  scale_color_discrete('RAI-A   ',labels=c('Low','High')) +
-  ggtitle('RAI-A as Predictor of 30 Mortality or Readmission');
-#' How predictive is Rockwood of deaths and readmissions?
-tidy(cxrck <- update(cxbase,.~a_rockwood));
-glance(cxrck);
-survfit(Surv.a_t..a_c.~.fitted>median(.fitted),data=augment(cxrck)) %>% 
-  autoplot(ylim=c(.75,1)) +
-  labs(x='Time in Days', y = 'Event-Free') +
-  scale_fill_discrete('Rockwood',labels=c('Low','High')) +
-  scale_color_discrete('Rockwood',labels=c('Low','High')) +
-  ggtitle('Rockwood Index as Predictor of 30 Mortality or Readmission');
 #ggduo(dat4,union(cnum,cintgr),resps);
 #ggduo(dat4,union(ctf,cfactr),resps);
-
-#plotting graphs:
-cnum <- vartype(dat4, 'numeric'); #<= I created this function in 'functions.R' file
-cintgr <- vartype(dat4, 'integer');
-ctf <- vartype(dat4, 'logical');
-cfactr <- vartype(dat4, 'factor');
-ggduo(dat4,union(cnum[1:2],cintgr[1:2]),resps);
-ggduo(dat4,union(ctf,cfactr),resps);
-
-#the following plots are interesting:
-ggduo(dat4, columnsX='income_final', columnsY=c('a_postop','a_cd4'), resps);
-ggduo(dat4, columnsX='age_at_time_surg', columnsY=c('a_postop','a_cd4'), resps);
-ggduo(dat4, columnsY='age_at_time_surg', columnsX=c('hispanic_ethnicity'), resps);
-ggduo(dat4, columnsY='income_final', columnsX=c('hispanic_ethnicity'), resps);
-ggduo(dat4, columnsY='hispanic_ethnicity', columnsX=c('a_postop','a_cd4'), resps);
-
-
 #' The goal is to find the most obvious relationships beteen
 #' predictors and variables.
 
@@ -450,12 +289,10 @@ ggduo(dat4, columnsY='hispanic_ethnicity', columnsX=c('a_postop','a_cd4'), resps
 #' methodical way that you can start making decisions about how
 #' to analyze it. For example...
 glmpostop <- glm(a_postop~1,dat4,family='poisson');
-glmpostopaic <- stepAIC(update(glmpostop,subset=!is.na(income_final))
-                        ,scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+age_at_time_surg+income_final)^3)
-                        ,direction='both');
+glmpostopaic <- stepAIC(update(glmpostop,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+income_final)^3),direction='both');
 summary(glmpostopaic);
 glmcd4 <- glm(a_cd4~1,dat4,family='poisson');
-glmcd4aic <- stepAIC(update(glmcd4,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+age_at_time_surg+income_final)^3),direction='both');
+glmcd4aic <- stepAIC(update(glmcd4,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+income_final)^3),direction='both');
 summary(glmcd4aic);
 #' BUt this is kind of a waste of time because RAI-A was never properly weighted.
 #' Let's fix that...
@@ -477,29 +314,3 @@ anova(update(glmp_cd4_aic,.~a_rai),update(glmp_cd4_aic,.~.+a_rai),test='LRT');
 #' And does RAI improve it?
 anova(glmp_cd4_aic,update(glmp_cd4_aic,.~.+a_rai),test='LRT');
 #' A little
-#' 
-
-#' ## (yet another) summary demographic table for NSQIP
-#' 
-#' (with patients aged 60-89)
-#' 
-subset(dat2,between((Sys.time() - dt_birth)/365.25,60,89)) %>% 
-  mutate(income=income_final/1000
-         ,age=(Sys.time()-dt_birth)/365.25
-         ,ohw=(ifelse(hispanic_ethnicity=='Yes'
-                      ,'Hispanic'
-                      ,ifelse(race=='White'
-                              ,'White'
-                              ,'Other')))) %>% 
-  group_by(ohw,gender) %>% 
-  summarise(N=n()
-            ,mage=sprintf('%0.1f (%0.1f, %0.1f)'
-                          ,median(age,na.rm=T)
-                          ,quantile(age,.25,na.rm=T)
-                          ,quantile(age,.75,na.rm=T))
-            ,inc=sprintf('%0.0f (%0.0f, %0.0f)'
-                         ,median(income,na.rm=T)
-                         ,quantile(income,.25,na.rm=T)
-                         ,quantile(income,.75,na.rm=T))) %>%
-  View;
-
