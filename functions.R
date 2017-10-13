@@ -75,6 +75,27 @@ grepor <- function(xx,patterns='.') {
   grep(paste0(patterns,collapse='|'),xx,val=T);
 }
 
+#' Take an object name \code{obj}, check to see if it  exists in environment \code{env}
+#' and if it does not, run \code{expression} \code{EXPR} and assign its result to \code{obj}
+#'
+#' @param obj   A \code{character} string (required) naming the variable in env
+#'   to which the results of running \code{EXPR} will be assigned.
+#' @param EXPR  An \code{expression} to execute and assign to the object named
+#'   by \code{obj} if it doesn't already exist.
+#' @param env   An \code{environment} to check for the existence of \code{obj}
+#'   and where to create it if it doesn't exist.
+#'
+#' @return Does not return anything.
+#'
+#' @examples `checkrun('dat3',{group_by(dat1,idn_mrn) %>% summarise_all(first)});`
+checkrun <- function(obj,EXPR,env=as.environment(-1)){
+  env<-env;
+  if(length(ls(env,all=T,pattern=obj))==0){
+    browser();
+  }
+}
+
+
 #' Delete all the junk in your environment, for testing
 clearenv <- function(env=.GlobalEnv) rm(list=setdiff(ls(all=T,envir=env),'clearenv'),envir=env);
 

@@ -9,7 +9,6 @@
 #' the libraries and `config.R` variables are taken
 #' care of by `run.R`
 #if('clearenv'%in% ls()) clearenv():
-
 #+ cache=TRUE, echo=FALSE
 if(!'dat4' %in% ls()) source('run.R');
 #+ echo=FALSE, results='asis'
