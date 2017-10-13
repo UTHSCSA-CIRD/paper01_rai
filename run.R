@@ -155,6 +155,7 @@ dat1$a_t[is.na(dat1$a_t)] <- 30;
 dat1$a_c <- dat1$a_t!=30;
 #' Obtain the RAI score
 dat1$a_rai <- raiscore(dat1);
+dat1$rai_range <- cut(dat1$a_rai, breaks=c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55));
 dat1$a_discrete_rai <- cut(dat1$a_rai
                            ,c(0,15,21,Inf)
                            ,right = F
@@ -217,7 +218,6 @@ dat2 <- group_by(dat1,idn_mrn) %>% summarise_all(first);
 dat3<-subset(dat2,hispanic_ethnicity!='Unknown'&(hispanic_ethnicity=='Yes'|race=='White'));
 dat3$hispanic_ethnicity<-factor(dat3$hispanic_ethnicity);
 #'  creating tables similar to the tables that Dan MacCarthy creates for the VASQIP data:
-dat3$rai_range <- cut(dat3$a_rai, breaks=c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55));
 
 
 #' Both of our main non time-to-event responses
