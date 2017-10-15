@@ -161,6 +161,8 @@ dat1$a_discrete_rai <- cut(dat1$a_rai
                            ,right = F
                            ,labels = c('Non Frail','Pre Frail','Frail'));
 dat1$a_rai_hisp <- with(dat1,interaction(a_discrete_rai,hispanic_ethnicity));
+
+
 #' ## The Rockwood Scale
 #' 
 #' ...sounds crazy but it actually works. According to Mitnitski, Mogilner and 
@@ -208,6 +210,15 @@ dat1 <- dat1[order(dat1$proc_surg_start),];
 #' 
 #' ### Drop patients without an income
 #dat1 <- dat1[!is.na(dat1$income_final),];
+
+#' ### Make several subsets of dat1 all at once
+#' 
+#' for later use to make multiple versions of the same table and multiple
+#' versions of the same graph, as for item #3 of the 10/13/2017 PKS email.
+dat1subs <- ssply(dat1
+                  ,full=T
+                  ,colon=cpt_code %in% v(c_colon,dct1)
+                  ,colon_cd4=cpt_code %in% v(c_colon,dct1) & a_any_cd4=='TRUE');
 
 #' ### Create a version of the dataset that only has each patient's 1st encounter
 #' 
