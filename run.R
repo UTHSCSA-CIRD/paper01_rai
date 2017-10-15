@@ -160,7 +160,7 @@ dat1$a_discrete_rai <- cut(dat1$a_rai
                            ,c(0,15,21,Inf)
                            ,right = F
                            ,labels = c('Non Frail','Pre Frail','Frail'));
-
+dat1$a_rai_hisp <- with(dat1,interaction(a_discrete_rai,hispanic_ethnicity));
 #' ## The Rockwood Scale
 #' 
 #' ...sounds crazy but it actually works. According to Mitnitski, Mogilner and 

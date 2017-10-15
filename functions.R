@@ -163,6 +163,8 @@ vartype <- function(dat, ctype) {
 gitstamp <- function() system("git commit -a -m 'auto commit changes I forgot to commit manually' > /dev/null && git push; 
                               git log --pretty=format:'%h' -n 1",intern=T);
 
+#' take a list of subset criteria and return a list of data.frames
+ssply<-function(dat,...) sapply(sys.call()[-(1:2)],function(ii) subset(dat,eval(ii)),simplify=F);
 
 #' ### Specific to RAI-A
 #' 
