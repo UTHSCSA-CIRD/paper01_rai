@@ -93,7 +93,8 @@ sapply(dat1subs, function(xx) group_by(xx,rai_range) %>%
 #' a `.junk` variable and do nothing with it.
 #' 
 #' Notice we need to do it differently depending on if this is running 
-#' inside an R Markdown report or interactively.
+#' inside an R Markdown report or interactively. Ugh, the RMarkdown versions
+#' of the tables need better formatting, `xtable()` or something
 if(interactive()) .junk <- sapply(tables_01,View) else {
   sapply(tables_01,identity,simplify=F)};
 
