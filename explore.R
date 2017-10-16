@@ -17,7 +17,7 @@ cat('\nGit commit number:',gitstamp(),'<br/>');
 cat('Data file:',inputdata,'\n');
 
 #' Moved over from run.R
-dat3 %>% group_by(rai_range) %>% 
+sapply(dat1subs) %>% group_by(rai_range) %>% 
   summarize(`RAI Range` = n(), `Non-Elective Surgery` = sum(elective_surg=='No')
             ,`Non-Elective Surgery Fraction` = mean(elective_surg=='No')
             ,`Emergency Case N` = sum(emergency_case=='Yes')
