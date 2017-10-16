@@ -10,7 +10,7 @@
 #' care of by `run.R`
 #if('clearenv'%in% ls()) clearenv():
 #+ cache=TRUE, echo=FALSE
-if(!'dat4' %in% ls()) source('run.R',);
+if(!'dat4' %in% ls()) source('run.R',echo = F);
 #+ echo=FALSE, results='asis'
 cat('\nGit commit number:',gitstamp(),'<br/>');
 #+ echo=FALSE, results='asis'
@@ -34,7 +34,8 @@ cat('Data file:',inputdata,'\n');
 #' can override that default with a different pattern if necessary
 #' * Inside each `sum()` or `mean()` is a logical vector. It highlights the fact
 #' that regardless of whether or not we make this into a function, we need to 
-#' standardize these values in `run.R`!
+#' standardize these values in `run.R`! This job would be easier all these 
+#' 'Yes'/'No' and 'TRUE'/'FALSE'
 sapply(dat1subs, function(xx) group_by(xx,rai_range) %>% 
   summarize(`RAI Range` = n(), `Non-Elective Surgery` = sum(elective_surg=='No')
             ,`Non-Elective Surgery Fraction` = mean(elective_surg=='No')
