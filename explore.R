@@ -13,7 +13,8 @@
 #' loading the libraries. Sounds like we will need to create a separate `init.R`
 #' file for just the libraries and have everything call that file.
 #if('clearenv'%in% ls()) clearenv():
-#+ cache=FALSE, echo=FALSE, message=FALSE
+source('global.R');
+#+ cache=TRUE, echo=FALSE, message=FALSE
 if(!'dat4' %in% ls()) source('run.R',echo = F);
 #+ echo=FALSE, results='asis'
 cat('\nGit commit number:',gitstamp(),'<br/>');
@@ -93,7 +94,8 @@ sapply(dat1subs, function(xx) group_by(xx,rai_range) %>%
 #' a `.junk` variable and do nothing with it.
 #' 
 #' Notice we need to do it differently depending on if this is running 
-#' inside an R Markdown report or interactively.
+#' inside an R Markdown report or interactively. Ugh, the RMarkdown versions
+#' of the tables need better formatting, `xtable()` or something
 if(interactive()) .junk <- sapply(tables_01,View) else {
   sapply(tables_01,identity,simplify=F)};
 

@@ -7,42 +7,7 @@
 #' Please read this file through before trying to run it. The comments tell
 #' you what you need to edit in order to proceed.
 #' 
-#' ## Load libraries
-#+ warning=FALSE, message=FALSE
-rq_libs <- c('compiler'                                   # just-in-time compilation
-             ,'MatchIt','DHARMa'                          # propensity scores and glm residuals
-             ,'pscl'                                      # zero-inflated poisson, sigh
-             ,'survival','MASS','Hmisc','zoo','coin'      # various analysis methods
-             ,'readr','dplyr','stringr','magrittr'        # data manipulation & piping
-             ,'ggplot2','ggfortify','grid','GGally'       # plotting
-             ,'stargazer','broom', 'tableone','janitor'); # table formatting
-rq_installed <- sapply(rq_libs,require,character.only=T);
-rq_need <- names(rq_installed[!rq_installed]);
-if(length(rq_need)>0) install.packages(rq_need,repos='https://cran.rstudio.com/',dependencies = T);
-sapply(rq_need,require,character.only=T);
-#' Turn JIT to max: pre-compile all closures, `for`, `while`, and `repeat` loops
-enableJIT(3);
-#' ## Load local config file
-#' 
-#' Please edit the file referenced below, it has instructions in the 
-#' comments.
-source('./config.R');
-#' Please edit the file referenced below, it has instructions in the
-#' comments
-source('./metadata.R');
-#' This file has some possible useful functions. You might not need to edit
-#' it but should read it.
-source('./functions.R');
-
-
-#'
-#' ## Set generic variables
-#' 
-#' data dictionary:
-dctfile <- 'VariableNamesFromUHSNSQIP.csv';
-cptfile <- 'cpt_dictionary.csv';
-#' saved session data (not used right now)
-session <- 'session.rdata';
+source('global.R');
 
 #' ## Load data if it exists 
 #' 
