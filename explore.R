@@ -1,5 +1,5 @@
 #' ---
-#' title: "RAI Exploratoru Tables and Plots"
+#' title: "RAI Exploratory Tables and Plots"
 #' author: "Wilson, Bokov, Shireman"
 #' date: "09/30/2017"
 #' ---
@@ -24,10 +24,13 @@ if(!'dat4' %in% ls()) source('run.R',echo = F);
 
 #' Moved over from run.R
 #' 
-#' We're redoing the table on each thing in dat1subs. Therefore sapply is needed, 
-#' and the entire table-creating pipeline is wrapped in a throwaway function 
-#' (there is a formal name for those, btw-they are called lambdas). This could 
-#' be made a permanent function with a few tweaks:
+#' We're redoing the table on each thing in `dat1subs`. The `dat1subs` list was
+#' created in `run.R` to create the various subsets of dat1 that are needed all
+#' in one step and in one place by means of our new `ssply()` function. Since we 
+#' are using a list of `data.frame`s, the `sapply()` function is needed. For its
+#' second argument the entire table-creating pipeline is wrapped in a throwaway 
+#' function (there is a formal name for those, btw-they are called lambdas). 
+#' This could be made a permanent function with a few tweaks:
 #' 
 #' * The human-readable names are cumbersome to work with and what if the desired
 #' choice of columns changes? Solution: we keep the original column names and 
