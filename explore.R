@@ -13,8 +13,8 @@
 #' loading the libraries. Sounds like we will need to create a separate `init.R`
 #' file for just the libraries and have everything call that file.
 #if('clearenv'%in% ls()) clearenv():
-#+ cache=TRUE, echo=FALSE, message=FALSE
-if(!'dat.4' %in% ls()) source('run.R',echo = F);
+#+ cache=FALSE, echo=FALSE, message=FALSE
+if(!'dat4' %in% ls()) source('run.R',echo = F);
 #+ echo=FALSE, results='asis'
 cat('\nGit commit number:',gitstamp(),'<br/>');
 #+ echo=FALSE, results='asis'
