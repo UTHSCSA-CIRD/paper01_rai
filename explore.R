@@ -10,14 +10,32 @@
 #' care of by `run.R`
 #if('clearenv'%in% ls()) clearenv():
 #+ cache=TRUE, echo=FALSE
-if(!'dat4' %in% ls()) source('run.R');
+if(!'dat4' %in% ls()) source('run.R',);
 #+ echo=FALSE, results='asis'
 cat('\nGit commit number:',gitstamp(),'<br/>');
 #+ echo=FALSE, results='asis'
 cat('Data file:',inputdata,'\n');
 
 #' Moved over from run.R
-sapply(dat1subs) %>% group_by(rai_range) %>% 
+#' 
+#' We're redoing the table on each thing in dat1subs, however tables that might
+#' currently be. Therefore sapply is needed, and the entire table-creating pipeline
+#' is wrapped in a throwaway function (there is a formal name for those, btw-- 
+#' they are called lambdas). This could be a permanent function with a few tweaks:
+#' 
+#' * The human-readable names are cumbersome to work with and what if the desired
+#' choice of columns changes? Solution: we keep the original column names and 
+#' create a column in dct0 from which to look up the table headers we would like
+#' to use for each one.
+#' * The columns are an alternating series of `sum()` and `mean()`. But this could
+#' change, not something that we should hard-code. Solution: if we make this into
+#' a real function it will take a list of functions as an argument. The 
+#' default value of the list will be `c(sum,mean)` repeated but this way the user
+#' can override that default with a different pattern if necessary
+#' * Inside each `sum()` or `mean()` is a logical vector. It highlights the fact
+#' that regardless of whether or not we make this into a function, we need to 
+#' standardize these values in `run.R`!
+sapply(dat1subs, function(xx) group_by(xx,rai_range) %>% 
   summarize(`RAI Range` = n(), `Non-Elective Surgery` = sum(elective_surg=='No')
             ,`Non-Elective Surgery Fraction` = mean(elective_surg=='No')
             ,`Emergency Case N` = sum(emergency_case=='Yes')
@@ -29,8 +47,15 @@ sapply(dat1subs) %>% group_by(rai_range) %>%
             ,`Clavien-Dindo Grade4 30days N` = sum(a_any_cd4=='TRUE')
             ,`Clavien-Dindo Grade4 30days Fraction` = mean(a_any_cd4=='TRUE')
   ) %>% 
-  mutate(`Cumulative Count`=cumsum(`RAI Range`)) %>% View();
+  mutate(`Cumulative Count`=cumsum(`RAI Range`)),simplify=F) -> tables_01;
 
+#' View each of the tables. This is in a separate step from the above so that we
+#' can capture the output for reuse. Note that in this rendering step we use 
+#' `sapply()` for its side effect of creating `View()` panels, but `sapply()`
+#' always creates output (in this case a named list of NULL values). It doesn't 
+#' break anything but it does clutter the console, so we capture that output to 
+#' a `.junk` variable and do nothing with it.
+.junk <- sapply(tables_01,View);
 
 
 
