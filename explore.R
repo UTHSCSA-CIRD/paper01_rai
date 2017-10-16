@@ -8,9 +8,13 @@
 #' summary tables and plots in this script. All
 #' the libraries and `config.R` variables are taken
 #' care of by `run.R`
+#' TODO: Just discovered that conditioning sourcing `run.R` on the existence of 
+#' `dat4` will skip sourcing it as intended but because of that also skip 
+#' loading the libraries. Sounds like we will need to create a separate `init.R`
+#' file for just the libraries and have everything call that file.
 #if('clearenv'%in% ls()) clearenv():
 #+ cache=TRUE, echo=FALSE
-if(!'dat4' %in% ls()) source('run.R',echo = F);
+if(!'dat.4' %in% ls()) source('run.R',echo = F);
 #+ echo=FALSE, message=FALSE, results='asis'
 cat('\nGit commit number:',gitstamp(),'<br/>');
 #+ echo=FALSE, results='asis'
