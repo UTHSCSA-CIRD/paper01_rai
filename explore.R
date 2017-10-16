@@ -21,10 +21,6 @@ if(!'dat4' %in% ls()) source('run.R',echo = F);
 #' 
 #' Data file: `r inputdata`
 #' 
-#+ echo=FALSE, results='asis'
-cat('\nGit commit number:',gitstamp(),'<br/>');
-#+ echo=FALSE, results='asis'
-cat('Data file:',inputdata,'\n');
 
 #' Moved over from run.R
 #' 
