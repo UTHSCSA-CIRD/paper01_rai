@@ -31,6 +31,8 @@ dat3 %>% group_by(rai_range) %>%
   ) %>% 
   mutate(`Cumulative Count`=cumsum(`RAI Range`)) %>% View();
 
+if(interactive()) .junk <- sapply(tables_01,View) else {
+  sapply(tables_01,identity,simplify=F)};
 
 
 
