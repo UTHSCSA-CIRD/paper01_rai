@@ -22,10 +22,10 @@ cat('Data file:',inputdata,'\n');
 
 #' Moved over from run.R
 #' 
-#' We're redoing the table on each thing in dat1subs, however tables that might
-#' currently be. Therefore sapply is needed, and the entire table-creating pipeline
-#' is wrapped in a throwaway function (there is a formal name for those, btw-- 
-#' they are called lambdas). This could be a permanent function with a few tweaks:
+#' We're redoing the table on each thing in dat1subs. Therefore sapply is needed, 
+#' and the entire table-creating pipeline is wrapped in a throwaway function 
+#' (there is a formal name for those, btw-they are called lambdas). This could 
+#' be made a permanent function with a few tweaks:
 #' 
 #' * The human-readable names are cumbersome to work with and what if the desired
 #' choice of columns changes? Solution: we keep the original column names and 
@@ -42,7 +42,18 @@ cat('Data file:',inputdata,'\n');
 #' `'Yes'/'No'` and `'TRUE'/'FALSE'` values were mass-converted to actual logical
 #' `TRUE/FALSE`. In fact I think the reason we even have these `'TRUE'/'FALSE'` 
 #' character columns is that I thought this would be cleaner later on for model
-#' fitting 
+#' fitting. However, if we do our models all in one file or one part of the file
+#' we could just mass-convert all the logical columns to factors at that point. 
+#' It may even be that `glm()` and friends give exactly the same output for
+#' logical vectors versus factors, we should check to see if we even need to
+#' convert logical vectors to anything. At any rate, when these are logical vectors
+#' we will be able to shorten, e.g., `a_any_postop=='TRUE'` to `a_any_postop`.
+#' * We are not always checking for true values, sometimes we are checking for 
+#' false ones. So our function, in addition to a list of functions and a vector of
+#' columns of interest our function will need a logical vector where each `TRUE`
+#' or `FALSE` value indicates whether or not to invert the value of that
+#' particular column.
+#' 
 sapply(dat1subs, function(xx) group_by(xx,rai_range) %>% 
   summarize(`RAI Range` = n(), `Non-Elective Surgery` = sum(elective_surg=='No')
             ,`Non-Elective Surgery Fraction` = mean(elective_surg=='No')
@@ -56,14 +67,36 @@ sapply(dat1subs, function(xx) group_by(xx,rai_range) %>%
             ,`Clavien-Dindo Grade4 30days Fraction` = mean(a_any_cd4=='TRUE')
   ) %>% 
   mutate(`Cumulative Count`=cumsum(`RAI Range`)),simplify=F) -> tables_01;
+#' Putting it all together, a permanent version of this function would have a 
+#' call that looks something like this (shortened for didactic purposes):
+# hypothetical_function(data=foo
+#                       # each column gets repeated however many times is is used
+#                       # in the table
+#                       ,cols=c(elective_surg,elective_surg,emergency_case,emergency_case)
+#                       # notice the absence of quotes and parentheses-- we are not
+#                       # executing these functions, we are passing them as objects 
+#                       # that will be executed later on, inside this function
+#                       ,funs=c(sum,mean,sum,mean)
+#                       ,invert=c(F,F,T,F));
+#' We don't need to write this function until the columns requested start to 
+#' change frequently or differ from one set of tables to the next. Even then, 
+#' `tableone` or one `stargazer` might have already done something equivalent
+#' (I don't remember what if anything prevented us from using them here).
+#' 
+#' But the reason I took the time to write this up in detail is so you would see
+#' the thought process behind looking at a bunch of semi-repetitive code and 
+#' seeing how it can be generalize to be a reusable function.
 
-#' View each of the tables. This is in a separate step from the above so that we
-#' can capture the output for reuse. Note that in this rendering step we use 
+#' Now we view each of the tables. This is in a separate step from the above so 
+#' that we can capture the output for reuse. Note that in this rendering step we use 
 #' `sapply()` for its side effect of creating `View()` panels, but `sapply()`
 #' always creates output (in this case a named list of NULL values). It doesn't 
 #' break anything but it does clutter the console, so we capture that output to 
 #' a `.junk` variable and do nothing with it.
-.junk <- sapply(tables_01,View);
+#' 
+#' Notice we need to do it differently depending on if this is running 
+#' inside an R Markdown report or interactively.
+if(interactive()) .junk <- sapply(tables_01,View) else sapply(tables_01,identity);
 
 
 
