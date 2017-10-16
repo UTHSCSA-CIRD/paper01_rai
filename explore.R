@@ -8,16 +8,53 @@
 #' summary tables and plots in this script. All
 #' the libraries and `config.R` variables are taken
 #' care of by `run.R`
+#' TODO: Just discovered that conditioning sourcing `run.R` on the existence of 
+#' `dat4` will skip sourcing it as intended but because of that also skip 
+#' loading the libraries. Sounds like we will need to create a separate `init.R`
+#' file for just the libraries and have everything call that file.
 #if('clearenv'%in% ls()) clearenv():
-#+ cache=TRUE, echo=FALSE
-if(!'dat4' %in% ls()) source('run.R');
+#+ cache=FALSE, echo=FALSE, message=FALSE
+if(!'dat4' %in% ls()) source('run.R',echo = F);
 #+ echo=FALSE, results='asis'
 cat('\nGit commit number:',gitstamp(),'<br/>');
 #+ echo=FALSE, results='asis'
 cat('Data file:',inputdata,'\n');
 
 #' Moved over from run.R
-dat3 %>% group_by(rai_range) %>% 
+#' 
+#' We're redoing the table on each thing in dat1subs. Therefore sapply is needed, 
+#' and the entire table-creating pipeline is wrapped in a throwaway function 
+#' (there is a formal name for those, btw-they are called lambdas). This could 
+#' be made a permanent function with a few tweaks:
+#' 
+#' * The human-readable names are cumbersome to work with and what if the desired
+#' choice of columns changes? Solution: we keep the original column names and 
+#' create a column in dct0 from which to look up the table headers we would like
+#' to use for each one.
+#' * The columns are an alternating series of `sum()` and `mean()`. But this could
+#' change, not something that we should hard-code. Solution: if we make this into
+#' a real function it will take a list of functions as an argument. The 
+#' default value of the list will be `c(sum,mean)` repeated but this way the user
+#' can override that default with a different pattern if necessary
+#' * Inside each `sum()` or `mean()` is a logical vector. It highlights the fact
+#' that regardless of whether or not we make this into a function, we need to 
+#' standardize these values in `run.R`! This job would be easier all these 
+#' `'Yes'/'No'` and `'TRUE'/'FALSE'` values were mass-converted to actual logical
+#' `TRUE/FALSE`. In fact I think the reason we even have these `'TRUE'/'FALSE'` 
+#' character columns is that I thought this would be cleaner later on for model
+#' fitting. However, if we do our models all in one file or one part of the file
+#' we could just mass-convert all the logical columns to factors at that point. 
+#' It may even be that `glm()` and friends give exactly the same output for
+#' logical vectors versus factors, we should check to see if we even need to
+#' convert logical vectors to anything. At any rate, when these are logical vectors
+#' we will be able to shorten, e.g., `a_any_postop=='TRUE'` to `a_any_postop`.
+#' * We are not always checking for true values, sometimes we are checking for 
+#' false ones. So our function, in addition to a list of functions and a vector of
+#' columns of interest our function will need a logical vector where each `TRUE`
+#' or `FALSE` value indicates whether or not to invert the value of that
+#' particular column.
+#' 
+sapply(dat1subs, function(xx) group_by(xx,rai_range) %>% 
   summarize(`RAI Range` = n(), `Non-Elective Surgery` = sum(elective_surg=='No')
             ,`Non-Elective Surgery Fraction` = mean(elective_surg=='No')
             ,`Emergency Case N` = sum(emergency_case=='Yes')
@@ -29,8 +66,34 @@ dat3 %>% group_by(rai_range) %>%
             ,`Clavien-Dindo Grade4 30days N` = sum(a_any_cd4=='TRUE')
             ,`Clavien-Dindo Grade4 30days Fraction` = mean(a_any_cd4=='TRUE')
   ) %>% 
-  mutate(`Cumulative Count`=cumsum(`RAI Range`)) %>% View();
+  mutate(`Cumulative Count`=cumsum(`RAI Range`)),simplify=F) -> tables_01;
+#' Putting it all together, a permanent version of this function would have a 
+#' call that looks something like this (shortened for didactic purposes):
+# hypothetical_function(data=foo
+#                       # each column gets repeated however many times is is used
+#                       # in the table
+#                       ,cols=c(elective_surg,elective_surg,emergency_case,emergency_case)
+#                       # notice the absence of quotes and parentheses-- we are not
+#                       # executing these functions, we are passing them as objects 
+#                       # that will be executed later on, inside this function
+#                       ,funs=c(sum,mean,sum,mean)
+#                       ,invert=c(F,F,T,F));
+#' We don't need to write this function until the columns requested start to 
+#' change frequently or differ from one set of tables to the next. Even then, 
+#' `tableone` or one `stargazer` might have already done something equivalent
+#' (I don't remember what if anything prevented us from using them here).
+#' 
+#' But the reason I took the time to write this up in detail is so you would see
+#' the thought process behind looking at a bunch of semi-repetitive code and 
+#' seeing how it can be generalize to be a reusable function.
 
+#' `sapply()` for its side effect of creating `View()` panels, but `sapply()`
+#' always creates output (in this case a named list of NULL values). It doesn't 
+#' break anything but it does clutter the console, so we capture that output to 
+#' a `.junk` variable and do nothing with it.
+#' 
+#' Notice we need to do it differently depending on if this is running 
+#' inside an R Markdown report or interactively.
 if(interactive()) .junk <- sapply(tables_01,View) else {
   sapply(tables_01,identity,simplify=F)};
 
