@@ -160,6 +160,9 @@ vartype <- function(dat, ctype) {
 
 #' Return a commit hash (for inclusion in reports for example) after first making
 #' sure all changes are committed and pushed
+#' TODO: instead of auto-committing, error if uncommited changes, needs to be 
+#' a deliberate process, otherwise we have tons of meaningless auto-commit
+#' messages that will make future maintenance harder
 gitstamp <- function() system("git commit -a -m 'auto commit changes I forgot to commit manually' > /dev/null && git push; 
                               git log --pretty=format:'%h' -n 1",intern=T);
 
