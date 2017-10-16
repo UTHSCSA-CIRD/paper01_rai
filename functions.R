@@ -160,8 +160,13 @@ vartype <- function(dat, ctype) {
 
 #' Return a commit hash (for inclusion in reports for example) after first making
 #' sure all changes are committed and pushed
-gitstamp <- function() system("git commit -a -m 'auto commit changes I forgot to commit manually' > /dev/null && git push; 
-                              git log --pretty=format:'%h' -n 1",intern=T);
+#' TODO: instead of auto-committing, error if uncommited changes, needs to be 
+#' a deliberate process, otherwise we have tons of meaningless auto-commit
+#' messages that will make future maintenance harder
+gitstamp <- function() {
+  stopifnot(length(system("git diff-index HEAD --",intern = T))==0);
+  system("git push && git log --pretty=format:'%h' -n 1",intern=T);
+}
 
 #' take a list of subset criteria and return a list of data.frames
 ssply<-function(dat,...) sapply(sys.call()[-(1:2)],function(ii) subset(dat,eval(ii)),simplify=F);

@@ -87,16 +87,16 @@ sapply(dat1subs, function(xx) group_by(xx,rai_range) %>%
 #' the thought process behind looking at a bunch of semi-repetitive code and 
 #' seeing how it can be generalize to be a reusable function.
 
-#' Now we view each of the tables. This is in a separate step from the above so 
-#' that we can capture the output for reuse. Note that in this rendering step we use 
 #' `sapply()` for its side effect of creating `View()` panels, but `sapply()`
 #' always creates output (in this case a named list of NULL values). It doesn't 
 #' break anything but it does clutter the console, so we capture that output to 
 #' a `.junk` variable and do nothing with it.
 #' 
 #' Notice we need to do it differently depending on if this is running 
-#' inside an R Markdown report or interactively.
-if(interactive()) .junk <- sapply(tables_01,View) else sapply(tables_01,identity);
+#' inside an R Markdown report or interactively. Ugh, the RMarkdown versions
+#' of the tables need better formatting, `xtable()` or something
+if(interactive()) .junk <- sapply(tables_01,View) else {
+  sapply(tables_01,identity,simplify=F)};
 
 
 
