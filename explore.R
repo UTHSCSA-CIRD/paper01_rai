@@ -13,9 +13,9 @@
 #' loading the libraries. Sounds like we will need to create a separate `init.R`
 #' file for just the libraries and have everything call that file.
 #if('clearenv'%in% ls()) clearenv():
-#+ cache=TRUE, echo=FALSE
+#+ cache=TRUE, echo=FALSE, message=FALSE
 if(!'dat.4' %in% ls()) source('run.R',echo = F);
-#+ echo=FALSE, message=FALSE, results='asis'
+#+ echo=FALSE, results='asis'
 cat('\nGit commit number:',gitstamp(),'<br/>');
 #+ echo=FALSE, results='asis'
 cat('Data file:',inputdata,'\n');
@@ -40,7 +40,9 @@ cat('Data file:',inputdata,'\n');
 #' that regardless of whether or not we make this into a function, we need to 
 #' standardize these values in `run.R`! This job would be easier all these 
 #' `'Yes'/'No'` and `'TRUE'/'FALSE'` values were mass-converted to actual logical
-#' `TRUE/FALSE`. In fact I think the reason we even have ``
+#' `TRUE/FALSE`. In fact I think the reason we even have these `'TRUE'/'FALSE'` 
+#' character columns is that I thought this would be cleaner later on for model
+#' fitting 
 sapply(dat1subs, function(xx) group_by(xx,rai_range) %>% 
   summarize(`RAI Range` = n(), `Non-Elective Surgery` = sum(elective_surg=='No')
             ,`Non-Elective Surgery Fraction` = mean(elective_surg=='No')
