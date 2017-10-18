@@ -12,7 +12,7 @@ source('global.R');
 #' ## Load data if it exists 
 #' 
 #' (useful later, right now don't bother saving sessions)
-if(session %in% list.files()) load(session);
+#'if(session %in% list.files()) load(session);
 #' Load your data. Notice that we're using `read_csv()` from the readr library.
 #' It is a little smarter than the built-in `read.csv()`
 dat0 <- read_tsv(inputdata,na=c('(null)',''));
@@ -20,35 +20,18 @@ dat0 <- read_tsv(inputdata,na=c('(null)',''));
 dct0 <- read_csv(dctfile,na = '');
 dct1 <- read_csv(cptfile,na='');
 colnames(dat0) <- tolower(colnames(dat0));
-#' ## Create the groups of exact column names for this dataset
-#' 
-#' We have a new way to get column names whenever we need them:
-#' `v(c_cd4)` . To see what other groups of column names are currently available
-#' do `names(dct0)[-(1:2)]`
 
-#' Might want to find columns with all/almost-all missing values, or ones with a
-#' value that is always the same for all rows.
-
-
-
-#' ## Convert columns
-#' 
+ 
 #' Create copy of original dataset
 dat1 <- dat0;
-#' Convert appropriate columns to factor
-# Example only, doesn't run, you need to actually populate `cfactr` with
-# names of columns for it to work
-#dat1[,cfactr] <- sapply(dat1[,cfactr],factor,simplify = F);
 
-#' Normalize weight units
-#' 
-#' Normalize the weight units
+
+#' Standardizing the weight units to kilograms
 dat1[dat0$weight_unit=='lbs','weight'] <- dat1[dat0$weight_unit=='lbs','weight']*0.453592;
-#' Similarly for height...
-
-#' -Do likewise for dates, factors, maybe logicals, maybe numerics-
-#' Turns out `read_delim()` is good at recognizing dates and numerics 
-#' on its own.
+dat1[dat0$weight_unit=='lbs','weight_unit'] <- c('kg');
+#' Standardizing height units to centimeters
+dat1[dat0$height_unit=='in','height'] <- dat1[dat0$height_unit=='in','height']*2.54;
+dat1[dat0$height_unit=='in','height_unit'] <- c('cm');
 
 
 #' ## Column names of primary relevance
@@ -103,7 +86,7 @@ dat1$a_any_cd4 <- factor(dat1$a_cd4>0);
 dat1$a_any_postop <- factor(dat1$a_postop>0);
 
 dat1$a_transfer <- dat1$origin_status!='Not transferred (admitted from home)';
-
+dat1$a_readm_30_dy <- ifelse(dat1$readm_30_dy==0, 'FALSE', 'TRUE'); 
 
 #' Time from surgery to adverse outcome if any
 dat1$a_t <- with(dat1
@@ -118,6 +101,8 @@ dat1$a_t <- with(dat1
 dat1$a_t[dat1$a_t>30] <- 30;
 dat1$a_t[is.na(dat1$a_t)] <- 30;
 dat1$a_c <- dat1$a_t!=30;
+
+
 #' Obtain the RAI score
 dat1$a_rai <- raiscore(dat1);
 dat1$rai_range <- cut(dat1$a_rai, breaks=c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55));
@@ -129,15 +114,6 @@ dat1$a_rai_hisp <- with(dat1,interaction(a_discrete_rai,hispanic_ethnicity));
 
 
 #' ## The Rockwood Scale
-#' 
-#' ...sounds crazy but it actually works. According to Mitnitski, Mogilner and 
-#' Rockwood The Scientific World 2001, you just add together a large number of 
-#' binary deficits and divide by the number of non-missing data elements for that
-#' patient and that's your score! Here I calculate it on every Yes/No preop risk
-#' except those whose time window is less than a week, plus creatinine > 30.
-#' 
-#' Lo and behold we get a distribution that looks a lot like what Mitnitski et al
-#' published, and a strong correlation with number of postop complications.
 dat1$a_rockwood <- with(dat1,(
   as.numeric(bmi>=25)+
     as.numeric(origin_status!='Not transferred (admitted from home)')+
@@ -180,10 +156,35 @@ dat1 <- dat1[order(dat1$proc_surg_start),];
 #' 
 #' for later use to make multiple versions of the same table and multiple
 #' versions of the same graph, as for item #3 of the 10/13/2017 PKS email.
-dat1subs <- ssply(dat1
+
+ dat1subs <- ssply(dat1
                   ,full=T
-                  ,colon=cpt_code %in% v(c_colon,dct1)
-                  ,colon_cd4=cpt_code %in% v(c_colon,dct1) & a_any_cd4=='TRUE');
+		  ,all_elective=elective_surg=='Yes'
+		  ,all_urgent=elective_surg=='No' & emergency_case=='No'
+		  ,all_emergency=emergency_case=='Yes'
+                  ,all_colon_all=cpt_code %in% v(c_all_colon,dct1)
+		  ,all_colon_elective=cpt_code %in% v(c_all_colon,dct1) &
+			 elective_surg=='Yes'
+		  ,all_colon_urgent=cpt_code %in% v(c_all_colon,dct1) &
+			 elective_surg=='No' & emergency_case=='No'
+		  ,all_colon_emergency=cpt_code %in% v(c_all_colon,dct1) &
+			 emergency_case=='Yes'
+		  ,open_colon_all=cpt_code %in% v(c_open_colon,dct1)
+		  ,open_colon_elective=cpt_code %in% v(c_open_colon,dct1) &
+			 elective_surg=='Yes'
+		  ,open_colon_urgent=cpt_code %in% v(c_open_colon,dct1) &
+			 elective_surg=='No' & emergency_case=='No'
+		  ,open_colon_emergency=cpt_code %in% v(c_open_colon,dct1) &
+			 emergency_case=='Yes'
+		  ,lapa_colon_all=cpt_code %in% v(c_lapa_colon,dct1)
+		  ,lapa_colon_elective=cpt_code %in% v(c_lapa_colon,dct1) &
+			 elective_surg=='Yes'
+		  ,lapa_colon_urgent=cpt_code %in% v(c_lapa_colon,dct1) &
+			 elective_surg=='No' & emergency_case=='No'
+		  ,lapa_colon_emergency=cpt_code %in% v(c_lapa_colon,dct1) &
+			 emergency_case=='Yes'                  
+);
+
 
 #' ### Create a version of the dataset that only has each patient's 1st encounter
 #' 
