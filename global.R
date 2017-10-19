@@ -21,18 +21,12 @@ sapply(rq_need,require,character.only=T);
 enableJIT(3);
 #' ## Load local config file
 #' 
-#' Please edit the file referenced below, it has instructions in the 
-#' comments.
 source('./config.R');
-#' Please edit the file referenced below, it has instructions in the
-#' comments
-source('./metadata.R');
-#' This file has some possible useful functions. You might not need to edit
-#' it but should read it.
+source('./metadata.R'); 
 source('./functions.R');
 
 
-#'
+
 #' ## Set generic variables
 #' 
 #' data dictionary:
