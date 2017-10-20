@@ -22,9 +22,9 @@ dat1subs[["all_colon_all"]] %>%
   # group_by( a_discrete_rai,hispanic_ethnicity, a_any_cd4) %>% 
   # mutate(count=length(a_discrete_rai)) %>% 
    ggplot(aes(x=a_discrete_rai,y=income_final,fill=a_any_cd4)) + 
-   geom_boxplot(coef=100) + labs(title = "Income Vs Frailty Vs Clavien-Dindo Grade 4 Complications in
-All Colectomy Patients") +
-   scale_fill_discrete(name="Clavien-Dindo Grade4"
+   geom_boxplot(coef=100) + labs(title = "Income vs Frailty & Clavien-Dindo Grade 4 
+Complications in all Colectomy Patients") +
+   scale_fill_discrete(name="Clavien-Dindo\nGrade4"
                       ,breaks=c("FALSE", "TRUE")
                       ,labels=c("No", "Yes")
                     ) -> plot_any_cd4;
