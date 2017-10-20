@@ -7,6 +7,7 @@ lapply(dat1subs, function(xx) group_by(xx,rai_range) %>%
             ,`Died 30days N` = sum(postop_death_30_dy_proc =='Yes') 
             ,`Died 30days Fraction` = mean(postop_death_30_dy_proc =='Yes')
             ,`Complications 30days N` = sum(a_any_postop=='TRUE')
+            #,`Cumulative Count` = cumsum()
             ,`Complications 30days Fraction` = mean(a_any_postop=='TRUE')
             ,`Clavien-Dindo Grade4 30days N` = sum(a_any_cd4=='TRUE')
             ,`Clavien-Dindo Grade4 30days Fraction` = mean(a_any_cd4=='TRUE')

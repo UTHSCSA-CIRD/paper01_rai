@@ -17,6 +17,34 @@
 #' patient/visit IDs, free text, and anything that is a comma-separated list
 #' of codes. These should be character vectors either of column names or of grep
 #' patterns for selecting those names.  
+subs <- alist(
+  full=T
+  ,all_elective=elective_surg=='Yes'
+  ,all_urgent=elective_surg=='No' & emergency_case=='No'
+  ,all_emergency=emergency_case=='Yes'
+  ,all_colon_all=cpt_code %in% v(c_all_colon,dct1)
+  ,all_colon_elective=cpt_code %in% v(c_all_colon,dct1) &
+    elective_surg=='Yes'
+  ,all_colon_urgent=cpt_code %in% v(c_all_colon,dct1) &
+    elective_surg=='No' & emergency_case=='No'
+  ,all_colon_emergency=cpt_code %in% v(c_all_colon,dct1) &
+    emergency_case=='Yes'
+  ,open_colon_all=cpt_code %in% v(c_open_colon,dct1)
+  ,open_colon_elective=cpt_code %in% v(c_open_colon,dct1) &
+    elective_surg=='Yes'
+  ,open_colon_urgent=cpt_code %in% v(c_open_colon,dct1) &
+    elective_surg=='No' & emergency_case=='No'
+  ,open_colon_emergency=cpt_code %in% v(c_open_colon,dct1) &
+    emergency_case=='Yes'
+  ,lapa_colon_all=cpt_code %in% v(c_lapa_colon,dct1)
+  ,lapa_colon_elective=cpt_code %in% v(c_lapa_colon,dct1) &
+    elective_surg=='Yes'
+  ,lapa_colon_urgent=cpt_code %in% v(c_lapa_colon,dct1) &
+    elective_surg=='No' & emergency_case=='No'
+  ,lapa_colon_emergency=cpt_code %in% v(c_lapa_colon,dct1) &
+    emergency_case=='Yes'   
+  
+)
 
 
 dcols <- c('idn_mrn', 'case_number', 'lmrn_visit',                    

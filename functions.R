@@ -173,6 +173,20 @@ ssply<-function(dat,...) sapply(sys.call()[-(1:2)],function(ii) subset(dat,eval(
 
 #' ### Specific to RAI-A
 #' 
+ggpks <- function(data,xx='a_discrete_rai',yy='income_final'
+                    ,fill='hispanic_ethnicity',title='Your Title Here'
+                    ,scalename = 'Ethnicity', breaks=c('No','Unknown','Yes')
+                    ,labels=c('Non-Hispanic','Unknown','Hispanic')){
+  ggplot(data,aes_string(x=xx,y=yy,fill=fill)) + 
+    labs(title = title) +
+    scale_fill_discrete(name=scalename,breaks=breaks,labels=labels) #+
+#  geom_boxplot()
+}
+# Usage example: you can swap out different things at the end
+# dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
+#   filter(a_any_cd4=='TRUE') %>%
+#   ggpks() + geom_violin(trim=F);
+
 
 #' Return a tableone object formatted just the way we like it
 #' @param xx     A \code{data.frame} (required).

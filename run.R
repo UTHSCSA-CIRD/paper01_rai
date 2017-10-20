@@ -77,8 +77,8 @@ c_cd4_count <- intersect(v(c_cd4),v(c_count));
 
 #' Do the same as above but just for the `ccd4` complications
 #dat1$a_cd4 <- rowSums(dat1[,c_cd4]);
-dat1$a_cd4 <- rowSums(dat1[,c_cd4_count]) + 
-  apply(dat1[,c_cd4_yesno],1,function(xx) sum(na.omit(xx=='Yes')));
+  dat1$a_cd4 <- rowSums(dat1[,c_cd4_count]) + 
+    apply(dat1[,c_cd4_yesno],1,function(xx) sum(na.omit(xx=='Yes')));
 
 #' TRUE/FALSE variables for postop and cd4 in both cases
 #' indicating whether or not the patient had _any_ complications
