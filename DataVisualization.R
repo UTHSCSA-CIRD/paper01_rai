@@ -1,6 +1,9 @@
 #' calling 'run.R' so that I can load the dataset. 'run.R' also does minor data cleaning.
 #+ echo=FALSE, message=FALSE
 source('global.R');
+#' Revision: `r gitstamp()`.
+#' 
+#' Data file: `r inputdata`.
 #+ cache=TRUE, echo=FALSE, message=FALSE
 source('run.R');
 
