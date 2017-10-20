@@ -1,4 +1,9 @@
-#' calling 'run.R' so that I can load the dataset. 'run.R' also does minor data cleaning.
+#' ---
+#' title: "RAI Visualization"
+#' author: "Wilson, Bokov, Shireman"
+#' date: "10/20/2017"
+#' ---
+#' 
 #+ echo=FALSE, message=FALSE
 source('global.R');
 #' Revision: `r gitstamp()`.
