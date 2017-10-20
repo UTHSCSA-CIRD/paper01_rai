@@ -12,8 +12,9 @@ source('global.R');
 #+ cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE
 source('run.R');
 
-#' exploring the relationship between income and frailty incidence in all colectomy patients
+#' Relationship between income and frailty incidence in all colectomy patients
 #' that have a Clavien-Dindo Grade 4 complication (TRUE) or not (FALSE)
+#' 
 #+ echo=FALSE, warning=FALSE
 dat1subs[["all_colon_all"]] %>% 
   # the next line doesn't actually do anything...
@@ -21,7 +22,8 @@ dat1subs[["all_colon_all"]] %>%
   # group_by( a_discrete_rai,hispanic_ethnicity, a_any_cd4) %>% 
   # mutate(count=length(a_discrete_rai)) %>% 
    ggplot(aes(x=a_discrete_rai,y=income_final,fill=a_any_cd4)) + 
-   geom_boxplot(coef=100) + labs(title = "Income Vs Frailty Vs Clavien-Dindo Grade 4 Complications in All Colectomy Patients") +
+   geom_boxplot(coef=100) + labs(title = "Income Vs Frailty Vs Clavien-Dindo Grade 4 Complications in
+All Colectomy Patients") +
    scale_fill_discrete(name="Clavien-Dindo Grade4"
                       ,breaks=c("FALSE", "TRUE")
                       ,labels=c("No", "Yes")
@@ -34,14 +36,17 @@ plot_any_cd4 + stat_summary(fun.data=n_fun,geom='text',position=position_dodge(w
 #' so 100% of the data is contained within them. The numbers indicate
 #' the number of cases in each group.
 #' 
+#' 
+#' 
 
 #' Patients that DO NOT have Clavien-Dindo Grade 4 complications
+#' 
 #+ echo=FALSE, warning=FALSE
 dat1subs[["all_colon_all"]] %>% 
   filter(a_any_cd4=='FALSE') %>%
   ggplot(aes(x=a_discrete_rai,y=income_final,fill=hispanic_ethnicity)) + 
   geom_boxplot() + labs(title = "Income Vs Frailty Vs Hispanic Ethnicity in 
-                        All Colectomy Patients with No CD4 Complications") +
+All Colectomy Patients with No CD4 Complications") +
   scale_fill_discrete(name="Ethnicity"
                      ,breaks=c("No", "Unknown", "Yes")
                      ,labels=c("Non-Hispanic", "Unknown", "Hispanic")
@@ -54,14 +59,18 @@ plot_no_cd4 + stat_summary(fun.data=n_fun,geom='text',position=position_dodge(wi
 #' so 100% of the data is contained within them. The numbers indicate
 #' the number of cases in each group.
 #' 
+#' 
+#' 
 
 
 #' Patients that HAVE Clavien-Dindo Grade 4 complications
+#' 
 #+ echo=FALSE, warning=FALSE
 dat1subs[["all_colon_all"]] %>% 
   filter(a_any_cd4=='TRUE') %>%
   ggplot(aes(x=a_discrete_rai,y=income_final,fill=hispanic_ethnicity)) + 
-  geom_boxplot() + labs(title = "Income Vs Frailty Vs Hispanic Ethnicity in All Colectomy Patients with CD4 Complications") +
+  geom_boxplot() + labs(title = "Income Vs Frailty Vs Hispanic Ethnicity in 
+All Colectomy Patients with CD4 Complications") +
   scale_fill_discrete(name="Ethnicity"
                      ,breaks=c("No", "Unknown", "Yes")
                      ,labels=c("Non-Hispanic", "Unknown", "Hispanic")
