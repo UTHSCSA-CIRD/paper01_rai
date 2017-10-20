@@ -9,7 +9,7 @@ source('global.R');
 #' Revision: `r gitstamp()`.
 #' 
 #' Data file: `r inputdata`.
-#+ cache=TRUE, echo=FALSE, message=FALSE
+#+ cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE
 source('run.R');
 
 #' exploring the relationship between income and frailty incidence in all colectomy patients
