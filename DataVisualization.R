@@ -14,14 +14,33 @@ source('run.R');
 
 #' exploring the relationship between income and frailty incidence in all colectomy patients
 #' that have a Clavien-Dindo Grade 4 complication (TRUE) or not (FALSE)
-dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, a_any_cd4, income_final) %>% group_by( a_discrete_rai,hispanic_ethnicity, a_any_cd4) %>% 
+#' 
+dat1subs[["all_colon_all"]] %>% 
+  # the next line doesn't actually do anything...
+  select(a_discrete_rai,hispanic_ethnicity, a_any_cd4, income_final) %>% group_by( a_discrete_rai,hispanic_ethnicity, a_any_cd4) %>% 
+  ggplot(aes(x=a_discrete_rai,y=income_final,fill=a_any_cd4)) + 
+  geom_boxplot(coef=100) + labs(title = "Income Vs Frailty Vs Clavien-Dindo Grade 4 Complications in All Colectomy Patients") +
+  scale_fill_discrete(name="Clavien-Dindo Grade4"
+                      ,breaks=c("FALSE", "TRUE")
+                      ,labels=c("No", "Yes")
+  );
+
+dat1subs[["all_colon_all"]] %>% 
+  # the next line doesn't actually do anything...
+  #select(a_discrete_rai,hispanic_ethnicity, a_any_cd4, income_final) %>% group_by( a_discrete_rai,hispanic_ethnicity, a_any_cd4) %>% 
    ggplot(aes(x=a_discrete_rai,y=income_final,fill=a_any_cd4)) + 
-   geom_boxplot() + labs(title = "Income Vs Frailty Vs Clavien-Dindo Grade 4 Complications in All Colectomy Patients") +
+   geom_boxplot(coef=100) + labs(title = "Income Vs Frailty Vs Clavien-Dindo Grade 4 Complications in All Colectomy Patients") +
    scale_fill_discrete(name="Clavien-Dindo Grade4"
                       ,breaks=c("FALSE", "TRUE")
                       ,labels=c("No", "Yes")
                     ) -> plot_any_cd4;
- plot_any_cd4;
+plot_any_cd4;
+#' The mid-lines are median values, the boxes extend from the
+#' 25th percentile to the 75th percentile-- i.e. they contain 
+#' half the observations for their respective groups. The
+#' vertical lines extend to the maximum and minimum observation,
+#' so 100% of the data is contained within them.
+#' 
 
 #' selecting patients that DO NOT have Clavien-Dindo Grade 4 complications
 dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
