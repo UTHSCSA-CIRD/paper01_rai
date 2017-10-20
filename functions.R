@@ -158,6 +158,8 @@ vartype <- function(dat, ctype) {
   return(res)
 }
 
+#' ## Functions for RMarkdown and ggplot2
+#' 
 #' Return a commit hash (for inclusion in reports for example) after first making
 #' sure all changes are committed and pushed
 #' TODO: instead of auto-committing, error if uncommited changes, needs to be 
@@ -167,6 +169,12 @@ gitstamp <- function() {
   stopifnot(length(system("git diff-index HEAD --",intern = T))==0);
   system("git push && git log --pretty=format:'%h' -n 1",intern=T);
 }
+
+#' This function can be called from `stat_summary()` as the
+#' `fun.data=` argument. It will cause group counts to be 
+#' over-printed on a `geom_boxplot()` (probably other similar
+#' plots too) if `stat_summary()` is added to it.
+n_fun <- function(xx) data.frame(y=mean(quantile(xx,c(.5,.75))),label=as.character(length(xx)));
 
 #' take a list of subset criteria and return a list of data.frames
 ssply<-function(dat,...) sapply(sys.call()[-(1:2)],function(ii) subset(dat,eval(ii)),simplify=F);
