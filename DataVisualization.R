@@ -45,7 +45,7 @@ plot_any_cd4 + stat_summary(fun.data=n_fun,geom='text',position=position_dodge(w
 dat1subs[["all_colon_all"]] %>% 
   filter(a_any_cd4=='FALSE') %>%
   ggplot(aes(x=a_discrete_rai,y=income_final,fill=hispanic_ethnicity)) + 
-  geom_boxplot() + labs(title = "Income Vs Frailty Vs Hispanic Ethnicity in 
+  geom_boxplot(coef=100) + labs(title = "Income Vs Frailty Vs Hispanic Ethnicity in 
 All Colectomy Patients with No CD4 Complications") +
   scale_fill_discrete(name="Ethnicity"
                      ,breaks=c("No", "Unknown", "Yes")
@@ -69,7 +69,7 @@ plot_no_cd4 + stat_summary(fun.data=n_fun,geom='text',position=position_dodge(wi
 dat1subs[["all_colon_all"]] %>% 
   filter(a_any_cd4=='TRUE') %>%
   ggplot(aes(x=a_discrete_rai,y=income_final,fill=hispanic_ethnicity)) + 
-  geom_boxplot() + labs(title = "Income Vs Frailty Vs Hispanic Ethnicity in 
+  geom_boxplot(coef=100) + labs(title = "Income Vs Frailty Vs Hispanic Ethnicity in 
 All Colectomy Patients with CD4 Complications") +
   scale_fill_discrete(name="Ethnicity"
                      ,breaks=c("No", "Unknown", "Yes")
