@@ -21,7 +21,7 @@ dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, a_any_
                       ,breaks=c("FALSE", "TRUE")
                       ,labels=c("No", "Yes")
                     ) -> plot_any_cd4;
- 
+ plot_any_cd4;
 
 #' selecting patients that DO NOT have Clavien-Dindo Grade 4 complications
 dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
