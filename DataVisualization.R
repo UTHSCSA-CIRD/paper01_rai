@@ -1,13 +1,13 @@
 #' ---
 #' title: "RAI Visualization"
 #' author: "Wilson, Bokov, Shireman"
-#' date: `r date()`
+#' date: "10/20/2017"
 #' ---
 #' 
 #+ echo=FALSE, message=FALSE
 source('global.R');
+#' Report date: `r date()`.
 #' Revision: `r gitstamp()`.
-#' 
 #' Data file: `r inputdata`.
 #+ cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE
 source('run.R');
