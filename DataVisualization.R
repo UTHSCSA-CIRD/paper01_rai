@@ -7,7 +7,9 @@
 #+ echo=FALSE, message=FALSE
 source('global.R');
 #' Report date: `r date()`.
+#' 
 #' Revision: `r gitstamp()`.
+#' 
 #' Data file: `r inputdata`.
 #+ cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE
 source('run.R');
