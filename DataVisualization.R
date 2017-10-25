@@ -6,6 +6,8 @@
 #' 
 #+ echo=FALSE, message=FALSE
 source('global.R');
+#' Report date: `r date()`.
+#' 
 #' Revision: `r gitstamp()`.
 #' 
 #' Data file: `r inputdata`.
