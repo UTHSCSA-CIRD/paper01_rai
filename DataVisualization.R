@@ -4,13 +4,19 @@ source('./run.R');
 
 #exploring the relationship between income and frailty incidence in all colectomy patients
 #that have a Clavien-Dindo Grade 4 complication (TRUE) or not (FALSE)
-dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, a_any_cd4, income_final) %>% group_by( a_discrete_rai,hispanic_ethnicity, a_any_cd4) %>% 
-   ggplot(aes(x=a_discrete_rai,y=income_final,fill=a_any_cd4)) + 
-   geom_boxplot() + labs(title = "Income Vs Frailty Vs Clavien-Dindo Grade 4 Complications in All Colectomy Patients") +
+thedata <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai, a_any_cd4, income_final) %>% group_by( a_discrete_rai, a_any_cd4)
+   ggplot(data = thedata, aes(x = factor(a_discrete_rai)
+                             ,y = income_final,fill=a_any_cd4)) + 
+   geom_boxplot(na.rm = TRUE) + labs(title = "Income Vs Frailty Vs Clavien-Dindo Grade 4 Complications in All Colectomy Patients") +
    scale_fill_discrete(name="Clavien-Dindo Grade4"
                       ,breaks=c("FALSE", "TRUE")
                       ,labels=c("No", "Yes")
                     ) -> plot_any_cd4;
+#' I should figure out how to print this table too:
+thecounts <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai, a_any_cd4, income_final) %>% group_by( a_discrete_rai, a_any_cd4) %>% count()
+plot_any_cd4 + annotate("text", x = c(0.8, 1.2, 1.8, 2.2, 2.8, 3.2)
+                        ,y = 10000, label = as.character(thecounts$n)
+                        ,size = 6)
  
 
 #selecting patients that DO NOT have Clavien-Dindo Grade 4 complications
