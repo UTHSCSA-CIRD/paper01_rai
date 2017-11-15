@@ -24,6 +24,9 @@ colnames(dat0) <- tolower(colnames(dat0));
  
 #' Create copy of original dataset
 dat1 <- dat0;
+names(dat1)<-gsub('deid_patient','idn_mrn',names(dat1));
+names(dat1)<-gsub('deid_visit','lmrn_visit',names(dat1));
+names(dat1)<-gsub('deid_case','case_number',names(dat1));
 
 
 #' Standardizing the weight units to kilograms
