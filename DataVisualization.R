@@ -53,6 +53,46 @@ plot_cd4 + annotate("text", x = c(0.75, 1.0, 1.25, 1.8, 2.2, 3.0)
                        ,y = 10000, label = as.character(thecounts3$n)
                        ,size = 5)
 
+#selecting patients that DO NOT have Clavien-Dindo Grade 4 complications
+#and are not hispanic
+thedata4 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai) %>% 
+  filter(hispanic_ethnicity=='No')
+ggplot(data = thedata4, aes(x = a_discrete_rai
+                            ,y = income_final, fill = a_any_cd4)) + 
+  geom_boxplot() + 
+  labs(title = "Income Vs Frailty Vs CD4 Complications in Non-Hispanic Colectomy Patients") +
+  scale_fill_discrete(name = "Clavien-Dindo Grade4"
+                      ,breaks = c("FALSE", "TRUE")
+                      ,labels = c("No", "Yes")
+  )-> plot_no_cd4_nohisp;
+
+#' I should figure out how to print this table too:
+thecounts4 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai, a_any_cd4) %>% 
+  filter(hispanic_ethnicity=='No') %>% count()
+plot_no_cd4_nohisp + annotate("text", x = c(0.75, 1.2, 1.8, 2.2)
+                              ,y = 10000, label = as.character(thecounts4$n)
+                              ,size = 5)
+#selecting patients that DO NOT have Clavien-Dindo Grade 4 complications
+#and are hispanic
+thedata5 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai) %>% 
+  filter(hispanic_ethnicity=='Yes')
+ggplot(data = thedata5, aes(x = a_discrete_rai
+                            ,y = income_final, fill = a_any_cd4)) + 
+  geom_boxplot() + 
+  labs(title = "Income Vs Frailty Vs CD4 Complications in Hispanic Colectomy Patients") +
+  scale_fill_discrete(name = "Clavien-Dindo Grade4"
+                      ,breaks = c("FALSE", "TRUE")
+                      ,labels = c("No", "Yes")
+  )-> plot_no_cd4_hisp;
+
+#' I should figure out how to print this table too:
+thecounts5 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by(a_discrete_rai, a_any_cd4) %>% 
+  filter(hispanic_ethnicity=='Yes') %>% count()
+plot_no_cd4_hisp + annotate("text", x = c(0.75, 1.2, 1.8, 2.2, 2.8, 3.2)
+                            ,y = 10000, label = as.character(thecounts5$n)
+                            ,size = 5)
+
+
 pdf(height = 10, width = 7.5, onefile = TRUE, file = paste0(outputpath,"UHS_ACSNSQIP_CD4complications-DSW-", format(Sys.Date(), '%m-%d-%Y'),".pdf"))
 plot_any_cd4 + annotate("text", x = c(0.8, 1.2, 1.8, 2.2, 2.8, 3.2)
                         ,y = 10000, label = as.character(thecounts$n)
@@ -63,4 +103,10 @@ plot_no_cd4 + annotate("text", x = c(0.75, 1.0, 1.25, 1.8, 2.2, 3.0)
 plot_cd4 +annotate("text", x = c(0.75, 1.0, 1.25, 1.8, 2.2, 3.0)
                    ,y = 10000, label = as.character(thecounts3$n)
                    ,size = 5)
+plot_no_cd4_nohisp + annotate("text", x = c(0.75, 1.2, 1.8, 2.2)
+                              ,y = 10000, label = as.character(thecounts4$n)
+                              ,size = 5)
+plot_no_cd4_hisp + annotate("text", x = c(0.75, 1.2, 1.8, 2.2, 2.8, 3.2)
+                            ,y = 10000, label = as.character(thecounts5$n)
+                            ,size = 5)
 dev.off()
