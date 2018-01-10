@@ -1,5 +1,18 @@
-#calling 'run.R' so that I can load the dataset. 'run.R' also does minor data cleaning.
-source('./run.R');
+#' ---
+#' title: "RAI Visualization"
+#' author: "Wilson, Bokov, Shireman"
+#' date: "10/20/2017"
+#' ---
+#' 
+#+ echo=FALSE, message=FALSE
+source('global.R');
+#' Report date: `r date()`.
+#' 
+#' Revision: `r gitstamp()`.
+#' 
+#' Data file: `r inputdata`.
+#+ cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE
+source('run.R');
 
 
 #exploring the relationship between income and frailty incidence in all colectomy patients
@@ -8,7 +21,7 @@ thedata <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai, a_any_cd4, inc
 ggplot(data = thedata, aes(x = factor(a_discrete_rai)
                           ,y = income_final,fill=a_any_cd4)) + 
 geom_boxplot(coef=100) + labs(title = "Income Vs Frailty Vs Clavien-Dindo Grade 4 Complications in All UHS Colectomy Patients") +
-scale_fill_discrete(name = "Clavien-Dindo Grade4"
+scale_fill_discrete(name = "Clavien-Dindo\nGrade4"
                     ,breaks = c("FALSE", "TRUE")
                     ,labels = c("No", "Yes")
                     ) -> plot_any_cd4;
@@ -29,6 +42,7 @@ scale_fill_discrete(name = "Ethnicity"
                     ,breaks = c("No", "Unknown", "Yes")
                     ,labels = c("Non-Hispanic", "Unknown", "Hispanic")
                     )-> plot_no_cd4;
+ 
 
 #' I should figure out how to print this table too:
 thecounts2 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
