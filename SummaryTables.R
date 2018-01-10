@@ -2,7 +2,7 @@ source('./run.R');
 
 #' Creating open colon summary tables:
 lapply(dat1subs, function(xx) group_by(xx,rai_range) %>% 
-  summarize(rai_n = n()	    
+  summarise(rai_n = n()	    
             ,cumul_count = cumsum(n())
             ,died_n = sum(postop_death_30_dy_proc =='Yes') 
             ,died_frac = mean(postop_death_30_dy_proc =='Yes')
@@ -81,7 +81,7 @@ lapply(tables_02, write.table, paste0(outputpath, 'UHS_ACSNSQIP_SummaryTables-DS
 table_01 <- dat1subs[["all_colon_all"]] %>% 
   filter(hospital_admissn_dt > "2015-12-31" & hospital_admissn_dt < "2017-01-01") %>% 
   group_by(rai_range) %>% 
-  summarize(rai_n = n()	    
+  summarise(rai_n = n()	    
             ,cumul_count = cumsum(n())
             ,died_n = sum(postop_death_30_dy_proc =='Yes') 
             ,died_frac = mean(postop_death_30_dy_proc =='Yes')
@@ -91,8 +91,7 @@ table_01 <- dat1subs[["all_colon_all"]] %>%
             ,cd4_frac = mean(a_any_cd4=='TRUE')
             ,readmsn_n = sum(a_readm_30_dy=='TRUE')
             ,readmsn_frac = mean(a_readm_30_dy=='TRUE')
-  ) %>% 
-  mutate(cumul_count=rev(cumsum(rev(rai_n)))) %>% 
+  ) %>% mutate(cumul_count=rev(cumsum(rev(rai_n)))) %>% 
   arrange(desc(rai_range)) 
 renamecol <- function(xx) {
   rai_range <- "Total"
@@ -134,3 +133,4 @@ renamecol <- function(xx) {
 }
 
 table_02 <- renamecol(table_01)
+write.table(table_02,  paste0(outputpath, 'UHS_ACSNSQIP_2016ColectomyTables-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')
