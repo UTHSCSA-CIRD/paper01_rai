@@ -167,8 +167,9 @@ vartype <- function(dat, ctype) {
 #' messages that will make future maintenance harder
 gitstamp <- function(production=T) {
   if(production){
-    if(length(system("git diff-index HEAD --",intern = T))!=0) stop(
-      "You have uncommitted changes. Please do 'git commit' and then try again.");
+    if(length(gitdiff<-system("git diff-index HEAD --",intern = T))!=0) stop(sprintf(
+      "git message: %s\n\nYou have uncommitted changes. Please do 'git commit' and then try again."
+      ,gitdiff));
     system("git push && git log --pretty=format:'%h' -n 1",intern=T);
   } else system("git log --pretty=format:'%h' -n 1",intern=T);
 }
