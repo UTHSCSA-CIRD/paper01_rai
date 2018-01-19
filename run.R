@@ -165,7 +165,9 @@ dat1 <- dat1[order(dat1$proc_surg_start),];
 		  ,all_elective=elective_surg=='Yes'
 		  ,all_urgent=elective_surg=='No' & emergency_case=='No'
 		  ,all_emergency=emergency_case=='Yes'
-                  ,all_colon_all=cpt_code %in% v(c_all_colon,dct1)
+		  ,all_colon_all=cpt_code %in% v(c_all_colon,dct1)
+		  # coming soon:
+		  #,all_colon_all_2017 = 
 		  ,all_colon_elective=cpt_code %in% v(c_all_colon,dct1) &
 			 elective_surg=='Yes'
 		  ,all_colon_urgent=cpt_code %in% v(c_all_colon,dct1) &
