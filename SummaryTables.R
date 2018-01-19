@@ -1,8 +1,7 @@
 #' Create a header here like there already is in `DataVisualization.R`
 source('./run.R');
 
-#' ### **AFB Summary:** I see no errors in how this was done, good job! What we 
-#' need to do is...
+#' ### **AFB Summary:** I see no errors in how this was done, good job! What we need to do is...
 #' 
 #' * **You need to read in Brad's data in the same place in `run.R` as we already
 #' read in the NSQIP input file, creating a variable for it in your `config.R`.
@@ -17,7 +16,7 @@ source('./run.R');
 #' like the ones used here to `TRUE`/`FALSE` in `dat1` so you don't have to do
 #' that here? This will make the code simpler still because then you can use 
 #' `summarize_each()` on a whole list of columns.
-
+#' 
 
 #' Creating open colon summary tables:
 #' 
