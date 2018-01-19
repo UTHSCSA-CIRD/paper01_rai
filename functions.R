@@ -260,3 +260,69 @@ raiscore.bak <- function(xx){
 #' named in the first argument is true. The first arg can be either a string or 
 #' a name. The second must be a data.frame
 v <- function(var,dictionary=dct0) {cc<-substitute(var);na.omit(dictionary[dictionary[[as.character(cc)]],'dataset_column_names'])[[1]]}
+
+
+
+#This function will count the number of times a patient
+#is readmitted to the hospital within a given time window
+#provided by the user (default will be 30 days). Here are
+#the variables:
+# mat = a mx3 matrix that only has pat_id, admit_dt and
+#       discharge_dt. This matrix was passed on by the 
+#	'readmission_total' wrapper function.
+# days = the time window beginning after
+#	 the discharge date to count the 
+#	 number of readmissions. This was passed on by
+#        the 'readmission_total' wrapper function. 
+readmit_counter <- function(one_id, m0, days)
+{
+  m1 <- m0 %>% filter(pat_id %in% one_id)
+  m1$admit_dt <- as.Date(m1$admit_dt)
+  m1$discharge_dt <- as.Date(m1$discharge_dt)
+  m2 <- m1 %>% arrange(admit_dt)
+  crit_date <- as.Date(m2[1,"discharge_dt"]) + as.numeric(days)
+  counter <- 0
+  holder <- sapply(m2$admit_dt[-1], function(ii){
+    if( nrow(m1) == 1)
+    { counter <- 0 }
+    else
+    { 
+      if( as.Date(ii) < crit_date )
+      { counter <- counter + 1 }
+      else 
+      { counter <- counter + 0 }
+    }
+  }    
+  )
+  counter2 <- sum(unlist(holder))
+  return(counter2)
+}
+
+#This wrapper function will pass on a matrix (see below)
+#to the 'readmit_counter' function to count the number 
+#of times a patient is readmitted to the hospital within 
+#a given time window provided by the user (default will 
+#be 30 days). Here are the variables:
+# pat_id = patient ID or MRN
+# admit_dt = hospital admission date
+# discharge_dt = hospital discharge date
+# days = the time window beginning after
+#	 the discharge date to count the 
+#	 number of readmissions 
+#The 'pat_id', 'admit_dt' and 'discharge_dt' variables
+#will be combined in a matrix format and then passed
+#on to the 'readmit_counter' function, along with the
+#the 'days' variable. After calculating the number of
+#readmissions, this wrapper function will return a 
+#matrix with the patient IDs in the first column
+#and the number of readmissions in the second column.
+readmission_total <- function(pat_id, admit_dt, discharge_dt, days)
+{
+  d0 <- as.data.frame(cbind(pat_id, as.character(admit_dt), as.character(discharge_dt)))
+  colnames(d0) <- c('pat_id', 'admit_dt', 'discharge_dt')
+  thepatient <- unique(d0$pat_id)
+  theresult <- c()
+  counter <- sapply(thepatient, function(ii) {readmit_counter(ii, d0, days)})
+  theresult <- as.data.frame(cbind(as.character(thepatient), counter))
+  return(theresult)
+}
