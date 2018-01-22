@@ -31,7 +31,10 @@ dat1 <- dat0;
 names(dat1)<-gsub('deid_patient','idn_mrn',names(dat1));
 names(dat1)<-gsub('deid_visit','lmrn_visit',names(dat1));
 names(dat1)<-gsub('deid_case','case_number',names(dat1));
-
+#' This is another departure from my not making code changes-- I think this is 
+#' the only obstacle to using the version of the cost data you gave me, and this
+#' code will be completely silent if your copy doesn't have spaces in the names
+names(cost1) <- chartr(' ','_',names(cost1));
 
 #' Fixing the date columns in the 'cost' dataset:
 cost1$admission_date <- as.Date(cost1$admission_date, format = '%m/%d/%y')
