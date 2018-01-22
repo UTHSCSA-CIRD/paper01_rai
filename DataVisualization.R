@@ -302,4 +302,4 @@ plot_no_rai_cd4_hisp_violin + annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 
                                        ,y = 5000, label = as.character(thecounts6$n)
                                        ,size = 5)
 
-dev.off()
+dev.off();
