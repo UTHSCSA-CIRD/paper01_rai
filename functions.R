@@ -165,9 +165,13 @@ vartype <- function(dat, ctype) {
 #' TODO: instead of auto-committing, error if uncommited changes, needs to be 
 #' a deliberate process, otherwise we have tons of meaningless auto-commit
 #' messages that will make future maintenance harder
-gitstamp <- function() {
-  stopifnot(length(system("git diff-index HEAD --",intern = T))==0);
-  system("git push && git log --pretty=format:'%h' -n 1",intern=T);
+gitstamp <- function(production=T) {
+  if(production){
+    if(length(gitdiff<-system("git update-index --refresh && git diff-index HEAD --",intern = T))!=0) stop(sprintf(
+      "\ngit message: %s\n\nYou have uncommitted changes. Please do 'git commit' and then try again."
+      ,gitdiff));
+    system("git push && git log --pretty=format:'%h' -n 1",intern=T);
+  } else system("git log --pretty=format:'%h' -n 1",intern=T);
 }
 
 #' This function can be called from `stat_summary()` as the
