@@ -45,12 +45,6 @@ cost1$discharge_date <- as.Date(cost1$discharge_date, format = '%m/%d/%Y')
 #' a quick dirty way to get the index cases:
 cost2 <- cost1 %>% filter(admitdatediff < 20 & admitdatediff > -20)
 
-#' Isolating the 2016 UHS colectomy data elements:
-col2016 <- dat1subs[["all_colon_all"]] %>% 
-  filter(hospital_admissn_dt < '2017-01-01' & hospital_admissn_dt > '2015-12-31')
-
-#' Merging the datasets:
-costdata <-  merge(col2016, cost1, by = 'idn_mrn', all.x = TRUE)
 
 #' Standardizing the weight units to kilograms
 dat1[dat0$weight_unit=='lbs','weight'] <- dat1[dat0$weight_unit=='lbs','weight']*0.453592;
@@ -235,6 +229,12 @@ dat1subs <- ssply(dat1
                   ,lapa_colon_emergency=cpt_code %in% v(c_lapa_colon,dct1) &
                     emergency_case=='Yes' & !(case_number %in% drop_case_num)
 );
+#' Isolating the 2016 UHS colectomy data elements:
+col2016 <- dat1subs[["all_colon_all"]] %>% 
+  filter(hospital_admissn_dt < '2017-01-01' & hospital_admissn_dt > '2015-12-31')
+
+#' Merging the datasets:
+costdata <-  merge(col2016, cost1, by = 'idn_mrn', all.x = TRUE)
 
 
 #' ### Create a version of the dataset that only has each patient's 1st encounter
