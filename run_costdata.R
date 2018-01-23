@@ -42,5 +42,4 @@ col2016 <- dat1subs[["all_colon_all"]] %>%
 
 #' Merging the datasets:
  costdata <-  merge(col2016, cost1, by = 'idn_mrn', all.x = TRUE)
-
-
+ 

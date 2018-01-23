@@ -171,34 +171,57 @@ dat1 <- dat1[order(dat1$proc_surg_start),];
 #' for later use to make multiple versions of the same table and multiple
 #' versions of the same graph, as for item #3 of the 10/13/2017 PKS email.
 
+#identifying the colectomy patients that have multiple visits:
+dup_mrn <- unlist(dat1 %>% filter(cpt_code %in% v(c_all_colon,dct1)) %>%
+  filter(duplicated(idn_mrn)==TRUE) %>% select(idn_mrn)) 
+
+#dropping visits after the index colectomy procedure for colectomy patients:
+drop_case_num <- unlist(sapply(dup_mrn, function(themrn){
+  mat0 <- dat1 %>% select(idn_mrn, case_number, hospital_admissn_dt) %>% 
+    filter(idn_mrn %in% themrn) %>% arrange(desc(hospital_admissn_dt))
+  drop_this <- mat0$case_number[-1]
+}))
+
+
  dat1subs <- ssply(dat1
                   ,full=T
 		  ,all_elective=elective_surg=='Yes'
 		  ,all_urgent=elective_surg=='No' & emergency_case=='No'
 		  ,all_emergency=emergency_case=='Yes'
-		  ,all_colon_all=cpt_code %in% v(c_all_colon,dct1)
+		  ,all_colon_all=cpt_code %in% v(c_all_colon,dct1) &
+		   !(case_number %in% drop_case_num)
 		  # coming soon:
 		  #,all_colon_all_2017 = 
 		  ,all_colon_elective=cpt_code %in% v(c_all_colon,dct1) &
-			 elective_surg=='Yes'
+			 elective_surg=='Yes' & 
+		   !(case_number %in% drop_case_num)
 		  ,all_colon_urgent=cpt_code %in% v(c_all_colon,dct1) &
-			 elective_surg=='No' & emergency_case=='No'
+			 elective_surg=='No' & emergency_case=='No' &
+		   !(case_number %in% drop_case_num)
 		  ,all_colon_emergency=cpt_code %in% v(c_all_colon,dct1) &
-			 emergency_case=='Yes'
-		  ,open_colon_all=cpt_code %in% v(c_open_colon,dct1)
+			 emergency_case=='Yes' & 
+		   !(case_number %in% drop_case_num)
+		  ,open_colon_all=cpt_code %in% v(c_open_colon,dct1) &
+		   !case_number %in% drop_case_num
 		  ,open_colon_elective=cpt_code %in% v(c_open_colon,dct1) &
-			 elective_surg=='Yes'
+			 elective_surg=='Yes' &
+		   !(case_number %in% drop_case_num)
 		  ,open_colon_urgent=cpt_code %in% v(c_open_colon,dct1) &
-			 elective_surg=='No' & emergency_case=='No'
+			 elective_surg=='No' & emergency_case=='No' &
+		   !(case_number %in% drop_case_num)
 		  ,open_colon_emergency=cpt_code %in% v(c_open_colon,dct1) &
-			 emergency_case=='Yes'
-		  ,lapa_colon_all=cpt_code %in% v(c_lapa_colon,dct1)
+			 emergency_case=='Yes' &
+		   !(case_number %in% drop_case_num)
+		  ,lapa_colon_all=cpt_code %in% v(c_lapa_colon,dct1) &
+		   !(case_number %in% drop_case_num)
 		  ,lapa_colon_elective=cpt_code %in% v(c_lapa_colon,dct1) &
-			 elective_surg=='Yes'
+			 elective_surg=='Yes' &
+		   !(case_number %in% drop_case_num)
 		  ,lapa_colon_urgent=cpt_code %in% v(c_lapa_colon,dct1) &
-			 elective_surg=='No' & emergency_case=='No'
+			 elective_surg=='No' & emergency_case=='No' &
+		   !(case_number %in% drop_case_num)
 		  ,lapa_colon_emergency=cpt_code %in% v(c_lapa_colon,dct1) &
-			 emergency_case=='Yes'                  
+			 emergency_case=='Yes' & !(case_number %in% drop_case_num)
 );
 
 
