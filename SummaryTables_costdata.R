@@ -8,9 +8,9 @@
 #' you what you need to edit in order to proceed.
 #' 
 
-# source('global.R');
-# source('run.R');
-source('run_costdata.R');
+source('global.R');
+source('run.R');
+#source('run_costdata.R');
 
 
 table_01 <- costdata %>% group_by(rai_range) %>% 
