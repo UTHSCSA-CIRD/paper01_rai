@@ -185,7 +185,7 @@ dat1 <- dat1[order(dat1$proc_surg_start),];
 
 #identifying the colectomy patients that have multiple visits:
 dup_mrn <- unlist(dat1 %>% filter(cpt_code %in% v(c_all_colon,dct1)) %>%
-                    filter(duplicated(idn_mrn)==TRUE) %>% select(idn_mrn)) 
+  filter(duplicated(idn_mrn)==TRUE) %>% select(idn_mrn)) 
 
 #dropping visits after the index colectomy procedure for colectomy patients:
 drop_case_num <- unlist(sapply(dup_mrn, function(themrn){
