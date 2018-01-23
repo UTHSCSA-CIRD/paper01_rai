@@ -143,9 +143,9 @@ plot_2016_cd4_income_box + annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2
 plot_2016_cd4_income_violin + annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2)
                                        ,y = 5000, label = as.character(thecounts1$n)
                                        ,size = 5)
-plot_2016_cd4_totcost_box + annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2)
-                                     ,y = 5000, label = as.character(thecounts2$n)
-                                     ,size = 5)
+plot_2016_cd4_totcost_box #+ annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2)
+                          #           ,y = 5000, label = as.character(thecounts2$n)
+                          #           ,size = 5)
 #' Commenting out the annotate part because it's giving errors that you are 
 #' better situated to fix than I am, I'm just focusing on getting this to run
 #' on both our environments so we can start reorganizing the overall project's 
