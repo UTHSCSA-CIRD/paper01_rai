@@ -146,14 +146,22 @@ plot_2016_cd4_income_violin + annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 
 plot_2016_cd4_totcost_box + annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2)
                                      ,y = 5000, label = as.character(thecounts2$n)
                                      ,size = 5)
-plot_2016_cd4_totcost_violin + annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2)
-                                        ,y = 5000, label = as.character(thecounts2$n)
-                                        ,size = 5)
-plot_2016_cd4_varcost_box + annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2)
-                                     ,y = 1000, label = as.character(thecounts3$n)
-                                     ,size = 5)
-plot_2016_cd4_varcost_violin + annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2)
-                                        ,y = 1000, label = as.character(thecounts3$n)
-                                        ,size = 5)
+#' Commenting out the annotate part because it's giving errors that you are 
+#' better situated to fix than I am, I'm just focusing on getting this to run
+#' on both our environments so we can start reorganizing the overall project's 
+#' code. Again, my commenting this out in this case doesn't mean it shouldn't be
+#' there, only that it's erroring. The error in question is:
+#' 
+#' `Error: Unequal parameter lengths: x (6), label (0)` and caused by 
+#' `thecounts2$n` and `thecounts3$n` being `integer(0)`
+plot_2016_cd4_totcost_violin #+ annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2)
+                                        #,y = 5000, label = as.character(thecounts2$n)
+                                        #,size = 5)
+plot_2016_cd4_varcost_box #+ annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2)
+                          #           ,y = 1000, label = as.character(thecounts3$n)
+                          #           ,size = 5)
+plot_2016_cd4_varcost_violin #+ annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2)
+                             #          ,y = 1000, label = as.character(thecounts3$n)
+                             #          ,size = 5)
 dev.off()
 
