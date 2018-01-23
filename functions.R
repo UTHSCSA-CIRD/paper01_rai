@@ -326,3 +326,44 @@ readmission_total <- function(pat_id, admit_dt, discharge_dt, days)
   theresult <- as.data.frame(cbind(as.character(thepatient), counter))
   return(theresult)
 }
+
+#This function will reformats the summary tables the way that Dr. Shireman wants them:
+renamecol <- function(xx) {
+  rai_range <- "Total"
+  rai_n <- sum(xx$rai_n)
+  cumul_count <- xx$cumul_count[nrow(xx)]
+  died_n <- sum(xx$died_n)
+  #this is how Dr. Shireman wanted the
+  #summary fraction reported:
+  #the total number of people in cumulative
+  #count in each table divided by the
+  #total number of people that died (in this case)
+  died_frac <- sum(xx$died_n)/cumul_count
+  comp_n <- sum(xx$comp_n)
+  #the total number of people in cumulative
+  #count in each table divided by the
+  #total number of people that had
+  #complications (in this case)
+  comp_frac <- sum(xx$comp_n)/cumul_count
+  cd4_n <- sum(xx$cd4_n)
+  #the total number of people in cumulative
+  #count in each table divided by the
+  #total number of people that had
+  #Clavien-Dindo Grade 4 complications (in this case)
+  cd4_frac <- sum(xx$cd4_n)/cumul_count
+  readmsn_n <- sum(xx$readmsn_n)
+  #the total number of people in cumulative
+  #count in each table divided by the
+  #total number of people that had
+  #readmissions (in this case)
+  readmsn_frac <- sum(xx$readmsn_n)/cumul_count
+  newtotals <- t(c(rai_range, rai_n, cumul_count
+                   ,died_n, died_frac, comp_n
+                   ,comp_frac, cd4_n, cd4_frac
+                   ,readmsn_n, readmsn_frac))
+  colnames(newtotals) <- colnames(xx)
+  newxx <- rbind(xx, newtotals)
+  colnames(newxx) <- thecolnames
+  return(newxx)
+}
+

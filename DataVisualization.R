@@ -26,14 +26,14 @@ scale_fill_discrete(name = "Clavien-Dindo\nGrade4"
                     ,labels = c("No", "Yes")
                     ) -> plot_any_cd4;
 #' I should figure out how to print this table too:
-thecounts <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai, a_any_cd4, income_final) %>% group_by( a_discrete_rai, a_any_cd4) %>% count()
+thecounts <- dat1subs[["all_colon_all"]] %>% filter(!is.na(income_final)) %>% select(a_discrete_rai, a_any_cd4, income_final) %>% group_by( a_discrete_rai, a_any_cd4) %>% count()
 plot_any_cd4 + annotate("text", x = c(0.8, 1.2, 1.8, 2.2, 2.8, 3.2)
                         ,y = 10000, label = as.character(thecounts$n)
                         ,size = 6)
  
 
 #selecting patients that DO NOT have Clavien-Dindo Grade 4 complications
-thedata2 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
+thedata2 <- dat1subs[["all_colon_all"]]  %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
             filter(a_any_cd4=='FALSE')
 ggplot(data = thedata2, aes(x = a_discrete_rai
                            ,y = income_final, fill = hispanic_ethnicity)) + 
@@ -45,7 +45,7 @@ scale_fill_discrete(name = "Ethnicity"
  
 
 #' I should figure out how to print this table too:
-thecounts2 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
+thecounts2 <- dat1subs[["all_colon_all"]] %>% filter(!is.na(income_final)) %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
               filter(a_any_cd4=='FALSE') %>% count()
 plot_no_cd4 + annotate("text", x = c(0.75, 1.0, 1.25, 1.8, 2.2, 3.0)
                         ,y = 10000, label = as.character(thecounts2$n)
@@ -61,7 +61,7 @@ scale_fill_discrete(name = "Ethnicity"
                     ,labels = c("Non-Hispanic", "Unknown", "Hispanic")
                     )-> plot_cd4;
 #' I should figure out how to print this table too:
-thecounts3 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
+thecounts3 <- dat1subs[["all_colon_all"]] %>% filter(!is.na(income_final)) %>% filter(!is.na(income_final)) %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
               filter(a_any_cd4=='TRUE') %>% count()
 plot_cd4 + annotate("text", x = c(0.75, 1.0, 1.25, 1.8, 2.2, 3.0)
                        ,y = 10000, label = as.character(thecounts3$n)
@@ -81,7 +81,7 @@ thedata4 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethni
   )-> plot_no_cd4_nohisp;
 
 #' I should figure out how to print this table too:
-thecounts4 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai, a_any_cd4) %>% 
+thecounts4 <- dat1subs[["all_colon_all"]] %>% filter(!is.na(income_final)) %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai, a_any_cd4) %>% 
   filter(hispanic_ethnicity=='No') %>% count()
 plot_no_cd4_nohisp + annotate("text", x = c(0.75, 1.2, 1.8, 2.2)
                               ,y = 10000, label = as.character(thecounts4$n)
@@ -100,7 +100,7 @@ thedata5 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethni
   )-> plot_no_cd4_hisp;
 
 #' I should figure out how to print this table too:
-thecounts5 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by(a_discrete_rai, a_any_cd4) %>% 
+thecounts5 <- dat1subs[["all_colon_all"]] %>% filter(!is.na(income_final)) %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by(a_discrete_rai, a_any_cd4) %>% 
   filter(hispanic_ethnicity=='Yes') %>% count()
 plot_no_cd4_hisp + annotate("text", x = c(0.75, 1.2, 1.8, 2.2, 2.8, 3.2)
                             ,y = 10000, label = as.character(thecounts5$n)
@@ -131,7 +131,7 @@ ggplot(data = thedata6, aes(x = hispanic_ethnicity3
   ) -> plot_no_rai_cd4_hisp;
 
 #' I should figure out how to print this table too:
-thecounts6 <- thedata6 %>% group_by(hispanic_ethnicity3, a_any_cd4) %>% count()
+thecounts6 <- thedata6 %>% filter(!is.na(income_final)) %>% group_by(hispanic_ethnicity3, a_any_cd4) %>% count()
 plot_no_rai_cd4_hisp + annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2)
                                        ,y = 5000, label = as.character(thecounts6$n)
                                        ,size = 5)
