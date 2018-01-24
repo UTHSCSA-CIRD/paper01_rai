@@ -111,7 +111,7 @@ autoboxplot <- function(pdata, xx, yy, zz, subset=T
                         , title=sprintf('%s vs %s\n by %s',xx,yy,zz)
                         , xx.name=if(xx==TRUE) 'All' else xx, xx.breaks=if(xx==TRUE) xx else unique(pdata[[xx]])
                         , xx.labels=if(xx==TRUE) '' else xx.breaks
-                        , yy.name=yy, yy.labels=scale_y_continuous(name=yy.name,labels = comma) 
+                        , yy.name=yy, yy.labels
                         , fill.name, fill.breaks, fill.labels
                         , counts=T
                         ,...){
@@ -145,7 +145,7 @@ autoboxplot <- function(pdata, xx, yy, zz, subset=T
           apply(table(pdata[,c(xx,zz)]),1,paste0,collapse=' \t ');
         }
     out <- out + annotate('text',x=ccrds$x.major_source,y=ccrds$y.range[1]
-                          ,label=ann.label);
+                          ,label=ann.label[ccrds$x.major_source]);
   }
   out;
 }

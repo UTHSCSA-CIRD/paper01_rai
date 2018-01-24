@@ -199,60 +199,62 @@ drop_case_num <- unlist(sapply(dup_mrn, function(themrn){
   drop_this <- mat0$case_number[-1]
 }))
 
-
-dat1subs <- ssply(dat1
-                  ,full=T
-                  ,all_elective=elective_surg=='Yes'
-                  ,all_urgent=elective_surg=='No' & emergency_case=='No'
-                  ,all_emergency=emergency_case=='Yes'
-                  ,all_colon_all=cpt_code %in% v(c_all_colon,dct1) &
-                    !(case_number %in% drop_case_num)
-                  # coming soon:
-                  #,all_colon_all_2017 = 
-                  ,all_colon_elective=cpt_code %in% v(c_all_colon,dct1) &
-                    elective_surg=='Yes' & 
-                    !(case_number %in% drop_case_num)
-                  ,all_colon_urgent=cpt_code %in% v(c_all_colon,dct1) &
-                    elective_surg=='No' & emergency_case=='No' &
-                    !(case_number %in% drop_case_num)
-                  ,all_colon_emergency=cpt_code %in% v(c_all_colon,dct1) &
-                    emergency_case=='Yes' & 
-                    !(case_number %in% drop_case_num)
-                  ,open_colon_all=cpt_code %in% v(c_open_colon,dct1) &
-                    !case_number %in% drop_case_num
-                  ,open_colon_elective=cpt_code %in% v(c_open_colon,dct1) &
-                    elective_surg=='Yes' &
-                    !(case_number %in% drop_case_num)
-                  ,open_colon_urgent=cpt_code %in% v(c_open_colon,dct1) &
-                    elective_surg=='No' & emergency_case=='No' &
-                    !(case_number %in% drop_case_num)
-                  ,open_colon_emergency=cpt_code %in% v(c_open_colon,dct1) &
-                    emergency_case=='Yes' &
-                    !(case_number %in% drop_case_num)
-                  ,lapa_colon_all=cpt_code %in% v(c_lapa_colon,dct1) &
-                    !(case_number %in% drop_case_num)
-                  ,lapa_colon_elective=cpt_code %in% v(c_lapa_colon,dct1) &
-                    elective_surg=='Yes' &
-                    !(case_number %in% drop_case_num)
-                  ,lapa_colon_urgent=cpt_code %in% v(c_lapa_colon,dct1) &
-                    elective_surg=='No' & emergency_case=='No' &
-                    !(case_number %in% drop_case_num)
-                  ,lapa_colon_emergency=cpt_code %in% v(c_lapa_colon,dct1) &
-                    emergency_case=='Yes' & !(case_number %in% drop_case_num)
-);
-
-#' Isolating the 2016 UHS colectomy data elements:
-col2016 <- dat1subs[["all_colon_all"]] %>% 
-  filter(hospital_admissn_dt < '2017-01-01' & hospital_admissn_dt > '2015-12-31')
-
-#' Merging the datasets:
-costdata <-  merge(col2016, cost2, by = 'idn_mrn', all.x = TRUE)
-
-
 #' ### Create a version of the dataset that only has each patient's 1st encounter
 #' 
 #' (you need to have specified the name of the ID column in `metadata.R`)
 dat2 <- group_by(dat1,idn_mrn) %>% summarise_all(first);
+
+subs_criteria <- alist(
+  y2016=hospital_admissn_dt<'2017-01-01' & hospital_admissn_dt>'2015-12-31'
+  ,full=T
+  ,all_elective=elective_surg=='Yes'
+  ,all_urgent=elective_surg=='No' & emergency_case=='No'
+  ,all_emergency=emergency_case=='Yes'
+  ,all_colon_all=cpt_code %in% v(c_all_colon,dct1) & !(case_number %in% drop_case_num)
+  # coming soon:
+  #,all_colon_all_2017 = 
+  ,all_colon_elective=cpt_code %in% v(c_all_colon,dct1) & elective_surg=='Yes' & 
+    !(case_number %in% drop_case_num)
+  ,all_colon_urgent=cpt_code %in% v(c_all_colon,dct1) & elective_surg=='No' & 
+    emergency_case=='No' &
+    !(case_number %in% drop_case_num)
+  ,all_colon_emergency=cpt_code %in% v(c_all_colon,dct1) &
+    emergency_case=='Yes' & 
+    !(case_number %in% drop_case_num)
+  ,open_colon_all=cpt_code %in% v(c_open_colon,dct1) &
+    !case_number %in% drop_case_num
+  ,open_colon_elective=cpt_code %in% v(c_open_colon,dct1) &
+    elective_surg=='Yes' &
+    !(case_number %in% drop_case_num)
+  ,open_colon_urgent=cpt_code %in% v(c_open_colon,dct1) &
+    elective_surg=='No' & emergency_case=='No' &
+    !(case_number %in% drop_case_num)
+  ,open_colon_emergency=cpt_code %in% v(c_open_colon,dct1) &
+    emergency_case=='Yes' &
+    !(case_number %in% drop_case_num)
+  ,lapa_colon_all=cpt_code %in% v(c_lapa_colon,dct1) &
+    !(case_number %in% drop_case_num)
+  ,lapa_colon_elective=cpt_code %in% v(c_lapa_colon,dct1) &
+    elective_surg=='Yes' &
+    !(case_number %in% drop_case_num)
+  ,lapa_colon_urgent=cpt_code %in% v(c_lapa_colon,dct1) &
+    elective_surg=='No' & emergency_case=='No' &
+    !(case_number %in% drop_case_num)
+  ,lapa_colon_emergency=cpt_code %in% v(c_lapa_colon,dct1) &
+    emergency_case=='Yes' & !(case_number %in% drop_case_num)
+);
+
+sbs0 <- sapply(list(all=dat1,index=dat2),function(xx) do.call(ssply,c(list(dat=xx),subs_criteria[-1])),simplify=F);
+sbs0$all2016 <- lapply(sbs0$all,subset,subset=eval(subs_criteria[['y2016']]));
+comment(sbs0$all2016$all_colon_all) <- c(comment(sbs0$all2016),'These are only the index colon patients for 2016');
+dat1subs <- sbs0$all; comment(dat1subs) <- c(comment(dat1subs),'This is deprecated, used sbs0$all instead');
+
+#' Isolating the 2016 UHS colectomy data elements:
+#col2016 <- sbs0$index[["all_colon_all"]] %>% 
+#  filter(hospital_admissn_dt < '2017-01-01' & hospital_admissn_dt > '2015-12-31')
+
+#' Merging the datasets:
+costdata <-  merge(sbs0$all2016$all_colon_all, cost2, by = 'idn_mrn', all.x = TRUE)
 
 #' Filter down to only NHW and hispanic
 dat3<-subset(dat2,hispanic_ethnicity!='Unknown'&(hispanic_ethnicity=='Yes'|race=='White'));
