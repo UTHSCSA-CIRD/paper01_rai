@@ -35,7 +35,7 @@ plt_eth_inc_cd4 <- autoboxplot(sbs0$all$all_colon_all
                                ,xx='a_discrete_rai',yy='income_final'
                                ,zz='hispanic_ethnicity'
                                ,subset=a_any_cd4==FALSE&!is.na(income_final)
-                               ,fill.name='Clavien-Dindo\n Grade 4'
+                               ,fill.name='Hispanic Ethnicity'
                                ,xx.name='Frailty Group',yy.name=NA,title='');
 
 
@@ -48,7 +48,7 @@ plt_eth_inc_cd4 <- autoboxplot(sbs0$all$all_colon_all
                                ,xx='a_discrete_rai',yy='income_final'
                                ,zz='hispanic_ethnicity'
                                ,subset=a_any_cd4==TRUE&!is.na(income_final)
-                               ,fill.name='Clavien-Dindo\n Grade 4'
+                               ,fill.name='Hispanic Ethnicity'
                                ,xx.name='Frailty Group',yy.name=NA,title='');
 
 
