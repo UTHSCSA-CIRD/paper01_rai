@@ -28,14 +28,25 @@ colnames(cost0) <- tolower(colnames(cost0));
 #' Create copy of original dataset
 cost1 <- cost0;
 dat1 <- dat0;
+dropcol_dat <- c('idn_mrn', 'lmrn_visit', 'case_number');
+dat1 <- dat0 %>% select(-one_of(dropcol_dat));
 names(dat1)<-gsub('deid_patient','idn_mrn',names(dat1));
 names(dat1)<-gsub('deid_visit','lmrn_visit',names(dat1));
 names(dat1)<-gsub('deid_case','case_number',names(dat1));
+
+
+dropcol_cost <- c('idn_mrn', 'case_number');
+cost1 <- cost0 %>% select(-one_of(dropcol_cost));
+names(cost1)<-gsub('deid_patient','idn_mrn',names(cost1));
+names(cost1)<-gsub('deid_case','case_number',names(cost1));
+
+ 
 #' This is another departure from my not making code changes-- I think this is 
 #' the only obstacle to using the version of the cost data you gave me, and this
 #' code will be completely silent if your copy doesn't have spaces in the names
 names(cost1)<-gsub('[()]','',names(cost1));
 names(cost1) <- chartr(' ','_',names(cost1));
+
 
 #' Fixing the date columns in the 'cost' dataset:
 cost1$admission_date <- as.Date(cost1$admission_date, format = '%m/%d/%y')
@@ -229,12 +240,13 @@ dat1subs <- ssply(dat1
                   ,lapa_colon_emergency=cpt_code %in% v(c_lapa_colon,dct1) &
                     emergency_case=='Yes' & !(case_number %in% drop_case_num)
 );
+
 #' Isolating the 2016 UHS colectomy data elements:
 col2016 <- dat1subs[["all_colon_all"]] %>% 
   filter(hospital_admissn_dt < '2017-01-01' & hospital_admissn_dt > '2015-12-31')
 
 #' Merging the datasets:
-costdata <-  merge(col2016, cost1, by = 'idn_mrn', all.x = TRUE)
+costdata <-  merge(col2016, cost2, by = 'idn_mrn', all.x = TRUE)
 
 
 #' ### Create a version of the dataset that only has each patient's 1st encounter
