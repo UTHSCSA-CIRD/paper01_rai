@@ -99,6 +99,46 @@ checkrun <- function(obj,EXPR,env=as.environment(-1)){
 #' Delete all the junk in your environment, for testing
 clearenv <- function(env=.GlobalEnv) rm(list=setdiff(ls(all=T,envir=env),'clearenv'),envir=env);
 
+#' Plots in the style we've been doing
+#' 
+#' Instead of creating new tables for 'All', just set xx=T
+#' 
+#' To suppress plotting of a legend (but still use fill) set fill.name=NA
+#' Likewise, to suppress printing y-axis labels make yy.name=NA
+#' To merely omit printing a name, set the name in question to ''
+autoboxplot <- function(pdata, xx, yy, zz, subset=T
+                        , type=c('box','violin')
+                        , title=sprintf('%s vs %s\n by %s',xx,yy,zz)
+                        , xx.name=if(xx==TRUE) 'All' else xx, xx.breaks=if(xx==TRUE) xx else unique(pdata[[xx]])
+                        , xx.labels=if(xx==TRUE) '' else xx.breaks
+                        , yy.name=yy, yy.labels=scale_y_continuous(name=yy.name,labels = comma) 
+                        , fill.name, fill.breaks, fill.labels
+                        ,...){
+  subset <- substitute(subset);
+  plot_type <- switch(match.arg(type)
+                      ,box=geom_boxplot(coef=100)
+                      ,violin=geom_violin());
+  pdata <- subset(pdata,subset=eval(subset));
+  if(!missing(zz)){
+    if(missing(fill.name)) fill.name <- zz;
+    if(missing(fill.breaks)) fill.breaks <- unique(pdata[[zz]]);
+    if(missing(fill.labels)) fill.labels <- fill.breaks;
+    fill <- if(is.na(fill.name)) scale_fill_discrete(guide=F) else {
+      scale_fill_discrete(name=fill.name,breaks=fill.breaks,labels=fill.labels);
+    }
+  }
+  if(missing(yy.labels)){
+    yy.labels <- if(is.na(yy.name)) scale_y_continuous(name='',labels=NULL) else {
+      scale_y_continuous(name=yy.name,labels = comma);
+      };
+    };
+  out <- ggplot(data = pdata, aes_string(x = xx, y = yy))+ plot_type + yy.labels +
+    scale_x_discrete(name=xx.name,breaks=xx.breaks,labels=xx.labels) +
+    labs(title=title)
+  if(!missing(zz)) out <- out + aes_string(fill=zz) + fill;
+  out;
+}
+
 #' From ... http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/
 # Multiple plot function
 #
