@@ -280,6 +280,16 @@ missing_from_costdata3<-setdiff(costdata$idn_mrn,costdata3$idn_mrn);
 # View(subset(cost1,idn_mrn==missing_from_costdata)[,intersect(names(cost1),ccs)]);
 #' Their admit/discharge dates are the only ones in cost1 that fail to span the surgery
 #' date by more than one day
+#' 
+#' We have duplicates in costdata3:
+# length(unique(costdata3$idn_mrn))
+# costdata3dups <- table(costdata3$idn_mrn);
+# costdata3dups <- costdata3dups[costdata3dups>1];
+#subset(costdata3,idn_mrn%in%costdata3dups);
+# Next step: I know which ones to drop, but the trick is to do it dynamically
+# so it doesn't break on a data update. And, why did they slip through?
+# To be continued!
+
 
 #' Filter down to only NHW and hispanic
 dat3<-subset(dat2,hispanic_ethnicity!='Unknown'&(hispanic_ethnicity=='Yes'|race=='White'));
