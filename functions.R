@@ -147,8 +147,11 @@ autoboxplot <- function(pdata, xx, yy, zz, subset=T
     out <- out + annotate('text',x=ccrds$x.major_source,y=ccrds$y.range[1]
                           ,label=ann.label[ccrds$x.major_source]);
   }
+  attr(out,'call') <- match.call();
   out;
 }
+
+getCall.gg <- function(xx) attr(xx,'call');
 
 #' From ... http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/
 # Multiple plot function
