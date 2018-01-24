@@ -254,7 +254,32 @@ dat1subs <- sbs0$all; comment(dat1subs) <- c(comment(dat1subs),'This is deprecat
 #  filter(hospital_admissn_dt < '2017-01-01' & hospital_admissn_dt > '2015-12-31')
 
 #' Merging the datasets:
-costdata <-  merge(sbs0$all2016$all_colon_all, cost2, by = 'idn_mrn', all.x = TRUE)
+costdata <-  merge(sbs0$all2016$all_colon_all, cost2, by = 'idn_mrn', all.x = TRUE);
+# na_in_costdata<-subset(costdata,is.na(admission_date))$idn_mrn;
+#' Useful columns
+# ccs<-c('admitdatediff','admission_date','discharge_date','proc_surg_start','case_number','idn_mrn','hospital_admissn_dt')
+#' merging all colonectomies (not limited by time) with all available cost data
+#' to hopefully resolve a few more missing variables
+costdata0 <- merge(sbs0$all$all_colon_all,cost1,by='idn_mrn',all.x=TRUE,all.y=F,suffixes = c('','.junk'));
+#' Dropping all records where the proc_surg_start does not fall between admission_date and discharge_date
+#' First create the temporary filtering variables
+costdata1 <- mutate(costdata0,a_srg=as.Date(proc_surg_start),a_adm=admission_date-1,a_dis=discharge_date+1);
+#' Then subset on them, keeping also the ones that are not in the costdata via is.na(...)
+costdata2 <- subset(costdata1,is.na(admitdatediff)|(a_srg>=a_adm&a_srg<=a_dis));
+costdata3 <- subset(costdata2
+                    ,(pmin(a_adm,as.Date(hospital_admissn_dt),na.rm=T)<'2017-01-01' &
+                      pmax(a_adm,as.Date(hospital_admissn_dt),na.rm=T)>'2015-12-31'));
+#' Do the `operatn_dt` fields match up?
+#dim(subset(costdata3,as.Date(proc_surg_start)==as.Date(operatn_dt)));
+#dim(costdata3);
+#' Yes
+#' We have one patient in the original costdata that is not making it into the 
+#' new version
+missing_from_costdata3<-setdiff(costdata$idn_mrn,costdata3$idn_mrn);
+# View(subset(dat1,idn_mrn==missing_from_costdata)[,intersect(names(dat1),ccs)]);
+# View(subset(cost1,idn_mrn==missing_from_costdata)[,intersect(names(cost1),ccs)]);
+#' Their admit/discharge dates are the only ones in cost1 that fail to span the surgery
+#' date by more than one day
 
 #' Filter down to only NHW and hispanic
 dat3<-subset(dat2,hispanic_ethnicity!='Unknown'&(hispanic_ethnicity=='Yes'|race=='White'));
