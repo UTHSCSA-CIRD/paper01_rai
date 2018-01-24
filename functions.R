@@ -99,7 +99,7 @@ checkrun <- function(obj,EXPR,env=as.environment(-1)){
 #' Delete all the junk in your environment, for testing
 clearenv <- function(env=.GlobalEnv) rm(list=setdiff(ls(all=T,envir=env),'clearenv'),envir=env);
 
-#' Plots in the style we've been doing
+#' Plots in the style we've been doing (continuous y, discrete x and optionally z)
 #' 
 #' Instead of creating new tables for 'All', just set xx=T
 #' 
@@ -113,6 +113,7 @@ autoboxplot <- function(pdata, xx, yy, zz, subset=T
                         , xx.labels=if(xx==TRUE) '' else xx.breaks
                         , yy.name=yy, yy.labels=scale_y_continuous(name=yy.name,labels = comma) 
                         , fill.name, fill.breaks, fill.labels
+                        , counts=T
                         ,...){
   subset <- substitute(subset);
   plot_type <- switch(match.arg(type)
@@ -132,10 +133,20 @@ autoboxplot <- function(pdata, xx, yy, zz, subset=T
       scale_y_continuous(name=yy.name,labels = comma);
       };
     };
-  out <- ggplot(data = pdata, aes_string(x = xx, y = yy))+ plot_type + yy.labels +
+  out <- ggplot(data = pdata, aes_string(x = xx, y = yy)) + plot_type + yy.labels +
     scale_x_discrete(name=xx.name,breaks=xx.breaks,labels=xx.labels) +
     labs(title=title)
   if(!missing(zz)) out <- out + aes_string(fill=zz) + fill;
+  if(counts){
+    ccrds<-ggplot_build(out)$layout$panel_ranges[[1]];
+    ann.label <- if(xx==TRUE && missing(zz)) nrow(pdata) else if(xx==TRUE){
+      paste0(table(pdata[,zz]),collapse='\t') } else if(missing(zz)){
+        paste0(table(pdata[,xx]),collapse='\t') } else {
+          apply(table(pdata[,c(xx,zz)]),1,paste0,collapse='\t');
+        }
+    out <- out + annotate('text',x=ccrds$x.major_source,y=ccrds$y.range[1]
+                          ,label=ann.label);
+  }
   out;
 }
 
