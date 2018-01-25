@@ -59,6 +59,7 @@ grid.arrange(plt_frl_inc_eth_noc4
              );
 
 #' 
+#' 
 #' Income VS Frailty VS Hispanic Ethnicty WITH CD4 Complications
 plt_frl_inc_eth_c4 <- update(plt_frl_inc_eth_noc4, subset=a_any_cd4==TRUE&!is.na(income_final));
 
