@@ -6,7 +6,7 @@
 #'
 #+ echo=FALSE, message=FALSE
 knitr::opts_chunk$set(echo=F,warning = F,cache=T,message=F);
-#+ cache=F
+#+ cache=FALSE
 source('global.R');
 #' Report date: `r date()`.
 #'
