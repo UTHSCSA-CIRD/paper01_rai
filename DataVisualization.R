@@ -13,7 +13,7 @@ source('global.R');
 #' Revision: `r gitstamp()`.
 #'
 #' Data file: `r inputdata`.
-# cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE
+#+ cache=TRUE
 source('run.R');
 
 # Note: above I set the global options so that the code is hidden in this report.
