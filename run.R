@@ -283,7 +283,7 @@ subset(cost1,admission_date-1<=operatn_dt&discharge_date+1>=operatn_dt) %>%
 #ccs<-c('admitdatediff','admission_date','discharge_date','proc_surg_start','case_number','idn_mrn','hospital_admissn_dt')
 #' Can we rely on the NSQIP variables operatn_dt and proc_surg_start, proc_surg_finish being in agreement
 #' with each other, since only the former is in the costdata?
-.debug_operatn_dt_mm0 <- subset(dat1,as.Date(proc_surg_start)!=as.Date(operatn_dt))[,c('proc_surg_start','proc_surg_finish','operatn_dt')] %>% data.frame;
+.debug_operatn_dt_mm0 <- subset(dat1,as.Date(proc_surg_start)!=as.Date(operatn_dt))[,c('idn_mrn','proc_surg_start','proc_surg_finish','operatn_dt')] %>% data.frame;
 #' There are `r nrow(.debug_operatn_dt_mm)` rows in NSQIP that disagree:
 .debug_operatn_dt_mm0[,c('idn_mrn','proc_surg_start','proc_surg_finish','operatn_dt')];
 .debug_operatn_dt_mm1 <- subset(.debug_operatn_dt_mm0,as.Date(proc_surg_start)-as.Date(operatn_dt)>2);
