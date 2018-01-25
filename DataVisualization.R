@@ -5,13 +5,14 @@
 #' ---
 #'
 #+ echo=FALSE, message=FALSE
+knitr::opts_chunk$set(echo=F,warning = F,cache=T,message=F);
 source('global.R');
 #' Report date: `r date()`.
 #'
 #' Revision: `r gitstamp()`.
 #'
 #' Data file: `r inputdata`.
-#+ cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE
+# cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE
 source('run.R');
 
 pdf(height = 10, width = 7.5, onefile = TRUE, file = paste0(outputpath,"UHS_ACSNSQIP_CD4comps_boxplots-DSW-", format(Sys.Date(), '%m-%d-%Y'),".pdf"))
