@@ -36,7 +36,7 @@ plt_eth_inc_cd4 <- autoboxplot(sbs0$all$all_colon_all
                                ,xx='hispanic_ethnicity',yy='income_final'
                                ,zz='a_any_cd4'
                                ,subset=hispanic_ethnicity!='Unknown'&!is.na(income_final)
-                               ,fill.name=titlehack
+                               ,fill.name=wrap_format(14)("Clavien-Dindo\n Grade 4")
                                ,fill.labels = c('Yes', 'No')
                                ,xx.name='Hispanic Ethnicity',yy.name=NA,title='');
 
