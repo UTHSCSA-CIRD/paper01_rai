@@ -254,42 +254,79 @@ dat1subs <- sbs0$all; comment(dat1subs) <- c(comment(dat1subs),'This is deprecat
 #  filter(hospital_admissn_dt < '2017-01-01' & hospital_admissn_dt > '2015-12-31')
 
 #' Merging the datasets:
-costdata <-  merge(sbs0$all2016$all_colon_all, cost2, by = 'idn_mrn', all.x = TRUE);
-# na_in_costdata<-subset(costdata,is.na(admission_date))$idn_mrn;
+# the first step in pipeline selects the index surgeries from cost1
+subset(cost1,admission_date-1<=operatn_dt&discharge_date+1>=operatn_dt) %>%
+  # now merge with all colectomy patients by MRN in order to avoid relying on admitdatediff
+  # as a literal merge criterion (because it could permit mismatches as we saw)
+  merge(sbs0$all$all_colon_all,.,by=c('idn_mrn','operatn_dt'),all.x=T,all.y=F,suffixes=c('','.junk')) %>%
+  # now we have all colectomies one-to-one matched with cost data where available, and just need
+  # to get rid of the out-of-range dates. This step has to come last because in future
+  # datasets the admit/discharge window can span multiple time periods, and the time 
+  # period of interest may vary while the fundamental structure of the merge remains the
+  # same
+  subset(eval(subs_criteria$y2016)) -> costdata;
+#' We now have `r dim(subset(costdata,is.na(admitdatediff)))` patients missing cost 
+#' data. This is one more missing than was previously calculated, because that one
+#' has an `operatn_dt` that does not fall between the `admission_date` and `discharge_date`.
+#' This is the only costdata patient for which this is the case, and the `proc_surg_start`
+#' and `proc_surg_finish` fields argee with the `operatn_dt`. Though the patient is
+#' eligible, and there is costdata for A visit by that patient, the costdata is not
+#' for the index visit.
+#' Below follows testing code for establishing that the above pipeling produces a 
+#' unique set of index patients meeting the criteria, with a single patient missing 
+#' from the earlier version of costdata because they do not have an index surgery
+#' 
+#' 
+#costdata <-  merge(sbs0$all2016$all_colon_all, cost2, by = 'idn_mrn', all.x = TRUE);
+#na_in_costdata<-subset(costdata,is.na(admission_date))$idn_mrn;
 #' Useful columns
-# ccs<-c('admitdatediff','admission_date','discharge_date','proc_surg_start','case_number','idn_mrn','hospital_admissn_dt')
+#ccs<-c('admitdatediff','admission_date','discharge_date','proc_surg_start','case_number','idn_mrn','hospital_admissn_dt')
+#' Can we rely on the NSQIP variables operatn_dt and proc_surg_start, proc_surg_finish being in agreement
+#' with each other, since only the former is in the costdata?
+.debug_operatn_dt_mm0 <- subset(dat1,as.Date(proc_surg_start)!=as.Date(operatn_dt))[,c('proc_surg_start','proc_surg_finish','operatn_dt')] %>% data.frame;
+#' There are `r nrow(.debug_operatn_dt_mm)` rows in NSQIP that disagree:
+.debug_operatn_dt_mm0[,c('idn_mrn','proc_surg_start','proc_surg_finish','operatn_dt')];
+.debug_operatn_dt_mm1 <- subset(.debug_operatn_dt_mm0,as.Date(proc_surg_start)-as.Date(operatn_dt)>2);
+#' `r nrow(.debug_operatn_dt_mm1)` of them by more than one day, none of which were in 2016
+.debug_operatn_dt_mm1[,c('idn_mrn','proc_surg_start','proc_surg_finish','operatn_dt')];
 #' merging all colonectomies (not limited by time) with all available cost data
 #' to hopefully resolve a few more missing variables
-costdata0 <- merge(sbs0$all$all_colon_all,cost1,by='idn_mrn',all.x=TRUE,all.y=F,suffixes = c('','.junk'));
+#costdata0 <- merge(sbs0$all$all_colon_all,cost1,by='idn_mrn',all.x=TRUE,all.y=F,suffixes = c('','.junk'));
 #' Dropping all records where the proc_surg_start does not fall between admission_date and discharge_date
 #' First create the temporary filtering variables
-costdata1 <- mutate(costdata0,a_srg=as.Date(proc_surg_start),a_adm=admission_date-1,a_dis=discharge_date+1);
+#costdata1 <- mutate(costdata0,a_srg=as.Date(proc_surg_start),a_adm=admission_date-1,a_dis=discharge_date+1);
 #' Then subset on them, keeping also the ones that are not in the costdata via is.na(...)
-costdata2 <- subset(costdata1,is.na(admitdatediff)|(a_srg>=a_adm&a_srg<=a_dis));
-costdata3 <- subset(costdata2
-                    ,(pmin(a_adm,as.Date(hospital_admissn_dt),na.rm=T)<'2017-01-01' &
-                      pmax(a_adm,as.Date(hospital_admissn_dt),na.rm=T)>'2015-12-31'));
+#costdata2 <- subset(costdata1,is.na(admitdatediff)|(a_srg>=a_adm&a_srg<=a_dis));
+#costdata3 <- subset(costdata2
+#                    ,(pmin(a_adm,as.Date(hospital_admissn_dt),na.rm=T)<'2017-01-01' &
+#                      pmax(a_adm,as.Date(hospital_admissn_dt),na.rm=T)>'2015-12-31'));
+#costdata3a <- subset(costdata2,as.Date(hospital_admissn_dt)<'2017-01-01' & 
+#                       as.Date(hospital_admissn_dt)>'2015-12-31');
+#costdata3b <- subset(costdata2,pmax(hospital_admissn_dt,hospital_admissn_dt.junk,na.rm = T)<'2017-01-01' & 
+#                       pmin(hospital_admissn_dt,hospital_admissn_dt.junk,na.rm = T)>'2015-12-31');
 #' Do the `operatn_dt` fields match up?
 #dim(subset(costdata3,as.Date(proc_surg_start)==as.Date(operatn_dt)));
-#dim(costdata3);
+#dim(costdata3); dim(costdata3a); dim(costdata3b);
 #' Yes
 #' We have one patient in the original costdata that is not making it into the 
 #' new version
-missing_from_costdata3<-setdiff(costdata$idn_mrn,costdata3$idn_mrn);
-# View(subset(dat1,idn_mrn==missing_from_costdata)[,intersect(names(dat1),ccs)]);
-# View(subset(cost1,idn_mrn==missing_from_costdata)[,intersect(names(cost1),ccs)]);
+#missing_from_costdata3<-setdiff(costdata$idn_mrn,costdata3$idn_mrn);
+#missing_from_costdata3a<-setdiff(costdata$idn_mrn,costdata3a$idn_mrn);
+# View(subset(dat1,idn_mrn==missing_from_costdata3)[,intersect(names(dat1),ccs)]);
+# View(subset(cost1,idn_mrn==missing_from_costdata3)[,intersect(names(cost1),ccs)]);
 #' Their admit/discharge dates are the only ones in cost1 that fail to span the surgery
 #' date by more than one day
 #' 
 #' We have duplicates in costdata3:
-# length(unique(costdata3$idn_mrn))
-# costdata3dups <- table(costdata3$idn_mrn);
-# costdata3dups <- costdata3dups[costdata3dups>1];
-#subset(costdata3,idn_mrn%in%costdata3dups);
-# Next step: I know which ones to drop, but the trick is to do it dynamically
-# so it doesn't break on a data update. And, why did they slip through?
-# To be continued!
-
+# length(unique(costdata3$idn_mrn)); # 169
+#costdata3dups <- table(costdata3$idn_mrn);
+#costdata3dups <- names(costdata3dups[costdata3dups>1]);
+#costdata3adups <- table(costdata3a$idn_mrn);
+#costdata3adups <- names(costdata3adups[costdata3adups>1]);
+#length(unique(costdata3b$idn_mrn)); #169
+#setdiff(costdata3b$idn_mrn,costdata3$idn_mrn); # 0
+#setdiff(costdata3$idn_mrn,costdata3b$idn_mrn); # 0
+#' Conclusion: the costdata3b algorithm pulls non-duplicated patients
 
 #' Filter down to only NHW and hispanic
 dat3<-subset(dat2,hispanic_ethnicity!='Unknown'&(hispanic_ethnicity=='Yes'|race=='White'));
