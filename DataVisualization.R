@@ -15,7 +15,19 @@ source('global.R');
 # cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE
 source('run.R');
 
-pdf(height = 10, width = 7.5, onefile = TRUE, file = paste0(outputpath,"UHS_ACSNSQIP_CD4comps_boxplots-DSW-", format(Sys.Date(), '%m-%d-%Y'),".pdf"))
+# Note: above I set the global options so that the code is hidden in this report.
+# Comments beginning with # are code and therefore get hidden (only the output
+# is shown). Comments with #' however are turned into markdown. So you should 
+# only have the #' comments below in places where you want those comments to 
+# be visible in the final product. I suspect everything after line 64 or so should
+# be a regular comment.
+#
+# I am commenting out the line below because the PDF files it generates seem to
+# have stopped working. However, you could just render this notebook as a PDF
+# file instead of HTML, and that will look better than using the built-in PDF
+# device anyway. If you really need to generate a parallel PDF copy in this manner
+# maybe experiment with dev.copy2pdf() but the below do not work.
+#pdf(height = 10, width = 7.5, onefile = TRUE, file = paste0(outputpath,"UHS_ACSNSQIP_CD4comps_boxplots-DSW-", format(Sys.Date(), '%m-%d-%Y'),".pdf"))
 
 #' Income VS Clavien-Dindo Grade 4 complications
 plt_eth_inc_cd4 <- autoboxplot(sbs0$all$all_colon_all
@@ -32,35 +44,29 @@ grid.arrange(plt_all_inc_cd4,plt_eth_inc_cd4
              ,top="Income Vs CD4 Complications in\n all UHS Colectomy Patients"
              ,nrow=1,widths=1:2);
 
+#' 
 #' Income VS Frailty VS Hispanic Ethnicty with NO CD4 Complications
-plt_eth_inc_cd4 <- autoboxplot(sbs0$all$all_colon_all
+plt_frl_inc_eth_noc4 <- autoboxplot(sbs0$all$all_colon_all
                                ,xx='a_discrete_rai',yy='income_final'
                                ,zz='hispanic_ethnicity'
                                ,subset=a_any_cd4==FALSE&!is.na(income_final)
                                ,fill.name='Hispanic Ethnicity'
                                ,fill.labels = c('Hispanic', 'Non-Hispanic', 'Unknown')
-                               ,xx.name='Frailty Group',yy.name=NA,title='');
+                               ,xx.name='Frailty Group',yy.name='Household Income',title='');
 
-
-grid.arrange(plt_eth_inc_cd4
+grid.arrange(plt_frl_inc_eth_noc4
              ,top="Income Vs Frailty VS Hispanic Ethnicity\n in all UHS Colectomy Patients\n with NO CD4 Complications"
              );
 
+#' 
 #' Income VS Frailty VS Hispanic Ethnicty WITH CD4 Complications
-plt_eth_inc_cd4 <- autoboxplot(sbs0$all$all_colon_all
-                               ,xx='a_discrete_rai',yy='income_final'
-                               ,zz='hispanic_ethnicity'
-                               ,subset=a_any_cd4==TRUE&!is.na(income_final)
-                               ,fill.name='Hispanic Ethnicity'
-                               ,fill.labels = c('Hispanic', 'Non-Hispanic', 'Unknown')
-                               ,xx.name='Frailty Group',yy.name=NA,title='');
-
+plt_frl_inc_eth_c4 <- autoboxplot(subset=a_any_cd4==TRUE&!is.na(income_final));
 
 grid.arrange(plt_eth_inc_cd4
              ,top="Income Vs Frailty VS Hispanic Ethnicity\n in all UHS Colectomy Patients\n WITH CD4 Complications"
 );
 
-dev.off();
+#dev.off();
 #' #exploring the relationship between income and frailty incidence in all colectomy patients
 #' #that have a Clavien-Dindo Grade 4 complication (TRUE) or not (FALSE)
 #' thedata <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai, a_any_cd4, income_final) %>% group_by( a_discrete_rai, a_any_cd4)
