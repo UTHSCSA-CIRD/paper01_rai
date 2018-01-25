@@ -76,7 +76,7 @@ grid.arrange(plt_frl_inc_eth_c4
 #' ggplot(data = thedata, aes(x = factor(a_discrete_rai)
 #'                           ,y = income_final,fill=a_any_cd4)) + 
 #' geom_boxplot(coef=100) + labs(title = "Income Vs Frailty Vs Clavien-Dindo Grade 4 Complications in All UHS Colectomy Patients") +
-#' scale_fill_discrete(name = "Clavien-Dindo\nGrade4"
+#' scale_fill_discrete(name = "Clavien-Dindo Grade4"
 #'                     ,breaks = c("FALSE", "TRUE")
 #'                     ,labels = c("No", "Yes")
 #'                     ) -> plot_any_cd4;
