@@ -124,7 +124,7 @@ autoboxplot <- function(pdata, xx, yy, zz, subset=T
     if(missing(fill.name)) fill.name <- zz;
     if(missing(fill.breaks)) fill.breaks <- unique(pdata[[zz]]);
     if(missing(fill.labels)) fill.labels <- fill.breaks;
-    fill <- if(is.na(fill.name)) scale_fill_discrete(guide=F) else {
+    fill <- if(is.atomic(fill.name)&&is.na(fill.name)) scale_fill_discrete(guide=F) else {
       scale_fill_discrete(name=fill.name,breaks=fill.breaks,labels=fill.labels);
     }
   }
