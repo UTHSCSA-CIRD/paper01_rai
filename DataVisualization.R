@@ -34,14 +34,14 @@ plt_eth_inc_cd4 <- autoboxplot(sbs0$all$all_colon_all
                                ,xx='hispanic_ethnicity',yy='income_final'
                                ,zz='a_any_cd4'
                                ,subset=hispanic_ethnicity!='Unknown'&!is.na(income_final)
-                               ,fill.name='Clavien-Dindo\n Grade 4'
+                               ,fill.name=wrap_format('Clavien-Dindo Grade 4')
                                ,fill.labels = c('Yes', 'No')
                                ,xx.name='Hispanic Ethnicity',yy.name=NA,title='');
 
 plt_all_inc_cd4 <- update(plt_eth_inc_cd4, xx=T, subset=!is.na(income_final), fill.name=NA, xx.name='All', yy.name='Household Income');
 
 grid.arrange(plt_all_inc_cd4,plt_eth_inc_cd4
-             ,top="Income Vs CD4 Complications in\n all UHS Colectomy Patients"
+             ,top=wrap_format(30)("Income Vs CD4 Complications in all UHS Colectomy Patients")
              ,nrow=1,widths=1:2);
 
 #' 
@@ -55,7 +55,7 @@ plt_frl_inc_eth_noc4 <- autoboxplot(sbs0$all$all_colon_all
                                ,xx.name='Frailty Group',yy.name='Household Income',title='');
 
 grid.arrange(plt_frl_inc_eth_noc4
-             ,top="Income Vs Frailty VS Hispanic Ethnicity\n in all UHS Colectomy Patients\n with NO CD4 Complications"
+             ,top=wrap_format(30)("Income Vs Frailty VS Hispanic Ethnicity in all UHS Colectomy Patients with NO CD4 Complications")
              );
 
 #' 
@@ -64,7 +64,7 @@ grid.arrange(plt_frl_inc_eth_noc4
 plt_frl_inc_eth_c4 <- update(plt_frl_inc_eth_noc4, subset=a_any_cd4==TRUE&!is.na(income_final));
 
 grid.arrange(plt_frl_inc_eth_c4
-             ,top="Income Vs Frailty VS Hispanic Ethnicity\n in all UHS Colectomy Patients\n WITH CD4 Complications"
+             ,top=wrap_format(30)("Income Vs Frailty VS Hispanic Ethnicity in all UHS Colectomy Patients WITH CD4 Complications")
 );
 
 #dev.off();
