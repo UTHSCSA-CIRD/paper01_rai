@@ -13,6 +13,8 @@ source('global.R');
 #' Revision: `r gitstamp()`.
 #'
 #' Data file: `r inputdata`.
+#' 
+#' Cost data file: `r inputdata_cost`.
 #+ cache=TRUE
 source('run.R');
 
