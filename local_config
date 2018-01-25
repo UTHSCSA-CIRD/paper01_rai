@@ -1,0 +1,20 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+	url = git@github.com:UTHSCSA-CIRD/paper01_rai
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+        mergeoptions = --no-ff
+[branch "integration"]
+	remote = origin
+	merge = refs/heads/integration
+        mergeoptions = --no-ff
+[branch "des003"]
+	remote = origin
+	merge = refs/heads/des003
+        mergeoptions = --no-ff
