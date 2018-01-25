@@ -144,6 +144,7 @@ autoboxplot <- function(pdata, xx, yy, zz, subset=T
         paste0(table(pdata[,xx]),collapse=' \t ') } else {
           apply(table(pdata[,c(xx,zz)]),1,paste0,collapse=' \t ');
         }
+    ann.label <- gsub('\\b0\\b','',ann.label);
     out <- out + annotate('text',x=ccrds$x.major_source,y=ccrds$y.range[1]
                           ,label=ann.label[ccrds$x.major_source]);
   }
