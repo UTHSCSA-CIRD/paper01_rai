@@ -2,6 +2,9 @@
 #' title: "RAI Visualization"
 #' author: "Wilson, Bokov, Shireman"
 #' date: "10/20/2017"
+#' output: 
+#'  pdf_document: 
+#'   latex_engine: xelatex
 #' ---
 #'
 #+ echo=FALSE, message=FALSE
