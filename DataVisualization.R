@@ -6,6 +6,7 @@
 #'
 #+ echo=FALSE, message=FALSE
 knitr::opts_chunk$set(echo=F,warning = F,cache=T,message=F);
+#+ cache=F
 source('global.R');
 #' Report date: `r date()`.
 #'
@@ -30,6 +31,7 @@ source('run.R');
 #pdf(height = 10, width = 7.5, onefile = TRUE, file = paste0(outputpath,"UHS_ACSNSQIP_CD4comps_boxplots-DSW-", format(Sys.Date(), '%m-%d-%Y'),".pdf"))
 
 #' Income VS Clavien-Dindo Grade 4 complications
+#+ cache=FALSE
 plt_eth_inc_cd4 <- autoboxplot(sbs0$all$all_colon_all
                                ,xx='hispanic_ethnicity',yy='income_final'
                                ,zz='a_any_cd4'
