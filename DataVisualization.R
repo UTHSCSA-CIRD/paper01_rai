@@ -55,7 +55,7 @@ plt_frl_inc_eth_noc4 <- autoboxplot(sbs0$all$all_colon_all
                                ,xx.name='Frailty Group',yy.name='Household Income',title='');
 
 grid.arrange(plt_frl_inc_eth_noc4
-             ,top=wrap_format(30)("Income Vs Frailty VS Hispanic Ethnicity in all UHS Colectomy Patients with NO CD4 Complications")
+             ,top=wrap_format(60)("Income Vs Frailty VS Hispanic Ethnicity in all UHS Colectomy Patients with NO CD4 Complications")
              );
 
 #' 
@@ -64,7 +64,7 @@ grid.arrange(plt_frl_inc_eth_noc4
 plt_frl_inc_eth_c4 <- update(plt_frl_inc_eth_noc4, subset=a_any_cd4==TRUE&!is.na(income_final));
 
 grid.arrange(plt_frl_inc_eth_c4
-             ,top=wrap_format(30)("Income Vs Frailty VS Hispanic Ethnicity in all UHS Colectomy Patients WITH CD4 Complications")
+             ,top=wrap_format(60)("Income Vs Frailty VS Hispanic Ethnicity in all UHS Colectomy Patients WITH CD4 Complications")
 );
 
 #dev.off();
