@@ -124,7 +124,7 @@ autoboxplot <- function(pdata, xx, yy, zz, subset=T
     if(missing(fill.name)) fill.name <- zz;
     if(missing(fill.breaks)) fill.breaks <- unique(pdata[[zz]]);
     if(missing(fill.labels)) fill.labels <- fill.breaks;
-    fill <- if(is.na(fill.name)) scale_fill_discrete(guide=F) else {
+    fill <- if(is.atomic(fill.name)&&is.na(fill.name)) scale_fill_discrete(guide=F) else {
       scale_fill_discrete(name=fill.name,breaks=fill.breaks,labels=fill.labels);
     }
   }
@@ -142,9 +142,9 @@ autoboxplot <- function(pdata, xx, yy, zz, subset=T
     ann.label <- if(xx==TRUE && missing(zz)) nrow(pdata) else if(xx==TRUE){
       paste0(table(pdata[,zz]),collapse=' \t ') } else if(missing(zz)){
         paste0(table(pdata[,xx]),collapse=' \t ') } else {
-          apply(table(pdata[,c(xx,zz)]),1,paste0,collapse=' \t ');
+          apply(table(pdata[,c(xx,zz)]),1,function(ii) paste0(ii[!ii%in%list(0,'')],collapse=' \t '));
         }
-    ann.label <- gsub('\\b0\\b','',ann.label);
+    #ann.label <- gsub('\\b0\\b','',ann.label);
     out <- out + annotate('text',x=ccrds$x.major_source,y=ccrds$y.range[1]
                           ,label=ann.label[ccrds$x.major_source]);
   }
