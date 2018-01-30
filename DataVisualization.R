@@ -75,6 +75,29 @@ grid.arrange(plt_frl_inc_eth_c4
 );
 
 #dev.off();
+
+
+#pdf(height = 10, width = 7.5, onefile = TRUE, file = paste0(outputpath,"UHS_ACSNSQIP_CD4comps_boxplots-DSW-", format(Sys.Date(), '%m-%d-%Y'),".pdf"))
+
+#' Income VS SSI VS Hispanic Ethnicity(surgical site infection)
+#+ cache=FALSE
+plt_ssi_inc_eth <- autoboxplot(sbs0$all$full
+                               ,xx='hispanic_ethnicity',yy='income_final'
+                               #,zz='a_any_ssi'
+                               ,subset=hispanic_ethnicity!='Unknown'&!is.na(income_final)
+                               ,fill.name=wrap_format(14)("SSI")
+                               ,fill.labels=c("NonHispanic", "Hispanic")
+                               ,xx.name='SSI',yy.name=NA,title='');
+
+plt_ssi_inc_eth2 <- update(plt_ssi_inc_eth, xx=T, subset=!is.na(income_final), fill.name=NA, xx.name='All', yy.name='Household Income');
+
+grid.arrange(plt_ssi_inc_eth2,plt_ssi_inc_eth
+             ,top=wrap_format(30)("Income Vs SSI VS Hispanic Ethnicty\n in all UHS Patients")
+             ,nrow=1,widths=1:2);
+
+#' 
+
+#dev.off();
 #' #exploring the relationship between income and frailty incidence in all colectomy patients
 #' #that have a Clavien-Dindo Grade 4 complication (TRUE) or not (FALSE)
 #' thedata <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai, a_any_cd4, income_final) %>% group_by( a_discrete_rai, a_any_cd4)

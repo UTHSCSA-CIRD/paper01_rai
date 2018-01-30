@@ -187,3 +187,44 @@ renamecol <- function(xx) {
 
 table_02 <- renamecol(table_01)
 write.table(table_02,  paste0(outputpath, 'UHS_ACSNSQIP_2016ColectomyTables-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')
+
+
+#' Here, Dr. Shireman is interested in 30 readmission data: 
+table_03 <- dat1subs[["all_colon_all"]] %>% 
+  filter(readm_30_dy >0) %>%
+  filter(hospital_admissn_dt > "2015-12-31" & hospital_admissn_dt < "2017-01-01") %>% 
+  group_by(rai_range) %>% 
+  summarise(rai_n = n()	    
+            ,cumul_count = cumsum(n())
+            ,died_n = sum(postop_death_30_dy_proc =='Yes') 
+            ,died_frac = mean(postop_death_30_dy_proc =='Yes')
+            ,comp_n = sum(a_any_postop=='TRUE')
+            ,comp_frac = mean(a_any_postop=='TRUE')
+            ,cd4_n = sum(a_any_cd4=='TRUE')
+            ,cd4_frac = mean(a_any_cd4=='TRUE')
+            ,readmsn_n = sum(a_readm_30_dy=='TRUE')
+            ,readmsn_frac = mean(a_readm_30_dy=='TRUE')
+  ) %>% mutate(cumul_count=rev(cumsum(rev(rai_n)))) %>% 
+  arrange(desc(rai_range)) 
+
+table_04 <- renamecol(table_03)
+write.table(table_04,  paste0(outputpath, 'UHS_ACSNSQIP_2016ColectomyTables30DayReadmission-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')
+
+#' Here, Dr. Shireman is interested in 30 readmission data: 
+table_05 <- dat1subs[["ssi_all"]] %>% 
+  group_by(rai_range) %>% 
+  summarise(rai_n = n()	    
+            ,cumul_count = cumsum(n())
+            ,died_n = sum(postop_death_30_dy_proc =='Yes') 
+            ,died_frac = mean(postop_death_30_dy_proc =='Yes')
+            ,comp_n = sum(a_any_postop=='TRUE')
+            ,comp_frac = mean(a_any_postop=='TRUE')
+            ,cd4_n = sum(a_any_cd4=='TRUE')
+            ,cd4_frac = mean(a_any_cd4=='TRUE')
+            ,readmsn_n = sum(a_readm_30_dy=='TRUE')
+            ,readmsn_frac = mean(a_readm_30_dy=='TRUE')
+  ) %>% mutate(cumul_count=rev(cumsum(rev(rai_n)))) %>% 
+  arrange(desc(rai_range)) 
+
+table_06 <- renamecol(table_05)
+write.table(table_06,  paste0(outputpath, 'UHS_ACSNSQIP_SSI_Table-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')

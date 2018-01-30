@@ -182,7 +182,13 @@ dat1 <- dat1[order(dat1$proc_surg_start),];
 #' 
 #' ### Drop patients without an income
 #dat1 <- dat1[!is.na(dat1$income_final),];
-
+#' 
+#' ### Adding a column that aggregates all SSI cases together:
+dat1$a_any_ssi <- rowSums(dat1[,c("postop_si_ssi", "postop_deep_incisnal_ssi")])
+dat1$a_any_ssi[dat1$a_any_ssi<1] <- "FALSE"
+dat1$a_any_ssi[dat1$a_any_ssi>0] <- "TRUE"
+#'
+#'
 #' ### Make several subsets of dat1 all at once
 #' 
 #' for later use to make multiple versions of the same table and multiple
@@ -242,6 +248,7 @@ subs_criteria <- alist(
     !(case_number %in% drop_case_num)
   ,lapa_colon_emergency=cpt_code %in% v(c_lapa_colon,dct1) &
     emergency_case=='Yes' & !(case_number %in% drop_case_num)
+  ,ssi_all=a_any_ssi>0
 );
 
 sbs0 <- sapply(list(all=dat1,index=dat2),function(xx) do.call(ssply,c(list(dat=xx),subs_criteria[-1])),simplify=F);
