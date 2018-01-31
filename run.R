@@ -184,9 +184,8 @@ dat1 <- dat1[order(dat1$proc_surg_start),];
 #dat1 <- dat1[!is.na(dat1$income_final),];
 #' 
 #' ### Adding a column that aggregates all SSI cases together:
-dat1$a_any_ssi <- rowSums(dat1[,c("postop_si_ssi", "postop_deep_incisnal_ssi")])
-dat1$a_any_ssi[dat1$a_any_ssi<1] <- "FALSE"
-dat1$a_any_ssi[dat1$a_any_ssi>0] <- "TRUE"
+dat1$a_any_ssi <- as.logical(rowSums(dat1[,c("postop_si_ssi", "postop_deep_incisnal_ssi")]))
+
 #'
 #'
 #' ### Make several subsets of dat1 all at once
