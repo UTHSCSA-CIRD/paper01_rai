@@ -151,7 +151,8 @@ autoboxplot <- function(pdata, xx, yy, zz, subset=T
   out;
 }
 
-getCall.gg <- function(xx) attr(xx,'call');
+getCall.data.frame <- getCall.gg <- function(xx) attr(xx,'call');
+
 
 #' From ... http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/
 # Multiple plot function
@@ -240,9 +241,15 @@ ssply<-function(dat,...) sapply(sys.call()[-(1:2)],function(ii) subset(dat,eval(
 #' save a named list of tables, including names
 savetablelist <- function(lst,fileprefix,filesuffix=paste0(format(Sys.Date(),'%m-%d-%Y-%H_%M_%S'),'.tsv')
                             ,filepath='./',outfile=paste0(filepath,fileprefix,filesuffix)
-                          ,sep='\t',row.names=F,...) for(ii in names(lst)){
+                          ,sep='\t',row.names=F
+                          ,singletabname=as.character(substitute(lst))
+                          ,replaceifexists=T,...) {
+  if(is.data.frame(lst)) lst<-setNames(list(lst),singletabname);
+  if(replaceifexists&&file.exists(outfile)) file.remove(outfile);
+  for(ii in names(lst)){
   write(ii,file=outfile,append=T);
   write.table(lst[[ii]],outfile,sep=sep,row.names=row.names,append=T);
+  }
 }
 
 #' ### Specific to RAI-A
@@ -309,6 +316,7 @@ countfrac <- function(xx,outcomes
     tot[[groupcols]] <- totalrow;
     oo <- rbind(oo,tot);
   }
+  attr(oo,'call') <- match.call();
   oo;
 }
 
