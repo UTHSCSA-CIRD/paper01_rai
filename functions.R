@@ -151,7 +151,8 @@ autoboxplot <- function(pdata, xx, yy, zz, subset=T
   out;
 }
 
-getCall.gg <- function(xx) attr(xx,'call');
+getCall.data.frame <- getCall.gg <- function(xx) attr(xx,'call');
+
 
 #' From ... http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/
 # Multiple plot function
@@ -240,9 +241,15 @@ ssply<-function(dat,...) sapply(sys.call()[-(1:2)],function(ii) subset(dat,eval(
 #' save a named list of tables, including names
 savetablelist <- function(lst,fileprefix,filesuffix=paste0(format(Sys.Date(),'%m-%d-%Y-%H_%M_%S'),'.tsv')
                             ,filepath='./',outfile=paste0(filepath,fileprefix,filesuffix)
-                          ,sep='\t',row.names=F,...) for(ii in names(lst)){
+                          ,sep='\t',row.names=F
+                          ,singletabname=as.character(substitute(lst))
+                          ,replaceifexists=T,...) {
+  if(is.data.frame(lst)) lst<-setNames(list(lst),singletabname);
+  if(replaceifexists&&file.exists(outfile)) file.remove(outfile);
+  for(ii in names(lst)){
   write(ii,file=outfile,append=T);
   write.table(lst[[ii]],outfile,sep=sep,row.names=row.names,append=T);
+  }
 }
 
 #' ### Specific to RAI-A
@@ -251,23 +258,66 @@ savetablelist <- function(lst,fileprefix,filesuffix=paste0(format(Sys.Date(),'%m
 #' Forget modifying the columns to TRUE/FALSE... some of them have 'Unknown',
 #' NA, who knows what else. We can just do it dynamically when we need to. 
 #' This might even let us get rid of a couple of analytic columns.
-truthy <- function(xx,...) ifelse(is.na(nmx<-as.numeric(xx))
-                                  ,xx %in% c(TRUE,'true','Yes','T','Y','yes','y')
-                                  ,nmx>0);
 
-countfrac <- function(xx,outcomes,groupcols='rai_range',sortby=groupcols
-                      # set to NA if don't want to sort
-                      ,dir=c('desc','asc')
-                      ,summfns=c(n=sum,frac=mean)){
-  xx[,outcomes] <- mutate_all(xx[,outcomes],truthy);
-  xx <- group_by_(xx,groupcols);
-  xx <- cbind(summarise(xx,bin_n=n())
-              ,summarise_all(xx[,outcomes],summfns)) %>%
+#' Example of using R methods dispatch
+#' 
+#' The actual usage is: `truthy(foo)` and `truthy()` itself figures
+#' out which method to actually dispatch.
+truthy <- function(xx,...) UseMethod('truthy');
+truthy.logical <- function(xx,...) xx;
+truthy.factor <- function(xx,...) truthy.default(as.character(xx),...);
+truthy.numeric <- function(xx,...) xx>0;
+truthy.default <- function(xx,truewords=c('TRUE','true','Yes','T','Y','yes','y')
+                           ,...) xx %in% truewords;
+
+countfrac <- function(xx,outcomes
+                      # set to TOTAL in order to do _only_ the total
+                      ,groupcols='rai_range',sortby=groupcols
+                      # set to 'none' if don't want to sort
+                      ,dir=c('desc','asc','none')
+                      ,summfns=c(n=sum,frac=mean)
+                      # set to '' to disable
+                      ,totalrow='Total'){
+  # callback, so this function can call itself even if it's renamed
+  # or nameless, for purposes of rerunning to get the totals row
+  if(totalrow!='') thisfn <- sys.function();
+  oo <- xx;
+  # is the function being invoked for the purpose of calculating a total row?
+  if(doingtotalrow <- tolower(trimws(groupcols[1]))=='total'){
+    oo[[groupcols]] <- totalrow;
+  };
+  oo <- group_by_(oo,groupcols);
+  # we coerce everything to logical, whatever it might have been
+  # but leave alone columns other than those specified in the 'outcomes' variable
+  oo[,outcomes] <- mutate_all(oo[,outcomes],truthy);
+  # Two different summary tables, the second one applies the same set of
+  # functions to everything, and the first one is just a count that doesn't 
+  # rely on any one specific column. So we do them separately and then cbind()
+  oo <- cbind(summarise(oo,bin_n=n()),summarise_all(oo[,c(groupcols,outcomes)],summfns)[,-1]) %>%
+    # creating cumul_count, as in the current code
     mutate(cumul_count=rev(cumsum(rev(bin_n))));
-  if(!is.na(dir)) xx <- switch(match.arg(dir)
-                               ,desc=arrange_(xx,sprintf('desc(%s)',groupcols))
-                               ,asc=arrange_(xx,groupcols));
-  xx;
+  # sort, if desired, just as in the current code
+  if(!doingtotalrow) oo <- switch(match.arg(dir)
+                                  ,none=oo
+                                  ,desc=arrange_(oo,sprintf('desc(%s)',groupcols))
+                                  ,asc=arrange_(oo,groupcols));
+  # now we insure that the column order is the same as the order of the groupcols
+  # argument-- first the grouping column name, then the 'bin_n' (used to be called
+  # rai_n, but this isn't specific to RAI, could group by anithing, so renamed)
+  # cumul_count...
+  oo <- oo[,c(groupcols,'bin_n','cumul_count'
+              # ...and then this: it pastes the suffixes as obtained from the names 
+              # of the summfns argument but orders them in the same way as they were
+              # given, rather than first the first summary function and then the second
+              ,c(t(outer(outcomes,names(summfns),paste,sep='_'))))];
+  if(!doingtotalrow&&totalrow!='') { 
+    tot <- thisfn(xx,outcomes,groupcols=totalrow,summfns=summfns,totalrow='');
+    names(tot)<-names(oo);
+    tot[[groupcols]] <- totalrow;
+    oo <- rbind(oo,tot);
+  }
+  attr(oo,'call') <- match.call();
+  oo;
 }
 
 

@@ -50,7 +50,18 @@ thecolnames <- c("RAI-A Range"
                  ,"Clavien-Dindo Grade4 30days N"
                  ,"Clavien-Dindo Grade4 30days Fraction"
                  ,"30day Readmission N"
-                 ,"30day Readmission Fraction")
+                 ,"30day Readmission Fraction");
+thecolnames0 <- c("RAI-A Range"
+                 ,"RAI-A Score N"
+                 ,"Cumulative Count"
+                 ,"Died 30days N"
+                 ,"Died 30days Fraction"
+                 ,"Complications 30days N"
+                 ,"Complications 30days Fraction"
+                 ,"Clavien-Dindo Grade4 30days N"
+                 ,"Clavien-Dindo Grade4 30days Fraction"
+                 ,"30day Readmission N"
+                 ,"30day Readmission Fraction");
 
 #' Here is where I am creating a summary row for each table
 #' in the list:
@@ -106,10 +117,20 @@ tables_02 <- lapply(tables_01, function(xx) {
                                 return(newxx)
                               }
 )
-                           
+
 #' Here', I'm writing the tables to a file:
 #lapply(tables_02, write.table, paste0(outputpath, 'UHS_ACSNSQIP_SummaryTables-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.xlsx'), row.names=FALSE, append=TRUE, sep='\t')
 savetablelist(tables_02,'UHS_ACSNSQIP_SummaryTables-DSW-');
+
+#' Since it seems like we're counting occurrences of the same outcomes for all 
+#' these tables, in order to avoid violating DRY, we can *temporarily change the
+#' default arguments for countfrac* ! 
+formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_any_postop','a_any_cd4','a_readm_30_dy');
+
+#' Test of new version:
+tables_02a <- lapply(dat1subs,countfrac);
+#' New version:will no longer be identical to tables_01, needs to be compared to tables_02
+mapply(function(aa,bb) all(aa==bb),tables_02a,tables_02);
 
 #' Focus on UHS colectomy data January 10, 2018:
 #' 
@@ -187,10 +208,17 @@ renamecol <- function(xx) {
   return(newxx)
 }
 
+
 table_02 <- renamecol(table_01)
 #write.table(table_02,  paste0(outputpath, 'UHS_ACSNSQIP_2016ColectomyTables-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')
 savetablelist(table_02,'UHS_ACSNSQIP_2016ColectomyTables-DSW-');
 
+#' New
+table_02a <- dat1subs[["all_colon_all"]] %>% 
+  # you can put several criteria in the same filter statement
+  filter(eval(subs_criteria$y2016)) %>% countfrac();
+
+all(table_02a==table_02);
 
 #' Here, Dr. Shireman is interested in 30 readmission data: 
 table_03 <- dat1subs[["all_colon_all"]] %>% 
@@ -213,6 +241,13 @@ table_03 <- dat1subs[["all_colon_all"]] %>%
 table_04 <- renamecol(table_03)
 write.table(table_04,  paste0(outputpath, 'UHS_ACSNSQIP_2016ColectomyTables30DayReadmission-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')
 
+#' New version
+table_04a <- dat1subs[["all_colon_all"]] %>% 
+  # you can put several criteria in the same filter statement
+  filter(readm_30_dy >0, eval(subs_criteria$y2016)) %>% countfrac();
+
+all(table_04a==table_04);
+
 #' Here, Dr. Shireman is interested in 30 readmission data: 
 table_05 <- dat1subs[["ssi_all"]] %>% 
   group_by(rai_range) %>% 
@@ -230,5 +265,8 @@ table_05 <- dat1subs[["ssi_all"]] %>%
   arrange(desc(rai_range)) 
 
 table_06 <- renamecol(table_05)
+#' **AFB**: the above is a duplicate of tables_02$ssi_all:
+all(table_06==tables_02$ssi_all);
+
 #write.table(table_06,  paste0(outputpath, 'UHS_ACSNSQIP_SSI_Table-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')
 savetablelist(table_06,'UHS_ACSNSQIP_SSI-DSW-');
