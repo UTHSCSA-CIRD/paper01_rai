@@ -248,6 +248,10 @@ savetablelist <- function(lst,fileprefix,filesuffix=paste0(format(Sys.Date(),'%m
 #' ### Specific to RAI-A
 #' 
 
+truthy <- function(xx,...) ifelse(is.na(nmx<-as.numeric(xx))
+                                  ,xx %in% c(TRUE,'true','Yes','T','Y','yes','y')
+                                  ,nmx>0);
+
 #' Return a tableone object formatted just the way we like it
 #' @param xx     A \code{data.frame} (required).
 #' @param vars   Vector of variable names to pass to \code{CreatTableOne} (optional)
