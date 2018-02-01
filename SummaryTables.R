@@ -30,7 +30,7 @@ lapply(dat1subs, function(xx) group_by(xx,rai_range) %>%
             ,comp_frac = mean(a_any_postop=='TRUE')
             ,cd4_n = sum(a_any_cd4=='TRUE')
             ,cd4_frac = mean(a_any_cd4=='TRUE')
-	          ,readmsn_n = sum(a_readm_30_dy=='TRUE')
+            ,readmsn_n = sum(a_readm_30_dy=='TRUE')
             ,readmsn_frac = mean(a_readm_30_dy=='TRUE')
             ) %>% 
   mutate(cumul_count=rev(cumsum(rev(rai_n)))) %>% 
@@ -107,7 +107,8 @@ tables_02 <- lapply(tables_01, function(xx) {
 )
                            
 #' Here', I'm writing the tables to a file:
-lapply(tables_02, write.table, paste0(outputpath, 'UHS_ACSNSQIP_SummaryTables-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.xlsx'), row.names=FALSE, append=TRUE, sep='\t')
+#lapply(tables_02, write.table, paste0(outputpath, 'UHS_ACSNSQIP_SummaryTables-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.xlsx'), row.names=FALSE, append=TRUE, sep='\t')
+savetablelist(tables_02,'UHS_ACSNSQIP_SummaryTables-DSW-');
 
 #' Focus on UHS colectomy data January 10, 2018:
 #' 
@@ -186,7 +187,8 @@ renamecol <- function(xx) {
 }
 
 table_02 <- renamecol(table_01)
-write.table(table_02,  paste0(outputpath, 'UHS_ACSNSQIP_2016ColectomyTables-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')
+#write.table(table_02,  paste0(outputpath, 'UHS_ACSNSQIP_2016ColectomyTables-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')
+savetablelist(table_02,'UHS_ACSNSQIP_2016ColectomyTables-DSW-');
 
 
 #' Here, Dr. Shireman is interested in 30 readmission data: 
@@ -227,4 +229,5 @@ table_05 <- dat1subs[["ssi_all"]] %>%
   arrange(desc(rai_range)) 
 
 table_06 <- renamecol(table_05)
-write.table(table_06,  paste0(outputpath, 'UHS_ACSNSQIP_SSI_Table-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')
+#write.table(table_06,  paste0(outputpath, 'UHS_ACSNSQIP_SSI_Table-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')
+savetablelist(table_06,'UHS_ACSNSQIP_SSI-DSW-');

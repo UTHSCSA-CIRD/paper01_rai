@@ -1,4 +1,3 @@
-#' Return a factor containing the top-N levels, and the rest binned
 #' into the specified existing or new level. That level is listed last
 #' in the resulting factor.
 #' @param xx A \code{vector} (required).
@@ -237,6 +236,14 @@ n_fun <- function(xx) data.frame(y=mean(quantile(xx,c(.5,.75))),label=as.charact
 
 #' take a list of subset criteria and return a list of data.frames
 ssply<-function(dat,...) sapply(sys.call()[-(1:2)],function(ii) subset(dat,eval(ii)),simplify=F);
+
+#' save a named list of tables, including names
+savetablelist <- function(lst,fileprefix,filesuffix=paste0(format(Sys.Date(),'%m-%d-%Y-%H_%M_%S'),'.tsv')
+                            ,filepath='./',outfile=paste0(filepath,fileprefix,filesuffix)
+                          ,sep='\t',row.names=F,...) for(ii in names(lst)){
+  write(ii,file=outfile,append=T);
+  write.table(lst[[ii]],outfile,sep=sep,row.names=row.names,append=T);
+}
 
 #' ### Specific to RAI-A
 #' 

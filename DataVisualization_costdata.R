@@ -21,11 +21,11 @@ d2$hispanic_ethnicity2 <- c(rep("All", times=nrow(costdata)), as.character(costd
 d2$hispanic_ethnicity3 <- factor(d2$hispanic_ethnicity2, levels = c("All", "No", "Yes", "Unknown"))
 
 #Income ~ CD4 Violin Plot
-thedata1 <- d2 %>% select(hispanic_ethnicity3, income_final, a_any_cd4.x) %>% 
-  filter(hispanic_ethnicity3 %in% c("All", "No", "Yes")) %>% group_by( hispanic_ethnicity3, a_any_cd4.x) 
+thedata1 <- d2 %>% select(hispanic_ethnicity3, income_final, a_any_cd4) %>% 
+  filter(hispanic_ethnicity3 %in% c("All", "No", "Yes")) %>% group_by( hispanic_ethnicity3, a_any_cd4) 
 
 ggplot(data = thedata1, aes(x = hispanic_ethnicity3
-                            ,y = income_final, fill = a_any_cd4.x)) + 
+                            ,y = income_final, fill = a_any_cd4)) + 
   geom_violin(coef=100) + 
   labs(title = "Income Vs CD4 Complications in UHS Colectomy\n Patients - 2016 Data Only") +
   scale_y_continuous(labels = comma) +
@@ -36,15 +36,15 @@ ggplot(data = thedata1, aes(x = hispanic_ethnicity3
                    ,breaks = c("All", "No", "Yes")
                    ,labels = c("All", "Non-Hispanic", "Hispanic")
   ) -> plot_2016_cd4_income_violin;
-thecounts1 <- thedata1 %>% filter(!is.na(income_final)) %>% group_by(hispanic_ethnicity3, a_any_cd4.x) %>% count()
+thecounts1 <- thedata1 %>% filter(!is.na(income_final)) %>% group_by(hispanic_ethnicity3, a_any_cd4) %>% count()
 
 
 #Total Cost ~ CD4 Violin Plot
-thedata2 <- d2 %>% select(hispanic_ethnicity3, tot_charges_tech_pro, a_any_cd4.x) %>% 
-  filter(hispanic_ethnicity3 %in% c("All", "No", "Yes")) %>% group_by( hispanic_ethnicity3, a_any_cd4.x) 
+thedata2 <- d2 %>% select(hispanic_ethnicity3, tot_charges_tech_pro, a_any_cd4) %>% 
+  filter(hispanic_ethnicity3 %in% c("All", "No", "Yes")) %>% group_by( hispanic_ethnicity3, a_any_cd4) 
 
 ggplot(data = thedata2, aes(x = hispanic_ethnicity3
-                            ,y = tot_charges_tech_pro, fill = a_any_cd4.x)) + 
+                            ,y = tot_charges_tech_pro, fill = a_any_cd4)) + 
   geom_violin(coef=100) + 
   labs(title = "Total Charges Vs CD4 Complications in UHS Colectomy\n Patients - 2016 Data Only") +
   scale_y_continuous(labels = comma) +
@@ -55,15 +55,15 @@ ggplot(data = thedata2, aes(x = hispanic_ethnicity3
                    ,breaks = c("All", "No", "Yes")
                    ,labels = c("All", "Non-Hispanic", "Hispanic")
   ) -> plot_2016_cd4_totcost_violin;
-thecounts2 <- thedata2 %>% filter(!is.na(tot_charges_tech_pro)) %>% group_by(hispanic_ethnicity3, a_any_cd4.x) %>% count()
+thecounts2 <- thedata2 %>% filter(!is.na(tot_charges_tech_pro)) %>% group_by(hispanic_ethnicity3, a_any_cd4) %>% count()
 
 
 #Variable Cost ~ CD4 Violin Plot
-thedata3 <- d2 %>% select(hispanic_ethnicity3, tot_vbl_direct_cost, a_any_cd4.x) %>% 
-  filter(hispanic_ethnicity3 %in% c("All", "No", "Yes")) %>% group_by( hispanic_ethnicity3, a_any_cd4.x) 
+thedata3 <- d2 %>% select(hispanic_ethnicity3, tot_vbl_direct_cost, a_any_cd4) %>% 
+  filter(hispanic_ethnicity3 %in% c("All", "No", "Yes")) %>% group_by( hispanic_ethnicity3, a_any_cd4) 
 
 ggplot(data = thedata3, aes(x = hispanic_ethnicity3
-                            ,y = tot_vbl_direct_cost, fill = a_any_cd4.x)) + 
+                            ,y = tot_vbl_direct_cost, fill = a_any_cd4)) + 
   geom_violin(coef=100) + 
   labs(title = "Variable Cost Vs CD4 Complications in UHS Colectomy\n Patients - 2016 Data Only") +
   scale_y_continuous(labels = comma) +
@@ -74,18 +74,18 @@ ggplot(data = thedata3, aes(x = hispanic_ethnicity3
                    ,breaks = c("All", "No", "Yes")
                    ,labels = c("All", "Non-Hispanic", "Hispanic")
   ) -> plot_2016_cd4_varcost_violin;
-thecounts3 <- thedata3 %>% filter(!is.na(tot_vbl_direct_cost)) %>% group_by(hispanic_ethnicity3, a_any_cd4.x) %>% count()
+thecounts3 <- thedata3 %>% filter(!is.na(tot_vbl_direct_cost)) %>% group_by(hispanic_ethnicity3, a_any_cd4) %>% count()
 
 
 #Income ~ CD4 Boxplot
-thedata1 <- d2 %>% select(hispanic_ethnicity3, income_final, a_any_cd4.x) %>% 
-  filter(hispanic_ethnicity3 %in% c("All", "No", "Yes")) %>% group_by( hispanic_ethnicity3, a_any_cd4.x) 
+thedata1 <- d2 %>% select(hispanic_ethnicity3, income_final, a_any_cd4) %>% 
+  filter(hispanic_ethnicity3 %in% c("All", "No", "Yes")) %>% group_by( hispanic_ethnicity3, a_any_cd4) 
 
 #' ### This is the plot I'll rework as an example for the other plots
 #' 
 #' old version
 ggplot(data = thedata1, aes(x = hispanic_ethnicity3
-                            ,y = income_final, fill = a_any_cd4.x)) + 
+                            ,y = income_final, fill = a_any_cd4)) + 
   geom_boxplot(coef=100) + 
   labs(title = "Income Vs CD4 Complications in UHS Colectomy\n Patients - 2016 Data Only") +
   scale_y_continuous(labels = comma) +
@@ -96,7 +96,7 @@ ggplot(data = thedata1, aes(x = hispanic_ethnicity3
                    ,breaks = c("All", "No", "Yes")
                    ,labels = c("All", "Non-Hispanic", "Hispanic")
   ) -> plot_2016_cd4_income_box;
-thecounts1 <- thedata1 %>% filter(!is.na(income_final)) %>% group_by(hispanic_ethnicity3, a_any_cd4.x) %>% count()
+thecounts1 <- thedata1 %>% filter(!is.na(income_final)) %>% group_by(hispanic_ethnicity3, a_any_cd4) %>% count()
 
 #' new version
 #' 
@@ -110,10 +110,10 @@ plt_eth_inc_cd4 <- autoboxplot(costdata   # first arg is a data.frame as usual
   # The xx and yy are the first and second positional arguments, I'm only 
   # using the argument names for readability
   ,xx='hispanic_ethnicity',yy='income_final'
-  # zz is an optional argument for the fill variable... I'm guessing a_any_cd4.x
+  # zz is an optional argument for the fill variable... I'm guessing a_any_cd4
   # is an artifact of linking the two datasets? No worries, we'll use it for now 
   # and clean it up before merging into integration branch
-  ,zz='a_any_cd4.x'
+  ,zz='a_any_cd4'
   # subset is an optional argument if needed... here I am getting rid of both
   # the unknown ethnicity and missing incomes-- though it doesn't matter for
   # plots, it does matter for the labels and this function does BOTH plots and
@@ -142,7 +142,7 @@ plt_all_inc_cd4 <- autoboxplot(costdata
                                # looks specifically for such a case and does 
                                # some stuff differently)
                                ,xx=T
-                               ,yy='income_final',zz='a_any_cd4.x'
+                               ,yy='income_final',zz='a_any_cd4'
                                ,subset=hispanic_ethnicity!='Unknown'&!is.na(income_final)
                                # to suppress the legend we set fill.name to NA 
                                # because we only need on copy of the legend
@@ -165,12 +165,12 @@ grid.arrange(plt_all_inc_cd4,plt_eth_inc_cd4
 #' going on even so:
 plt_eth_inc_cd4 <- autoboxplot(costdata
                                ,xx='hispanic_ethnicity',yy='income_final'
-                               ,zz='a_any_cd4.x'
+                               ,zz='a_any_cd4'
                                ,subset=hispanic_ethnicity!='Unknown'&!is.na(income_final)
                                ,fill.name='Clavien-Dindo\n Grade 4'
                                ,xx.name='Hispanic Ethnicity',yy.name=NA,title='');
 
-plt_all_inc_cd4 <- autoboxplot(costdata,xx=T,yy='income_final',zz='a_any_cd4.x'
+plt_all_inc_cd4 <- autoboxplot(costdata,xx=T,yy='income_final',zz='a_any_cd4'
                                ,subset=hispanic_ethnicity!='Unknown'&!is.na(income_final)
                                ,fill.name=NA,yy.name='Household Income'
                                ,title='');
@@ -182,11 +182,11 @@ grid.arrange(plt_all_inc_cd4,plt_eth_inc_cd4
 
 
 #Total Cost ~ CD4 Boxplot
-thedata2 <- d2 %>% select(hispanic_ethnicity3, tot_charges_tech_pro, a_any_cd4.x) %>% 
-  filter(hispanic_ethnicity3 %in% c("All", "No", "Yes")) %>% group_by( hispanic_ethnicity3, a_any_cd4.x) 
+thedata2 <- d2 %>% select(hispanic_ethnicity3, tot_charges_tech_pro, a_any_cd4) %>% 
+  filter(hispanic_ethnicity3 %in% c("All", "No", "Yes")) %>% group_by( hispanic_ethnicity3, a_any_cd4) 
 
 ggplot(data = thedata2, aes(x = hispanic_ethnicity3
-                            ,y = tot_charges_tech_pro, fill = a_any_cd4.x)) + 
+                            ,y = tot_charges_tech_pro, fill = a_any_cd4)) + 
   geom_boxplot(coef=100) + 
   labs(title = "Total Charges Vs CD4 Complications in UHS Colectomy\n Patients - 2016 Data Only") +
   scale_y_continuous(labels = comma) +
@@ -197,15 +197,15 @@ ggplot(data = thedata2, aes(x = hispanic_ethnicity3
                    ,breaks = c("All", "No", "Yes")
                    ,labels = c("All", "Non-Hispanic", "Hispanic")
   ) -> plot_2016_cd4_totcost_box;
-thecounts2 <- thedata2 %>% filter(!is.na(tot_charges_tech_pro)) %>% group_by(hispanic_ethnicity3, a_any_cd4.x) %>% count()
+thecounts2 <- thedata2 %>% filter(!is.na(tot_charges_tech_pro)) %>% group_by(hispanic_ethnicity3, a_any_cd4) %>% count()
 
 
 #Variable Cost ~ CD4 Boxplot
-thedata3 <- d2 %>% select(hispanic_ethnicity3, tot_vbl_direct_cost, a_any_cd4.x) %>% 
-  filter(hispanic_ethnicity3 %in% c("All", "No", "Yes")) %>% group_by( hispanic_ethnicity3, a_any_cd4.x) 
+thedata3 <- d2 %>% select(hispanic_ethnicity3, tot_vbl_direct_cost, a_any_cd4) %>% 
+  filter(hispanic_ethnicity3 %in% c("All", "No", "Yes")) %>% group_by( hispanic_ethnicity3, a_any_cd4) 
 
 ggplot(data = thedata3, aes(x = hispanic_ethnicity3
-                            ,y = tot_vbl_direct_cost, fill = a_any_cd4.x)) + 
+                            ,y = tot_vbl_direct_cost, fill = a_any_cd4)) + 
   geom_boxplot(coef=100) + 
   labs(title = "Variable Cost Vs CD4 Complications in UHS Colectomy\n Patients - 2016 Data Only") +
   scale_y_continuous(labels = comma) +
@@ -216,7 +216,7 @@ ggplot(data = thedata3, aes(x = hispanic_ethnicity3
                    ,breaks = c("All", "No", "Yes")
                    ,labels = c("All", "Non-Hispanic", "Hispanic")
   ) -> plot_2016_cd4_varcost_box;
-thecounts3 <- thedata3 %>% filter(!is.na(tot_vbl_direct_cost)) %>% group_by(hispanic_ethnicity3, a_any_cd4.x) %>% count()
+thecounts3 <- thedata3 %>% filter(!is.na(tot_vbl_direct_cost)) %>% group_by(hispanic_ethnicity3, a_any_cd4) %>% count()
 
 
 

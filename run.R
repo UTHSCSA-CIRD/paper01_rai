@@ -117,7 +117,7 @@ dat1$a_any_cd4 <- factor(dat1$a_cd4>0);
 dat1$a_any_postop <- factor(dat1$a_postop>0);
 
 dat1$a_transfer <- dat1$origin_status!='Not transferred (admitted from home)';
-dat1$a_readm_30_dy <- ifelse(dat1$readm_30_dy==0, 'FALSE', 'TRUE'); 
+dat1$a_readm_30_dy <- dat1$readm_30_dy>0; 
 
 #' Time from surgery to adverse outcome if any
 dat1$a_t <- with(dat1
@@ -184,7 +184,7 @@ dat1 <- dat1[order(dat1$proc_surg_start),];
 #dat1 <- dat1[!is.na(dat1$income_final),];
 #' 
 #' ### Adding a column that aggregates all SSI cases together:
-dat1$a_any_ssi <- as.logical(rowSums(dat1[,c("postop_si_ssi", "postop_deep_incisnal_ssi")]))
+dat1$a_any_ssi <- rowSums(dat1[,c("postop_si_ssi", "postop_deep_incisnal_ssi")],na.rm=T) > 0;
 
 #'
 #'
