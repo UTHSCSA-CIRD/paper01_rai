@@ -263,36 +263,53 @@ truthy.numeric <- function(xx,...) xx>0;
 truthy.default <- function(xx,truewords=c('TRUE','true','Yes','T','Y','yes','y')
                            ,...) xx %in% truewords;
 
-countfrac <- function(xx,outcomes,groupcols='rai_range',sortby=groupcols
+countfrac <- function(xx,outcomes
+                      # set to TOTAL in order to do _only_ the total
+                      ,groupcols='rai_range',sortby=groupcols
                       # set to 'none' if don't want to sort
                       ,dir=c('desc','asc','none')
-                      ,summfns=c(n=sum,frac=mean)){
+                      ,summfns=c(n=sum,frac=mean)
+                      # set to '' to disable
+                      ,totalrow='Total'){
+  # callback, so this function can call itself even if it's renamed
+  # or nameless, for purposes of rerunning to get the totals row
+  if(totalrow!='') thisfn <- sys.function();
+  oo <- xx;
+  # is the function being invoked for the purpose of calculating a total row?
+  if(doingtotalrow <- tolower(trimws(groupcols[1]))=='total'){
+    oo[[groupcols]] <- totalrow;
+  };
+  oo <- group_by_(oo,groupcols);
   # we coerce everything to logical, whatever it might have been
   # but leave alone columns other than those specified in the 'outcomes' variable
-  xx[,outcomes] <- mutate_all(xx[,outcomes],truthy);
-  # grouping, as usual
-  xx <- group_by_(xx,groupcols);
+  oo[,outcomes] <- mutate_all(oo[,outcomes],truthy);
   # Two different summary tables, the second one applies the same set of
   # functions to everything, and the first one is just a count that doesn't 
   # rely on any one specific column. So we do them separately and then cbind()
-  xx <- cbind(summarise(xx,bin_n=n())
-              ,summarise_all(xx[,c(groupcols,outcomes)],summfns)[,-1]) %>%
+  oo <- cbind(summarise(oo,bin_n=n()),summarise_all(oo[,c(groupcols,outcomes)],summfns)[,-1]) %>%
     # creating cumul_count, as in the current code
     mutate(cumul_count=rev(cumsum(rev(bin_n))));
   # sort, if desired, just as in the current code
-  xx <- switch(match.arg(dir)
-               ,none=xx
-               ,desc=arrange_(xx,sprintf('desc(%s)',groupcols))
-               ,asc=arrange_(xx,groupcols));
+  if(!doingtotalrow) oo <- switch(match.arg(dir)
+                                  ,none=oo
+                                  ,desc=arrange_(oo,sprintf('desc(%s)',groupcols))
+                                  ,asc=arrange_(oo,groupcols));
   # now we insure that the column order is the same as the order of the groupcols
   # argument-- first the grouping column name, then the 'bin_n' (used to be called
   # rai_n, but this isn't specific to RAI, could group by anithing, so renamed)
   # cumul_count...
-  xx[,c(groupcols,'bin_n','cumul_count'
-        # ...and then this: it pastes the suffixes as obtained from the names 
-        # of the summfns argument but orders them in the same way as they were
-        # given, rather than first the first summary function and then the second
-        ,c(t(outer(outcomes,names(summfns),paste,sep='_'))))];
+  oo <- oo[,c(groupcols,'bin_n','cumul_count'
+              # ...and then this: it pastes the suffixes as obtained from the names 
+              # of the summfns argument but orders them in the same way as they were
+              # given, rather than first the first summary function and then the second
+              ,c(t(outer(outcomes,names(summfns),paste,sep='_'))))];
+  if(!doingtotalrow&&totalrow!='') { 
+    tot <- thisfn(xx,outcomes,groupcols=totalrow,summfns=summfns,totalrow='');
+    names(tot)<-names(oo);
+    tot[[groupcols]] <- totalrow;
+    oo <- rbind(oo,tot);
+  }
+  oo;
 }
 
 
