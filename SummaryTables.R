@@ -50,7 +50,38 @@ thecolnames <- c("RAI-A Range"
                  ,"Clavien-Dindo Grade4 30days N"
                  ,"Clavien-Dindo Grade4 30days Fraction"
                  ,"30day Readmission N"
-                 ,"30day Readmission Fraction")
+                 ,"30day Readmission Fraction");
+
+thecolnames0 <- c("RAI-A Range"='rai_range'
+                 ,"RAI-A Score N"='rai_n'
+                 ,"Cumulative Count"='cumul_count'
+                 ,"Died 30days N"="died_n"
+                 ,"Died 30days Fraction"="died_frac"
+                 ,"Complications 30days N"="comp_n"
+                 ,"Complications 30days Fraction"="comp_frac"
+                 ,"Clavien-Dindo Grade4 30days N"="cd4_n"
+                 ,"Clavien-Dindo Grade4 30days Fraction"="cd4_frac"
+                 ,"30day Readmission N"="readmsn_n"
+                 ,"30day Readmission Fraction"="readmsn_frac"
+);
+
+thecolnames1 <- c("RAI-A Range"='rai_range'
+                  ,"RAI-A Score N"='bin_n'
+                  ,"Cumulative Count"='cumul_count'
+                  ,"Died 30days N"="postop_death_30_dy_proc_n"
+                  ,"Died 30days Fraction"="postop_death_30_dy_proc_frac"
+                  ,"Complications 30days N"="a_any_postop_n"
+                  ,"Complications 30days Fraction"="a_any_postop_frac"
+                  ,"Complications 30days N"="a_postop_n"
+                  ,"Complications 30days Fraction"="a_postop_frac"
+                  ,"Clavien-Dindo Grade4 30days N"="a_cd4_n"
+                  ,"Clavien-Dindo Grade4 30days Fraction"="a_cd4_frac"
+                  ,"Clavien-Dindo Grade4 30days N"="a_any_cd4_n"
+                  ,"Clavien-Dindo Grade4 30days Fraction"="a_any_cd4_frac"
+                  ,"30day Readmission N"="a_readm_30_dy_n"
+                  ,"30day Readmission Fraction"="a_readm_30_dy_frac"
+);
+
 
 #' Here is where I am creating a summary row for each table
 #' in the list:
@@ -143,6 +174,10 @@ table_01 <- dat1subs[["all_colon_all"]] %>%
 #' won't even need to run this function on it, it will be one of objects inside 
 #' `tables_02`
 #' 
+#' Test of `mapnames()` function:
+table_01;
+mapnames(table_01,thecolnames0);
+#' 
 #' I now think that the function we really need is summarize_each(), we just need
 #' to recode the 'Yes'/'No' and 'TRUE'/'FALSE' to actual binary `TRUE`/`FALSE`
 #' variables in `dat1`. It's my fault that they aren't, I don't remember what 
@@ -183,6 +218,9 @@ renamecol <- function(xx) {
                    ,readmsn_n, readmsn_frac))
   colnames(newtotals) <- colnames(xx)
   newxx <- rbind(xx, newtotals)
+  # **AFB**: if something you do to the columns along the way changes their
+  # order, then this will incorrectly rename them. The new mapnames() function
+  # will not do that.
   colnames(newxx) <- thecolnames
   return(newxx)
 }
