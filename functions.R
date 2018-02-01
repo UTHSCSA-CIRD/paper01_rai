@@ -252,8 +252,19 @@ savetablelist <- function(lst,fileprefix,filesuffix=paste0(format(Sys.Date(),'%m
   }
 }
 
-#' ### Specific to RAI-A
-#' 
+#' Usage: `xx<-mapnames(xx,lookup)` where lookup is a named character vector
+#' the names of the elements in the character vector are what you are renaming
+#' things TO and the values are what needs to be matched, i.e. what renaming things
+#' FROM. If you set namesonly=T then it just returns the names, not the original
+#' object.
+mapnames<-function(xx,lookup,namesonly=F,...){
+  xnames <- names(xx);
+  idxmatch <- na.omit(match(xnames,lookup));
+  newnames <- names(lookup)[idxmatch];
+  if(namesonly) return(newnames);
+  names(xx)[xnames %in% lookup] <- newnames;
+  xx;
+}
 
 #' Forget modifying the columns to TRUE/FALSE... some of them have 'Unknown',
 #' NA, who knows what else. We can just do it dynamically when we need to. 
@@ -320,6 +331,8 @@ countfrac <- function(xx,outcomes
   oo;
 }
 
+#' ### Specific to RAI-A
+#' 
 
 #' Return a tableone object formatted just the way we like it
 #' @param xx     A \code{data.frame} (required).
