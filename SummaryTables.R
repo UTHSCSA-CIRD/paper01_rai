@@ -37,6 +37,7 @@ lapply(dat1subs, function(xx) group_by(xx,rai_range) %>%
   arrange(desc(rai_range))
 )  -> tables_01;
 
+
 #' I have to create a summary row for each table in the list
 #' Here, I am creating a variable that renames the columns:
 thecolnames <- c("RAI-A Range"

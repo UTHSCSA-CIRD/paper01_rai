@@ -248,9 +248,28 @@ savetablelist <- function(lst,fileprefix,filesuffix=paste0(format(Sys.Date(),'%m
 #' ### Specific to RAI-A
 #' 
 
+#' Forget modifying the columns to TRUE/FALSE... some of them have 'Unknown',
+#' NA, who knows what else. We can just do it dynamically when we need to. 
+#' This might even let us get rid of a couple of analytic columns.
 truthy <- function(xx,...) ifelse(is.na(nmx<-as.numeric(xx))
                                   ,xx %in% c(TRUE,'true','Yes','T','Y','yes','y')
                                   ,nmx>0);
+
+countfrac <- function(xx,outcomes,groupcols='rai_range',sortby=groupcols
+                      # set to NA if don't want to sort
+                      ,dir=c('desc','asc')
+                      ,summfns=c(n=sum,frac=mean)){
+  xx[,outcomes] <- mutate_all(xx[,outcomes],truthy);
+  xx <- group_by_(xx,groupcols);
+  xx <- cbind(summarise(xx,bin_n=n())
+              ,summarise_all(xx[,outcomes],summfns)) %>%
+    mutate(cumul_count=rev(cumsum(rev(bin_n))));
+  if(!is.na(dir)) xx <- switch(match.arg(dir)
+                               ,desc=arrange_(xx,sprintf('desc(%s)',groupcols))
+                               ,asc=arrange_(xx,groupcols));
+  xx;
+}
+
 
 #' Return a tableone object formatted just the way we like it
 #' @param xx     A \code{data.frame} (required).
