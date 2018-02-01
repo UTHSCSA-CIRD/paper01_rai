@@ -37,6 +37,12 @@ lapply(dat1subs, function(xx) group_by(xx,rai_range) %>%
   arrange(desc(rai_range))
 )  -> tables_01;
 
+#' New version:
+lapply(dat1subs,countfrac
+       ,c('postop_death_30_dy_proc','a_any_postop','a_any_cd4','a_readm_30_dy')) -> tables_01a;
+
+#' Test of new version:
+mapply(function(aa,bb) all(aa==bb),tables_01a,tables_01);
 
 #' I have to create a summary row for each table in the list
 #' Here, I am creating a variable that renames the columns:
