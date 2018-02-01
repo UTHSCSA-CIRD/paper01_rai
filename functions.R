@@ -251,23 +251,48 @@ savetablelist <- function(lst,fileprefix,filesuffix=paste0(format(Sys.Date(),'%m
 #' Forget modifying the columns to TRUE/FALSE... some of them have 'Unknown',
 #' NA, who knows what else. We can just do it dynamically when we need to. 
 #' This might even let us get rid of a couple of analytic columns.
-truthy <- function(xx,...) ifelse(is.na(nmx<-as.numeric(xx))
-                                  ,xx %in% c(TRUE,'true','Yes','T','Y','yes','y')
-                                  ,nmx>0);
+
+#' Example of using R methods dispatch
+#' 
+#' The actual usage is: `truthy(foo)` and `truthy()` itself figures
+#' out which method to actually dispatch.
+truthy <- function(xx,...) UseMethod('truthy');
+truthy.logical <- function(xx,...) xx;
+truthy.factor <- function(xx,...) truthy.default(as.character(xx),...);
+truthy.numeric <- function(xx,...) xx>0;
+truthy.default <- function(xx,truewords=c('TRUE','true','Yes','T','Y','yes','y')
+                           ,...) xx %in% truewords;
 
 countfrac <- function(xx,outcomes,groupcols='rai_range',sortby=groupcols
-                      # set to NA if don't want to sort
-                      ,dir=c('desc','asc')
+                      # set to 'none' if don't want to sort
+                      ,dir=c('desc','asc','none')
                       ,summfns=c(n=sum,frac=mean)){
+  # we coerce everything to logical, whatever it might have been
+  # but leave alone columns other than those specified in the 'outcomes' variable
   xx[,outcomes] <- mutate_all(xx[,outcomes],truthy);
+  # grouping, as usual
   xx <- group_by_(xx,groupcols);
+  # Two different summary tables, the second one applies the same set of
+  # functions to everything, and the first one is just a count that doesn't 
+  # rely on any one specific column. So we do them separately and then cbind()
   xx <- cbind(summarise(xx,bin_n=n())
-              ,summarise_all(xx[,outcomes],summfns)) %>%
+              ,summarise_all(xx[,c(groupcols,outcomes)],summfns)[,-1]) %>%
+    # creating cumul_count, as in the current code
     mutate(cumul_count=rev(cumsum(rev(bin_n))));
-  if(!is.na(dir)) xx <- switch(match.arg(dir)
-                               ,desc=arrange_(xx,sprintf('desc(%s)',groupcols))
-                               ,asc=arrange_(xx,groupcols));
-  xx;
+  # sort, if desired, just as in the current code
+  xx <- switch(match.arg(dir)
+               ,none=xx
+               ,desc=arrange_(xx,sprintf('desc(%s)',groupcols))
+               ,asc=arrange_(xx,groupcols));
+  # now we insure that the column order is the same as the order of the groupcols
+  # argument-- first the grouping column name, then the 'bin_n' (used to be called
+  # rai_n, but this isn't specific to RAI, could group by anithing, so renamed)
+  # cumul_count...
+  xx[,c(groupcols,'bin_n','cumul_count'
+        # ...and then this: it pastes the suffixes as obtained from the names 
+        # of the summfns argument but orders them in the same way as they were
+        # given, rather than first the first summary function and then the second
+        ,c(t(outer(outcomes,names(summfns),paste,sep='_'))))];
 }
 
 
