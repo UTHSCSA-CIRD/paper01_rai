@@ -1,6 +1,7 @@
 #' Create a header here like there already is in `DataVisualization.R`
 source('./run.R');
-
+#' Variable Summary Table:
+test <- variable_summary(sbs0$all2016$all_colon_all)
 #' ### **AFB Summary:** I see no errors in how this was done, good job! What we need to do is...
 #' 
 #' * **You need to read in Brad's data in the same place in `run.R` as we already

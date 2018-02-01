@@ -519,3 +519,60 @@ renamecol <- function(xx) {
   return(newxx)
 }
 
+#This function is the actual function that will summarize the variable
+#information with the help of the 'apply' function. In order for this 
+#function to work, the wrapper function 'variable_summary' will need
+#to provide the data frame the user wants to summarize and the
+#column names. 
+summary_vector <- function(xx, df){
+  #browser()
+  #collecting the name of the column:
+  colname <- xx
+  #collecting the summary information for that column
+  #(either Tukey's 5 number summary or something else): 
+  description <- summary(df[,colname])
+  #determining if the variable is coninuous or discrete:
+  #removing the whitespace in the second row in "description":
+  test <- gsub(" ", "", description[2,])
+  #if "test" is "Class:character", then varialbe is discrete;
+  #else, variable is continuous:
+  if(test == "Class:character"){
+    vartype <- "discrete"
+    #counting the number of observations:
+    total_count <- nrow(df[,colname])
+    #counting the number of missing observations:
+    na_count <- sum(is.na(df[,colname]))
+    #creating a table that prints the  categories
+    #the discrete variable in descending order:
+    count_table <- sort(table(df[,colname], useNA = "always"), decreasing = TRUE)
+    #simplifying "description" to a 1 x 1 vector object:
+    description <- paste0(names(count_table), ":", count_table, collapse = "; ")
+  } else{
+    vartype <- "continuous"
+    #counting the number of observations:
+    total_count <- nrow(df[,colname])
+    #counting the number of missing observations:
+    na_count <- sum(is.na(df[,colname]))
+    #simplifying "description" to a 1 x 1 vector object:
+    description <- gsub(" ", "", description) %>% paste0(collapse="; ")
+  }
+  #combining the variable information into a vector:
+  info <- cbind(colname, vartype, total_count, na_count, description)
+}
+
+#This function will create a variable summary table that will provide 
+#the name of the variable, tells whether the variable is discrete or
+#continuous, Tukey's 5 number summary for continuousvariables, and
+#the number of observations for each category for discrete variables.
+#All the user need for this function is the data frame (df) and the
+#function will do the rest.
+variable_summary <- function(df){
+  #collecting the column names from the data frame:
+  all_names <- names(df)
+  #passing the column names to an 'sapply' function:
+  theresult <- sapply(all_names, summary_vector, df)
+  #reformatting the table:
+  theresult <- as.data.frame(t(theresult))
+  colnames(theresult) <-c('VariableName', 'VariableType', 'TotalCounts', 'NumberOfNAs', 'VariableDescription')
+  return(theresult)
+}
