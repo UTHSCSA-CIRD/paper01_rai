@@ -576,3 +576,133 @@ variable_summary <- function(df){
   colnames(theresult) <-c('VariableName', 'VariableType', 'TotalCounts', 'NumberOfNAs', 'VariableDescription')
   return(theresult)
 }
+
+
+#' ### Functions for Characterizing and Simulating Data for Sharing and Testing
+
+#' ### This will take a data.frame and simulate a random data.frame that has similar properties to the original
+#'
+#' Usage:
+#
+# foo <- faker(mtcars); 
+# bar <- faker(mtcars,200);
+# baz <- faker(foo);
+# fakemeta <- attr(foo,'fm');
+# bav <- faker(c(),fm=fakemeta);
+#' In the above example, `mtcars` represents the data that is being portably simulated but none of the original
+#' data lingers ins the simulated files, only the minimal information about it necessary to create more simulated
+#' data. Not a substitute for common sense, though-- it's the user's responsibility to insure that none of the 
+#' discrete data (which is, in effect sampled) is confidential. This is provided for informational purposes only
+#' with no warrantee whatsoever, including of correctness or of suitability for any purpose. Use at own risk.
+#' 
+#' `discrete_cutoff` is how few discrete values there need to be in a column before it is no longer treated as
+#' a continuous variable
+#' `enforcerows` tells faker to keep running itself and generating more data after removing the out-of-range 
+#' values until the number of rows is exactly equal to what was requested. It might run quicker but returns 
+#' fewer rows than requested if set to FALSE instead of the default TRUE
+#' `...` not used yet
+faker<-function(dat=c(),nr=c(nrow(dat),200)[1],fm=attr(dat,'fm')
+                ,discrete_cutoff=15,enforcerows=T,keepmeta=T,nafrac=1,...){
+  if(is.null(nrow(dat)) && is.null(fm)) stop(
+    'You need to either provide a data.frame as the first argument or set the fm argument equal to the fm attribute of a data.frame previously simulated by faker()');
+  if(is.null(fm)){
+    cat(' generating metadata\n');
+    fm$allnames <- names(dat);
+    fm$unq<-apply(dat,2,function(xx) length(unique(xx)));
+    fm$nnas<-apply(dat,2,function(xx) mean(is.na(xx)));
+    fm$nonmssg <- fm$nnas<nafrac;
+    fm$coldiscr <- names(fm$unq[fm$unq<discrete_cutoff & fm$nonmssg]);
+    dat <- data.frame(dat);
+    fm$classes <- lapply(dat,class);
+    fm$numtypes <- sapply(fm$classes
+                          ,function(xx) any(xx %in% c('numeric','integer'
+                                                      ,'logical','POSIXct','Date')));
+    fm$coldiscr <- union(fm$coldiscr,names(fm$classes)[!fm$numtypes & fm$nonmssg]);
+    fm$colnondsc <- setdiff(names(fm$numtypes[fm$numtypes & fm$nonmssg])
+                            ,fm$coldiscr);
+    datfct <- dat; 
+    datfct[,fm$coldiscr]<-lapply(datfct[,fm$coldiscr],factor,exclude=NULL);
+    fm$levels <- lapply(datfct[,fm$coldiscr],levels);
+    datmtx <- data.matrix(datfct[,fm$nonmssg]);
+    # get the centers and scales of the data, and save a scaled copy
+    # Important!!! Only the scale and center go here, not actual data!
+    fm$ctsc <- setNames(attributes(scdat<-scale(datmtx))[c('scaled:center','scaled:scale')],c('ct','sc'));
+    # get the covariance matrix
+    cv <- cov(scdat,use='pairwise.complete');
+    cv[is.na(cv)] <- 0;
+    fm$cv <- as.matrix(nearPD(cv)$mat);
+    fm$nrdat <- nrow(datmtx);
+    fm$nc <- ncol(datmtx);
+    fm$digits<- apply(datmtx,2,function(xx) max(ndec(xx,trailingonly=T),na.rm=T));
+    fm$ranges <- apply(datmtx,2,range,na.rm=T);
+    #fm$coldiscr <- names(fm$unq[fm$unq<discrete_cutoff]);
+    #fm$ranked <- lapply(dat[fm$coldiscr],function(xx) sort(unique(xx)));
+    # important-- we do not put real data into fm!!!!
+  } #else ranked <- fm$ranked;
+  thisfun <- sys.function();
+  # generate a standard normal variable and apply the covariance matrix to it, then restore the scale
+  fakedat <- data.frame(unscale(matrix(rnorm(nr*fm$nc),nrow=nr) %*% 
+                                  chol(fm$cv),fm$ctsc$ct,fm$ctsc$sc));
+  # round them all to the right number of digits
+  fakedat <- data.frame(mapply(function(aa,bb) round(aa,bb)
+                               ,fakedat,fm$digits[names(fakedat)]));
+  # find rows where all values fall within the ranges of their respective real-data columns
+  keep<-apply(fakedat[,fm$colnondsc],1,function(xx) all(
+    xx>=fm$ranges[1,fm$colnondsc]&xx<=fm$ranges[2,fm$colnondsc],na.rm=T));
+  # re-assign the discrete levels
+  fakedat[,fm$coldiscr] <- mapply(function(aa,bb) aa[as.numeric(cut(bb,breaks=length(aa)))]
+                                  ,fm$levels[fm$coldiscr],fakedat[,fm$coldiscr]);
+  # restore the columns with many/all missing values
+  fakedat[,fm$allnames[!fm$nonmssg]] <- NA;
+  # restore the order of the columns. Using make.names() to fix any spaces or
+  # other illegal characters in the names...
+  fakedat <- fakedat[,make.names(fm$allnames)];
+  # ...only to put them all back in again
+  names(fakedat) <- fm$allnames;
+  # restore the exact column classes
+  fakedat <- data.frame(mapply(function(aa,bb) {class(aa)<-bb;aa}
+                               ,fakedat,fm$classes[names(fakedat)],SIMPLIFY=F));
+  # drop all the values outside the range supported by the data
+  fakedat <- fakedat[keep,]; nrf <- nrow(fakedat);
+  # keep trying to make up the shortfall with additional sims
+  if(enforcerows){
+    while(nrf<nr){
+      fakedat <- rbind(fakedat,thisfun(dat,nr=2*(nr-nrf),fm=fm,discrete_cutoff=discrete_cutoff,enforcerows=F));
+      keep<-apply(fakedat,1,function(xx) all(xx>=fm$ranges[1,]&xx<=fm$ranges[2,]));
+      fakedat <- fakedat[keep,];
+      nrf <- nrow(fakedat);
+    }
+  }
+  fakedat<-fakedat[seq_len(nr),];
+  # only here do we put columns into fm-- and not the columns from the actual data, but from the fake data
+  # so now the fake data object is a clean self-contained object that can generate more similar data without
+  # further access to the original
+  if(keepmeta) attributes(fakedat)<-c(attributes(fakedat),list(fm=fm));
+  fakedat;
+}
+
+#' unscale centers and scales a vector/matrix/data.frame by the specified center and scale values, which by
+#' default it attempts to extract from the attributes where the build-in `scale()` function would have put 
+#' them. If there are none, it defaults to values tha will not alter the output.
+unscale <- function(xx,center=attr(xx,'scaled:center'),scale=attr(xx,'scaled:scale')) if(!is.null(nrow(xx))) {
+  fn<-sys.function(); t(apply(xx,1,fn,center=center,scale=scale))
+} else {
+  if(is.null(center)) center<-0; if(is.null(scale)) scale<-1; xx*scale+center;
+};
+
+#' counts the number of decimal places in a number or vector
+#' https://stackoverflow.com/a/48480190/945039
+ndec <- function(xx,places=15,trailingonly=F) {
+  xx<-abs(xx);
+  if(length(xx)>1) {
+    fn<-sys.function();
+    return(sapply(xx,fn,places=places,trailingonly=trailingonly))};
+  if(is.na(xx)||is.infinite(xx)||is.nan(xx)) return(NA);
+  if(xx %in% 0:9) return(!trailingonly+0);
+  mtch0<-round(xx,nds <- 0:places);
+  out <- nds[match(TRUE,mtch0==xx)];
+  if(trailingonly) return(out);
+  mtch1 <- floor(xx*10^-nds);
+  pmin(out,places,na.rm=T) + pmin(nds[match(TRUE,mtch1==0)],places,na.rm=T)
+}
+
