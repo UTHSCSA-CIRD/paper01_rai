@@ -120,7 +120,7 @@ dt_death,Date of Death,,,,,T,,,,,
 dt_death_unknown,Date of Death Unknown,,,,,,,T,,,
 end_life_withdrawal_care,End of Life/Withdrawal of Care,,,,,,,T,,,
 readm_30_dy,# of Readmissions w/in 30 days,F,T,,,,,,T,,T
-dt_first_readm,,,,,,,,,,,
+dt_first_readm,Date of First Readmission,,,,,,,,,,
 unpl_readm,# of Unplanned Readmissions,T,T,,,,,,T,,T
 readm_likely_rel_pr_proc,# of Readmissions likely related to principal procedure,F,T,,,,,,T,,T
 readm_likely_unrel_pr_proc,# of Readmissions likely unrelated to principal procedure,F,T,,,,,,T,,
