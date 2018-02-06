@@ -1,5 +1,25 @@
-#' Create a header here like there already is in `DataVisualization.R`
-source('./run.R');
+#+ echo=FALSE, message=FALSE
+knitr::opts_chunk$set(echo=F,warning = F,cache=T,message=F);
+#+ cache=FALSE
+source('global.R');
+# Note: if the lanscape classoption errors on your machine, you need an
+# additional LaTeX package, which you can install as follows, from bash:
+# tlmgr install multirow
+# tlmgr install wrapfig
+# tlmgr install tabu
+# 
+#' Report date: `r date()`.
+#'
+#' Revision: `r gitstamp()`.
+#'
+#' Data file: `r inputdata`.
+#' 
+#' Cost data file: `r inputdata_cost`.
+#' 
+#' 
+#' 
+#+ cache=TRUE
+source('run.R');
 #' Variable Summary Table:
 test <- variable_summary(sbs0$all2016$all_colon_all)
 #' ### **AFB Summary:** I see no errors in how this was done, good job! What we need to do is...
