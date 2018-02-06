@@ -13,7 +13,7 @@ rq_libs <- c('compiler'                                   # just-in-time compila
              ,'readr','dplyr','stringr','magrittr'        # data manipulation & piping
              ,'ggplot2','ggfortify','grid','GGally'       # plotting
              ,'gridExtra','scales'
-             ,'stargazer','broom', 'tableone','janitor'); # table formatting
+             ,'stargazer','broom', 'tableone','janitor', 'knitr'); # table formatting
 rq_installed <- sapply(rq_libs,require,character.only=T);
 rq_need <- names(rq_installed[!rq_installed]);
 if(length(rq_need)>0) install.packages(rq_need,repos='https://cran.rstudio.com/',dependencies = T);

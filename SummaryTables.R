@@ -138,10 +138,12 @@ tables_02 <- lapply(tables_01, function(xx) {
                                 return(newxx)
                               }
 )
-                           
+ 
+
 #' Here', I'm writing the tables to a file:
 #lapply(tables_02, write.table, paste0(outputpath, 'UHS_ACSNSQIP_SummaryTables-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.xlsx'), row.names=FALSE, append=TRUE, sep='\t')
 savetablelist(tables_02,'UHS_ACSNSQIP_SummaryTables-DSW-');
+kable(tables_02) 
 
 #' Since it seems like we're counting occurrences of the same outcomes for all 
 #' these tables, in order to avoid violating DRY, we can *temporarily change the
@@ -150,6 +152,7 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_any_postop','a_any
 
 #' Test of new version:
 tables_02a <- lapply(dat1subs,countfrac);
+ 
 #' New version:will no longer be identical to tables_01, needs to be compared to tables_02
 mapply(function(aa,bb) all(aa==bb),tables_02a,tables_02);
 
@@ -240,7 +243,7 @@ renamecol <- function(xx) {
 table_02 <- renamecol(table_01)
 #write.table(table_02,  paste0(outputpath, 'UHS_ACSNSQIP_2016ColectomyTables-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')
 savetablelist(table_02,'UHS_ACSNSQIP_2016ColectomyTables-DSW-');
-
+kable(table_02)  
 #' New
 table_02a <- dat1subs[["all_colon_all"]] %>% 
   # you can put several criteria in the same filter statement
@@ -268,7 +271,7 @@ table_03 <- dat1subs[["all_colon_all"]] %>%
 
 table_04 <- renamecol(table_03)
 write.table(table_04,  paste0(outputpath, 'UHS_ACSNSQIP_2016ColectomyTables30DayReadmission-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')
-
+kable(tables_04)  
 #' New version
 table_04a <- dat1subs[["all_colon_all"]] %>% 
   # you can put several criteria in the same filter statement
@@ -295,6 +298,7 @@ table_05 <- dat1subs[["ssi_all"]] %>%
 table_06 <- renamecol(table_05)
 #' **AFB**: the above is a duplicate of tables_02$ssi_all:
 all(table_06==tables_02$ssi_all);
-
+ 
 #write.table(table_06,  paste0(outputpath, 'UHS_ACSNSQIP_SSI_Table-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')
 savetablelist(table_06,'UHS_ACSNSQIP_SSI-DSW-');
+kable(tables_06) 
