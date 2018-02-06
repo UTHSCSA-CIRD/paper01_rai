@@ -139,12 +139,11 @@ tables_02 <- lapply(tables_01, function(xx) {
                               }
 )
  
-
+options(digits=2)
 #' Here', I'm writing the tables to a file:
 #lapply(tables_02, write.table, paste0(outputpath, 'UHS_ACSNSQIP_SummaryTables-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.xlsx'), row.names=FALSE, append=TRUE, sep='\t')
 savetablelist(tables_02,'UHS_ACSNSQIP_SummaryTables-DSW-');
-#+ results='asis'
-lapply(tables_02, function(xx){cat("\n\n");kable(xx, digits=2)}) 
+
 
 #' Since it seems like we're counting occurrences of the same outcomes for all 
 #' these tables, in order to avoid violating DRY, we can *temporarily change the
@@ -153,7 +152,8 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_any_postop','a_any
 
 #' Test of new version:
 tables_02a <- lapply(dat1subs,countfrac);
- 
+#+ results='asis'
+lapply(tables_02a, function(xx){cat("\n\n");kable(xx, digits=2)})  
 #' New version:will no longer be identical to tables_01, needs to be compared to tables_02
 mapply(function(aa,bb) all(aa==bb),tables_02a,tables_02);
 
