@@ -35,8 +35,8 @@ source('run.R');
 # maybe experiment with dev.copy2pdf() but the below do not work.
 #pdf(height = 10, width = 7.5, onefile = TRUE, file = paste0(outputpath,"UHS_ACSNSQIP_CD4comps_boxplots-DSW-", format(Sys.Date(), '%m-%d-%Y'),".pdf"))
 
-#' Income VS Frailty VS Clavien-Dindo Grade 4 complications 
-#' in ALL UHS colectomy patients:
+# Income VS Frailty VS Clavien-Dindo Grade 4 complications 
+# in ALL UHS colectomy patients:
 #+ cache=FALSE
 plt_frl_inc_cd4 <- autoboxplot(sbs0$all$all_colon_all
                                ,xx='a_discrete_rai',yy='income_final'
@@ -49,8 +49,8 @@ grid.arrange(plt_frl_inc_cd4
              ,top=wrap_format(30)("Income Vs Frailty VS CD4 Complications in ALL UHS Colectomy Patients")
              );
 
-#' Income VS Hispanic Ethnicity VS Clavien-Dindo Grade 4 complications
-#' in ALL UHS colectomy patients:
+# Income VS Hispanic Ethnicity VS Clavien-Dindo Grade 4 complications
+# in ALL UHS colectomy patients:
 plt_eth_inc_cd4 <- autoboxplot(sbs0$all$all_colon_all
                                ,xx='hispanic_ethnicity',yy='income_final'
                                ,zz='a_any_cd4'
@@ -65,8 +65,8 @@ grid.arrange(plt_all_inc_cd4,plt_eth_inc_cd4
              ,top=wrap_format(30)("Income Vs CD4 Complications in all UHS Colectomy Patients")
              ,nrow=1,widths=1:2);
 
-#' 
-#' Income VS Frailty VS Hispanic Ethnicty with NO CD4 Complications
+# 
+# Income VS Frailty VS Hispanic Ethnicty with NO CD4 Complications
 plt_frl_inc_eth_noc4 <- autoboxplot(sbs0$all$all_colon_all
                                ,xx='a_discrete_rai',yy='income_final'
                                ,zz='hispanic_ethnicity'
@@ -81,19 +81,15 @@ grid.arrange(plt_frl_inc_eth_noc4
 
 #' 
 #' 
-#' Income VS Frailty VS Hispanic Ethnicty WITH CD4 Complications
+# Income VS Frailty VS Hispanic Ethnicty WITH CD4 Complications
 plt_frl_inc_eth_c4 <- update(plt_frl_inc_eth_noc4, subset=a_any_cd4==TRUE&!is.na(income_final));
 
 grid.arrange(plt_frl_inc_eth_c4
              ,top=wrap_format(60)("Income Vs Frailty VS Hispanic Ethnicity in all UHS Colectomy Patients WITH CD4 Complications")
 );
 
-#dev.off();
 
-
-#pdf(height = 10, width = 7.5, onefile = TRUE, file = paste0(outputpath,"UHS_ACSNSQIP_CD4comps_boxplots-DSW-", format(Sys.Date(), '%m-%d-%Y'),".pdf"))
-
-#' Income VS Hispanic Ethnicity VS SSI (surgical site infection)
+# Income VS Hispanic Ethnicity VS SSI (surgical site infection)
 #+ cache=FALSE
 plt_ssi_inc_eth <- autoboxplot(sbs0$all$full
                                ,xx='hispanic_ethnicity',yy='income_final'
@@ -108,8 +104,8 @@ plt_ssi_inc_eth2 <- update(plt_ssi_inc_eth, xx=T, subset=!is.na(income_final), f
 grid.arrange(plt_ssi_inc_eth2,plt_ssi_inc_eth
              ,top=wrap_format(30)("Income Vs SSI VS Hispanic Ethnicty\n in all UHS Patients")
              ,nrow=1,widths=1:2);
-#' The following code checks the counts in the graph:
+# The following code checks the counts in the graph:
 sbs0$all$full %>% filter(!is.na(income_final)) %>% select(hispanic_ethnicity, a_any_ssi) %>% group_by(hispanic_ethnicity, a_any_ssi) %>% count() %>% View()
-#' the numbers do check out. Unfortunately, there is nothing interesting
-#' going on here.
-#' 
+# the numbers do check out. Unfortunately, there is nothing interesting
+# going on here.
+# 
