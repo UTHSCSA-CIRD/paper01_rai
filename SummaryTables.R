@@ -271,7 +271,7 @@ table_03 <- dat1subs[["all_colon_all"]] %>%
 
 table_04 <- renamecol(table_03)
 write.table(table_04,  paste0(outputpath, 'UHS_ACSNSQIP_2016ColectomyTables30DayReadmission-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')
-kable(tables_04)  
+kable(table_04)  
 #' New version
 table_04a <- dat1subs[["all_colon_all"]] %>% 
   # you can put several criteria in the same filter statement
@@ -301,4 +301,4 @@ all(table_06==tables_02$ssi_all);
  
 #write.table(table_06,  paste0(outputpath, 'UHS_ACSNSQIP_SSI_Table-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.txt'), row.names=FALSE, append=TRUE, sep='\t')
 savetablelist(table_06,'UHS_ACSNSQIP_SSI-DSW-');
-kable(tables_06) 
+kable(table_06) 
