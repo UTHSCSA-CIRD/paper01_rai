@@ -2,12 +2,18 @@
 #' title: "RAI Data Quality Checks"
 #' author: "Wilson, Bokov, Shireman"
 #' date: "02/05/2018"
+#' classoption: landscape
 #' ---
 #'
 #+ echo=FALSE, message=FALSE
 knitr::opts_chunk$set(echo=F,warning = F,cache=T,message=F);
 #+ cache=FALSE
 source('global.R');
+# Note: if the lanscape classoption errors on your machine, you need an
+# additional LaTeX package, which you can install as follows, from bash
+# tlmgr install multirow
+# tlmgr install wrapfig
+# 
 #' Report date: `r date()`.
 #'
 #' Revision: `r gitstamp()`.
@@ -62,10 +68,12 @@ dq_missing <- lapply(dat1subs, subset,eval(subs_criteria$y2016)) %>%
                      # the below argument prevents R from replacing spaces with
                      # dots
                      ,check.names=F);
+    oo;
     });
 
-#' ## Missing data
 #' 
 #+ results='asis'
-knitr::kable(dq_missing$all_colon_all);
+knitr::kable(dq_missing$all_colon_all
+             ,caption='Missing Data for 2016 Colectomy Patients');
+
 
