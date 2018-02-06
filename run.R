@@ -186,6 +186,11 @@ dat1 <- dat1[order(dat1$proc_surg_start),];
 #' ### Adding a column that aggregates all SSI cases together:
 dat1$a_any_ssi <- rowSums(dat1[,c("postop_si_ssi", "postop_deep_incisnal_ssi")],na.rm=T) > 0;
 
+#' Creating an object to use as the lookup argument for `mapnames()``
+dat1namelookup <- with(dct0,setNames(dataset_column_names
+                                     ,ifelse(is.na(NSQIP_NAMES)
+                                             ,dataset_column_names
+                                             ,NSQIP_NAMES)));
 #'
 #'
 #' ### Make several subsets of dat1 all at once
