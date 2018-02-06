@@ -143,7 +143,7 @@ tables_02 <- lapply(tables_01, function(xx) {
 #' Here', I'm writing the tables to a file:
 #lapply(tables_02, write.table, paste0(outputpath, 'UHS_ACSNSQIP_SummaryTables-DSW-', format(Sys.Date(), '%m-%d-%Y'),'.xlsx'), row.names=FALSE, append=TRUE, sep='\t')
 savetablelist(tables_02,'UHS_ACSNSQIP_SummaryTables-DSW-');
-kable(tables_02) 
+lapply(tables_02, function(xx){cat("\n\n");kable(xx)}) 
 
 #' Since it seems like we're counting occurrences of the same outcomes for all 
 #' these tables, in order to avoid violating DRY, we can *temporarily change the
