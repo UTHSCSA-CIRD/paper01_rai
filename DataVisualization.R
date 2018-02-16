@@ -112,14 +112,13 @@ sbs0$all$full %>% filter(!is.na(income_final)) %>% select(hispanic_ethnicity, a_
 
 
 #trying to create the survival plots:
-plt_rai_surv_death <-autoplot(coxph(Surv((dt_death - dt_birth), postop_death_30_dy_proc=='No') ~ a_discrete_rai, data = sbs0$all$all_emergency))
+plt_rai_surv_death <-autoplot(coxph(Surv(a_t,a_c) ~ I(a_rai>median(a_rai)), data = sbs0$all$all_emergency)) # doesn't run at all
 
-res.cox <- coxph(Surv((dt_death - dt_birth), postop_death_30_dy_proc=='No') ~ a_discrete_rai, data = sbs0$all$all_emergency)
-autoplot(res.cox)
-summary(res.cox)
+res.cox <- coxph(Surv(a_t,a_c) ~ I(a_rai>median(a_rai)), data = sbs0$all$all_emergency)
 
-res.fit <- survfit(Surv((dt_death - dt_birth), postop_death_30_dy_proc=='No') ~ a_discrete_rai, data = sbs0$all$all_emergency)
-ggsurvplot(res.fit)
+res.fit0 <- survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rai)), data = sbs0$all$all_emergency)
+#res.fit1 <- survfit(Surv(a_t,a_c) ~ cut(a_rai,3), data = sbs0$all$all_emergency)
+ggsurvplot(res.fit0)
 ggsurvplot(res.cox) # doesn't run properly
 
 
