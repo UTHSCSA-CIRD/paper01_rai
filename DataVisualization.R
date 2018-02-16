@@ -109,3 +109,17 @@ sbs0$all$full %>% filter(!is.na(income_final)) %>% select(hispanic_ethnicity, a_
 # the numbers do check out. Unfortunately, there is nothing interesting
 # going on here.
 # 
+
+
+#trying to create the survival plots:
+plt_rai_surv_death <-autoplot(coxph(Surv((dt_death - dt_birth), postop_death_30_dy_proc=='No') ~ a_discrete_rai, data = sbs0$all$all_emergency))
+
+res.cox <- coxph(Surv((dt_death - dt_birth), postop_death_30_dy_proc=='No') ~ a_discrete_rai, data = sbs0$all$all_emergency)
+autoplot(res.cox)
+summary(res.cox)
+
+res.fit <- survfit(Surv((dt_death - dt_birth), postop_death_30_dy_proc=='No') ~ a_discrete_rai, data = sbs0$all$all_emergency)
+ggsurvplot(res.fit)
+ggsurvplot(res.cox) # doesn't run properly
+
+
