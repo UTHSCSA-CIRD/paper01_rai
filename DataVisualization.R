@@ -116,7 +116,7 @@ plt_rai_surv_death <-autoplot(coxph(Surv(a_t,a_c) ~ I(a_rai>median(a_rai)), data
 
 res.cox <- coxph(Surv(a_t,a_c) ~ a_rai, data = sbs0$all$all_emergency)
 res.fit0 <- survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rai)), data = sbs0$all$all_emergency)
-res.fit1 <- survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rockwood)), data = sbs0$all$all_emergency)
+res.fit1 <- survfit(Surv(a_t,a_c) ~ I(a_rockwood>median(a_rockwood)), data = sbs0$all$all_emergency)
 #res.fit2 <- survfit(Surv(a_t,a_c) ~ cut(a_rai,3), data = sbs0$all$all_emergency)
 ggsurvplot(res.fit0)
 ggsurvplot(res.fit1)
