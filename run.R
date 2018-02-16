@@ -34,6 +34,17 @@ names(dat1)<-gsub('deid_patient','idn_mrn',names(dat1));
 names(dat1)<-gsub('deid_visit','lmrn_visit',names(dat1));
 names(dat1)<-gsub('deid_case','case_number',names(dat1));
 
+#' Create synonyms for 'TRUE' for components of the Rockwood index
+#' l_ is a variable storing labels for factors
+l_truthy_default <- eval(formals(truthy.default)$truewords);
+l_rockwood_true <- c("Insulin", "Non-Insulin"
+                     , "At Rest", "Moderate Exertion"
+                     , "Partially Dependent","Totally Dependent"
+                     ,"From acute care hospital inpatient"
+                     , "Nursing home - Chronic care - Intermediate care"
+                     ,"Outside emergency department"
+                     , "Transfer from other"
+                     , l_truthy_default);
 
 dropcol_cost <- c('idn_mrn', 'case_number');
 cost1 <- cost0 %>% select(-one_of(dropcol_cost));
@@ -143,6 +154,7 @@ dat1$a_discrete_rai <- cut(dat1$a_rai
                            ,labels = c('Non Frail','Pre Frail','Frail'));
 dat1$a_rai_hisp <- with(dat1,interaction(a_discrete_rai,hispanic_ethnicity));
 
+temp_truewords <- formals(truthy.default)$truewords;
 
 #' ## The Rockwood Scale
 dat1$a_rockwood <- with(dat1,(
