@@ -331,6 +331,11 @@ countfrac <- function(xx,outcomes
   oo;
 }
 
+withinrange <- function(dat,upper,lower){
+  
+}
+
+
 #' ### Specific to RAI-A
 #' 
 
@@ -413,7 +418,40 @@ raiscore.bak <- function(xx){
 #' a name. The second must be a data.frame
 v <- function(var,dictionary=dct0) {cc<-substitute(var);na.omit(dictionary[dictionary[[as.character(cc)]],'dataset_column_names'])[[1]]}
 
-
+#' Returns a list of 2-column data.frames where each data.frame is
+#' a particular demographic grouping (currently male and female)
+#' with the first column representing the lower bound of the reference
+#' range (e.g. for labs or vitals) and the second column the upper bound
+#' 
+#' @param whichcols  Which of the c_ columns returned by v() (above) specify the 
+#'                   column names to check against reference ranges
+#' @param groups     A named list where the names are the names of the groups of
+#'                   subjects that will have distinct sets of lower and upper 
+#'                   bounds for their reference ranges and the values are 
+#'                   strings or some other distinguishing features that the 
+#'                   expressions in `lboundcols` and `uboundcols` will use as
+#'                   arguments to create the actual names of group-specific 
+#'                   lower and upper reference bound columns
+#' @param lboundcols An expression that returns the name of the lower bound 
+#'                   column for each group. These columns must exist in 
+#'                   the `dictionary` object and they must contain numeric, non
+#'                   NA values for rows in `dictionary` where whichcols is `TRUE`
+#' @param uboundcols Same as above but for the upper bounds.
+#' @param colnamecol The column in `dictionary` that contains the column names 
+#'                   that will be matched in the data to the respective `lboundcols`
+#'                   and `uboundcols` lower and upper bounds specified in the 
+#'                   `dictionary`
+#' @param dictionary A data dictionary `data.frame` in the same format as for the
+#'                   `v()` function
+vbounds <- function(
+  whichcols='c_refval'
+  ,groups=list(Female='f',Male='m')
+  ,lboundcols=setNames(paste0('lref_',groups),names(groups))
+  ,uboundcols=setNames(paste0('uref_',groups),names(groups))
+  ,colnamecol='dataset_column_names'
+  ,dictionary=dct0){
+  browser();
+}
 
 #This function will count the number of times a patient
 #is readmitted to the hospital within a given time window

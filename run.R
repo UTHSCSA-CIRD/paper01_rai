@@ -45,6 +45,7 @@ l_rockwood_true <- c("Insulin", "Non-Insulin"
                      ,"Outside emergency department"
                      , "Transfer from other"
                      , l_truthy_default);
+l_missing <- c(NA,'Unknown','unknown','UNKNOWN');
 
 dropcol_cost <- c('idn_mrn', 'case_number');
 cost1 <- cost0 %>% select(-one_of(dropcol_cost));
