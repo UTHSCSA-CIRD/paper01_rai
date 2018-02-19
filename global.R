@@ -11,7 +11,7 @@ rq_libs <- c('compiler'                                   # just-in-time compila
              ,'pscl'                                      # zero-inflated poisson, sigh
              ,'survival','MASS','Hmisc','zoo','coin'      # various analysis methods
              ,'readr','dplyr','stringr','magrittr'        # data manipulation & piping
-             ,'ggplot2','ggfortify','grid','GGally'       # plotting
+             ,'ggplot2','ggfortify','grid','GGally', 'survminer'       # plotting
              ,'gridExtra','scales'
              ,'stargazer','broom', 'tableone','janitor', 'knitr'); # table formatting
 rq_installed <- sapply(rq_libs,require,character.only=T);
