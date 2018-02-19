@@ -331,10 +331,26 @@ countfrac <- function(xx,outcomes
   oo;
 }
 
-withinrange <- function(dat,upper,lower){
-  
+#' Stack a vector to form a matrix with repeating rows, with optional 
+#' column names and transformation
+#'
+#' @param  vv    A vector which will become the row of a matrix
+#' @param  nr    Number of (identical) rows this matrix will contain
+#' @param  trans An optional function that can take a matrix as its 
+#'              sole argument. Useful functions include `as.data.frame()`
+#'              `as_tibble()` and `as.table()`
+#' @return A matrix, unless the function specified in the `trans` argument
+#'         causes the output to be something else.
+#' @export 
+#'
+#' @examples 
+#' vec2m(1:10,5);
+#' vec2m(1:10,5,tr=data.frame);
+#' vec2m(setNames(1:12,month.name),3);
+vec2m <- function(vv,nr=1,trans=identity) {
+  return(trans(matrix(as.matrix(c(vv)),nrow=nr,ncol=length(vv),byrow=T
+                ,dimnames=list(NULL,names(vv)))));
 }
-
 
 #' ### Specific to RAI-A
 #' 
@@ -416,42 +432,51 @@ raiscore.bak <- function(xx){
 #' Returns a list of column names from the data dictionary for which the column
 #' named in the first argument is true. The first arg can be either a string or 
 #' a name. The second must be a data.frame
-v <- function(var,dictionary=dct0) {cc<-substitute(var);na.omit(dictionary[dictionary[[as.character(cc)]],'dataset_column_names'])[[1]]}
+#'
+#' @param var        Either a string or a name, of a column in `dictionary`
+#' @param dat        An optional data.frame, to constrain which rows of the 
+#'                   'dictionary' object get used
+#' @param matchcol   Optional column that maps the rows of 'dictionary' to the rows
+#'                   of a 'data.frame' of interest
+#' @param retcol     Which column to return-- by default the same as used for 'matchcol'
+#' @param dictionary A 'data.frame' that is used as a data dictionary. It must at 
+#'                   minimum contain a column of column-names for the dataset for
+#'                   which it is a data dictionary ('matchcol') and one or more 
+#'                   columns each representing a _group_ of columns in the dataset, 
+#'                   such that a TRUE or T value means the column whose name is 
+#'                   the value of 'matchcol' is the name of a column in the data
+#'                   that belongs to the group defined by the grouping column.
+#'                   These grouping columns are what the argument 'var' is
+#'                   supposed to refer to. We will use the convention that grouping
+#'                   column names begin with 'c_' but this convention is not 
+#'                   (currently) enforced programmatically.
+v <- function(var,dat
+              ,matchcol='dataset_column_names'
+              ,retcol=matchcol
+              ,dictionary=dct0) {
+  # convenience function: if forgot what column names are available, call with
+  # no arguments and they will be listed
+  if(missing(var)) return(names(dictionary));
+  # support both standard or non-standard evaluation
+  var<-as.character(substitute(var));
+  # if a 'dat' argument is given, restrict the output so that only results having
+  # having values found in the colnames of 'dat' are returned.
+  if(!missing(dat)) dictionary <- dictionary[dictionary[[matchcol]]%in%colnames(dat),];
+  # TODO: Think about what to do when nothing matches... not necessarily an error
+  #       condition, might just be something to warn about and move on.
+  out<-dictionary[dictionary[[var]],retcol][[1]];
+  # if something other than matchcol is returned, give it a name to make it 
+  # easier to align with column names in the data
+  if(retcol != matchcol){
+    out<-setNames(out,dictionary[dictionary[[var]],matchcol][[1]]);
+  }
+  # 'na.omit()' needed because we allows the 'dictionary' object to have NAs instead
+  # of FALSEs. 'c()' needed to strip na.omit metadata, so the output is a plain
+  # old vector
+  return(c(na.omit(out)));
+  }
 
-#' Returns a list of 2-column data.frames where each data.frame is
-#' a particular demographic grouping (currently male and female)
-#' with the first column representing the lower bound of the reference
-#' range (e.g. for labs or vitals) and the second column the upper bound
-#' 
-#' @param whichcols  Which of the c_ columns returned by v() (above) specify the 
-#'                   column names to check against reference ranges
-#' @param groups     A named list where the names are the names of the groups of
-#'                   subjects that will have distinct sets of lower and upper 
-#'                   bounds for their reference ranges and the values are 
-#'                   strings or some other distinguishing features that the 
-#'                   expressions in `lboundcols` and `uboundcols` will use as
-#'                   arguments to create the actual names of group-specific 
-#'                   lower and upper reference bound columns
-#' @param lboundcols An expression that returns the name of the lower bound 
-#'                   column for each group. These columns must exist in 
-#'                   the `dictionary` object and they must contain numeric, non
-#'                   NA values for rows in `dictionary` where whichcols is `TRUE`
-#' @param uboundcols Same as above but for the upper bounds.
-#' @param colnamecol The column in `dictionary` that contains the column names 
-#'                   that will be matched in the data to the respective `lboundcols`
-#'                   and `uboundcols` lower and upper bounds specified in the 
-#'                   `dictionary`
-#' @param dictionary A data dictionary `data.frame` in the same format as for the
-#'                   `v()` function
-vbounds <- function(
-  whichcols='c_refval'
-  ,groups=list(Female='f',Male='m')
-  ,lboundcols=setNames(paste0('lref_',groups),names(groups))
-  ,uboundcols=setNames(paste0('uref_',groups),names(groups))
-  ,colnamecol='dataset_column_names'
-  ,dictionary=dct0){
-  browser();
-}
+
 
 #This function will count the number of times a patient
 #is readmitted to the hospital within a given time window
