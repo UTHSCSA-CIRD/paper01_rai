@@ -19,7 +19,7 @@ height_unknown,Height Unknown,,,,,,,,,,,,,,,FALSE,FALSE
 weight,Weight,,,,,,,,,,,,,T,,FALSE,FALSE
 weight_unit,Weight Unit,,,,,,,,,,,,,,,FALSE,FALSE
 weight_unknown,Weight Unknown,,,,,,,,,,,,,,,FALSE,FALSE
-bmi,BMI,18.5,18.5,25,25,,,,,,,,,T,T,FALSE,FALSE
+bmi,BMI,18.5,18.5,25,25,,,,,,,,,T,T,FALSE,TRUE
 diabetes_mellitus,Diabetes Mellitus,,,,,,,,,,,,,,T,TRUE,FALSE
 current_smoker_within_1_year,Current Smoker within 1 year,,,,,,,,,,,T,,,,TRUE,FALSE
 dyspnea,Dyspnea,,,,,,,,,,T,,,,,TRUE,FALSE
