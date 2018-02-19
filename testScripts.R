@@ -13,12 +13,13 @@
 source('global.R');
 require(testthat);
 #' Test run.R
-#+ echo=FALSE, message=FALSE
+#+ source_run, echo=FALSE, message=FALSE
 source('run.R');
 #' Does the old (corrected) algorithm for TRUE/FALSE rockwood values give
 #' the same results as the new one?
+#+ test_00
 test00<-list(
-  # original, hardcoded method
+  # original, hardcoded method but excluding the numeric variables
   n_origrock=with(dat1,(
   #as.numeric(bmi>=25)+
     as.numeric(!origin_status%in%c('Unknown','Not transferred (admitted from home)'))+
@@ -44,7 +45,7 @@ test00<-list(
   )
   # new, dynamic method
   ,n_newrock = apply(dat1[,v(c_rock_tf)],1
-                    ,function(xx) sum(truthy(xx,truewords=l_rockwood_true),na.rm = T)/
+                     ,function(xx) sum(truthy(xx,truewords=l_rockwood_true),na.rm = T)/
                       sum(!xx %in% l_missing)
                     )
 );
