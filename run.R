@@ -8,6 +8,7 @@
 #' you what you need to edit in order to proceed.
 #' 
 source('global.R');
+project_seed <- 20180218;
 
 #' ## Load data if it exists 
 #' 
@@ -80,6 +81,15 @@ dat1[dat0$weight_unit=='lbs','weight_unit'] <- c('kg');
 #' Standardizing height units to centimeters
 dat1[dat0$height_unit=='in','height'] <- dat1[dat0$height_unit=='in','height']*2.54;
 dat1[dat0$height_unit=='in','height_unit'] <- c('cm');
+
+#' Creating training/testing/validation samples
+#' 
+#' As long as the seed is the same, all random values will be generated the same
+#' reproducibly.
+set.seed(project_seed);
+#' Randomly assign IDN_MRNs to training, testing, or validation sets
+pat_samples <- split(dat1$idn_mrn,sample(c('train','test','val')
+                                         ,size=nrow(dat1),rep=T));
 
 #' Make sex/gender a factor
 #' 
@@ -313,8 +323,8 @@ dat1$a_rockwood_old <- with(dat1,(
 ));
 
 c_tabsievars <- c(v('c_tabsie')
-                ,'a_postop','a_any_postop','a_cd4','a_any_cd4'
-                ,'a_rai','a_discrete_rai','a_rockwood');
+                  ,'a_postop','a_any_postop','a_cd4','a_any_cd4'
+                  ,'a_rai','a_discrete_rai','a_rockwood');
 #' ## Transform Rows
 #'
 #' ### Sort the rows by patient ID and then by date of surgery, ascending
@@ -341,14 +351,14 @@ dat1namelookup <- with(dct0,setNames(dataset_column_names
 
 #identifying the colectomy patients that have multiple visits:
 dup_mrn <- unlist(dat1 %>% filter(cpt_code %in% v(c_all_colon,di=dct1)) %>%
-  filter(duplicated(idn_mrn)==TRUE) %>% select(idn_mrn)) 
+                    filter(duplicated(idn_mrn)==TRUE) %>% select(idn_mrn));
 
 #dropping visits after the index colectomy procedure for colectomy patients:
 drop_case_num <- unlist(sapply(dup_mrn, function(themrn){
   mat0 <- dat1 %>% select(idn_mrn, case_number, hospital_admissn_dt) %>% 
-    filter(idn_mrn %in% themrn) %>% arrange(desc(hospital_admissn_dt))
+    filter(idn_mrn %in% themrn) %>% arrange(desc(hospital_admissn_dt));
   drop_this <- mat0$case_number[-1]
-}))
+}));
 
 #' ### Create a version of the dataset that only has each patient's 1st encounter
 #' 
@@ -400,6 +410,9 @@ sbs0 <- sapply(list(all=dat1,index=dat2),function(xx) do.call(ssply,c(list(dat=x
 sbs0$all2016 <- lapply(sbs0$all,subset,subset=eval(subs_criteria[['y2016']]));
 comment(sbs0$all2016$all_colon_all) <- c(comment(sbs0$all2016),'These are only the index colon patients for 2016');
 dat1subs <- sbs0$all; comment(dat1subs) <- c(comment(dat1subs),'This is deprecated, used sbs0$all instead');
+#' Subsetting by the earlier randomly assigned train and test groups
+sbs0$train <- lapply(sbs0$all,subset,idn_mrn%in%pat_samples$train);
+sbs0$test <- lapply(sbs0$all,subset,idn_mrn%in%pat_samples$test);
 
 #' Isolating the 2016 UHS colectomy data elements:
 #col2016 <- sbs0$index[["all_colon_all"]] %>% 
@@ -490,7 +503,13 @@ dat3$hispanic_ethnicity<-factor(dat3$hispanic_ethnicity);
 c_resps <- c('a_postop','a_cd4');
 
 #' ### Create your random sample
-source('random_seed.R');
-pat_samp <- sample(dat3$idn_mrn,1000,rep=F);
-dat4 <- subset(dat3,idn_mrn %in% pat_samp);
+#source('random_seed.R');
+#pat_samp_dat3 <- sample(dat3$idn_mrn,1000,rep=F);
+#' These are the samples for survival analysis
+#dat4 <- subset(dat3,idn_mrn %in% pat_samp_dat3);
 
+#' # Survival Analysis
+cox.rai.train <- coxph(Surv(a_t,a_c) ~ a_rai, data = sbs0$train$all_emergency
+                 ,subset=a_t>0);
+cox.rock.train <- coxph(Surv(a_t,a_c) ~ a_rockwood, data = sbs0$train$all_emergency
+                 ,subset=a_t>0);
