@@ -46,6 +46,11 @@ l_rockwood_true <- c("Insulin", "Non-Insulin"
                      , "Transfer from other"
                      , l_truthy_default);
 l_missing <- c(NA,'Unknown','unknown','UNKNOWN');
+#+ inl_test_001
+if(length(inl_test_000.0<-intersect(v(c_refval,dat1),v(c_rock_tf,dat1)))>0){
+  stop(sprintf('Problem with %s. the following variables are listed as both discrete and numeric components of Rockwood index:
+               %s'),dctfile,paste0(inl_test_000.0,collapse=','));
+}
 
 dropcol_cost <- c('idn_mrn', 'case_number');
 cost1 <- cost0 %>% select(-one_of(dropcol_cost));
@@ -76,6 +81,11 @@ dat1[dat0$weight_unit=='lbs','weight_unit'] <- c('kg');
 dat1[dat0$height_unit=='in','height'] <- dat1[dat0$height_unit=='in','height']*2.54;
 dat1[dat0$height_unit=='in','height_unit'] <- c('cm');
 
+#' Make sex/gender a factor
+#' 
+#' TODO: do this dynamically via new c_ group for all columns that are safe to
+#' directly convert to factors
+dat1$gender <- factor(dat1$gender);
 
 #' ## Column names of primary relevance
 c_modelvars <- c(v(c_rai),v(c_postop),'income_final','hispanic_ethnicity');
@@ -157,8 +167,126 @@ dat1$a_rai_hisp <- with(dat1,interaction(a_discrete_rai,hispanic_ethnicity));
 
 temp_truewords <- formals(truthy.default)$truewords;
 
-#' ## The Rockwood Scale
-dat1$a_rockwood <- with(dat1,(
+#' ## The Rockwood Index!!!
+#' 
+#' ### Counting just the abnormal labs first
+#+ task_rock_num0
+# The first step in the pipeline, outer(...), simply creates a matrix of column
+# names, with the column names of lower bounds in the first row (named 'lo') and
+# those of the upper bounds in the second row (named 'hi'). The male values are
+# in the first column ('Male') and the female values in the second ('Female')
+.junk_rock_numerator0 <- outer(c(lo='lref_',hi='uref_'),c(Male='m',Female='f'),paste0) %>% 
+  # this is piped to apply(). The 1:2 value of MARGIN argument of the apply() 
+  # function means that the function will be applied to each combination of 
+  # row and column rather than just rows (1) or just columns (2). The output of
+  # this is a THREE dimensional matrix where the first dimension is the column
+  # specified by v(c_refval, ...), the second dimension is whether it's the 
+  # 'lo' or the 'hi' bound, and the third dimension is whether the reference 
+  # value is for a male or a female (but this can generalize to any number of
+  # patient subgroups which is why I did it this wierd-seeming way). Have a look
+  # at what v(c_refval,dat1,retcol='lref_m')) does for example, and try the other
+  # three values as well. c_refval is the newly created column in the data dictionary
+  # dct0 that identifies which variables have upper and lower reference values 
+  # and therefore can be treated as labs. Reference values are sex-specific (even
+  # if that means they repeat in cases where they are the same for both sexes).
+  # That is why we have a 2x2 grid in the previous step.
+  apply(1:2,function(xx) v(c_refval,dat1,retcol=xx)) %>% 
+  # This step of the pipeline turns a 3-dimensional matrix into a list containing
+  # two data.frames-- one for males and one for females. Rather than trying to
+  # understand this abstractly, again, try executing the pipeline just up to this
+  # step and then capturing the output to a temporary variable, and examining that
+  # variable.
+  apply(3,data.frame) %>% 
+  # It doesn't matter which order the data.frames appear, as long as it is
+  # deterministic so that we can make sure that the right reference values are
+  # matched in the next steps, so we explicitly put the subset function into
+  # the pipeline for the sole purpose of specifying the order, whatever the
+  # original one might have been
+  `[`(levels(dat1$gender)) %>% 
+  # mapply() is like lapply() or sapply() except the first argument is the function
+  # and the subsequent arguments are list-like objects on which the function 
+  # operates. The function should take as many arguments are there are list-like
+  # objects passed to mapply(), and it will run on all the first elements as
+  # its arguments, then all the second elements, and so on, until it's processed
+  # all the elements of the objects passed to it. For more info, I recommend
+  # ?mapply
+  # I will document this one argument at a time
+  # The function will take the FIRST top-level argument (which as we will see 
+  # is a data.frame)...
+  mapply(function(aa,bb) apply(bb
+                               # ...passes each row to another anonymous function
+                               # as the argument zz.
+                               ,1,function(zz) 
+                                 # that function compares the row to the 'lo'
+                                 # column and the 'hi' column of the FIRST 
+                                 # top-level argument and returns TRUE for
+                                 # elements of zz that are outside their 
+                                 # respective lo and hi bounds, and FALSE 
+                                 # if they are within bounds (i.e. normal)
+                                 aa$lo > zz | aa$hi < zz)
+         # the FIRST top-level argument is what comes out of the pipeline that
+         # is prior to this step (represented by a '.' because it's not the 
+         # first argument to mapply). As a reminder, it is a list of data.frames
+         # in our case one for males and one for females, and each data.frame
+         # has a 'lo' and a 'hi' column. Each of them in turn becomes the 'aa'
+         # variable to the function that is the first top-level argument.
+         ,.
+         # The third top-level argument, which will supply the corresponding 'bb'
+         # arguments to that function is our main dataset, but it needs to be
+         # split by sex, just like our reference values were split by sex in the
+         # above pipeline. But this is a simpler process and we do it in one
+         # step using the split() command. Notice that we are only keeping the 
+         # columns that have reference values according to our data dictionary 
+         # and exist in dat1.
+         ,split(dat1[,v(c_refval,dat1)]
+                # The second argument to split() is a variable that we split by
+                # in this case gender. Just as before, we end up with a list of
+                # two data.frames-- one the records for male patients, one with
+                # the records for female patients. As above, we specify the 
+                # order explicitly
+                ,dat1$gender)[levels(dat1$gender)]) %>% 
+  # What comes out of the mapply() step of the pipeline is another list with two
+  # matrices, one for Males and one for Females. Each matrix has as many columns
+  # as there are records for that group and as many rows as there are variables
+  # currently included in c_refval. This is because a quirk of apply() wherein
+  # it transposes its output. That's not a big deal, though, we aren't keeping 
+  # these matrices around for very long-- in the next step, we do colSums, which
+  # is exactly what it sounds like-- for every column (i.e. for every NSQIP case) 
+  # we sum up all the normal values, omitting the missing ones by using the
+  # na.rm=T argument to colSums. Recall that in apply-type functions you can 
+  # add additional arbitrary arguments that get passed to the function that is
+  # being applied. Recall also that when you to arithmetic on TRUE/FALSE values
+  # they get coerced to 1s and 0s, so a column sum is the same a a count of TRUE
+  lapply(colSums,na.rm=T) %>% 
+  # The output of the pipeline so far is a list of two integer vectors, one for 
+  # males, one for females. Each has the same length as there are male/female 
+  # records. The values represent the number of aberrant labs for that NSQIP 
+  # case. But now we need to get the data back into its original order so we can
+  # insert it back into dat1 as a new column. R has a brilliantly simple way of
+  # doing this: unsplit, which reverses the split we did on dat1! It will put 
+  # these scalar values back in the same order as the rows in the data frame
+  # from which they were calculated.
+  unsplit(dat1$gender);
+
+#' ### Rockwood: counts for pre-op conditions (i.e. TRUE/FALSE)
+#+ task_rock_num1
+.junk_rock_numerator1 <- apply(dat1[,v(c_rock_tf)],1
+                               ,function(xx) sum(truthy(xx,truewords=l_rockwood_true),na.rm = T));
+#' ### Rockwood: number of non-missing values for each case (denominator)
+#+ task_rock_denom
+# include both the discrete columns from numerator0 and the numeric columns 
+# from numerator1
+.junk_rock_denominator <- apply(dat1[,c(v(c_refval),v(c_rock_tf))] 
+                                # for each row...
+                                ,1
+                                # sum/count all the elements that don't have a 
+                                # value synonymous with missing (that's why we 
+                                # created 'l_missing') earlier
+                                ,function(xx) sum(!xx %in% l_missing));
+dat1$a_rockwood <- (.junk_rock_numerator1+.junk_rock_numerator0)/.junk_rock_denominator;
+
+#+ task_rock_old
+dat1$a_rockwood_old <- with(dat1,(
   as.numeric(bmi>=25)+
     as.numeric(origin_status!='Not transferred (admitted from home)')+
     as.numeric(diabetes_mellitus!='No')+
