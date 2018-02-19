@@ -112,27 +112,58 @@ sbs0$all$full %>% filter(!is.na(income_final)) %>% select(hispanic_ethnicity, a_
 
 
 #trying to create the survival plots:
-plt_rai_surv_death <-autoplot(coxph(Surv(a_t,a_c) ~ I(a_rai>median(a_rai)), data = sbs0$all$all_emergency)) # doesn't run at all
+#plt_rai_surv_death <-autoplot(coxph(Surv(a_t,a_c) ~ I(a_rai>median(a_rai)), data = sbs0$all$all_emergency)) # doesn't run at all
+# If it errors, don't leave it in uncommented-- that will cause it to fail
+# our RMarkdown test. Please either delete it or if you need it for future 
+# reference comment it out (plain comments, not #').
 
-res.cox <- coxph(Surv(a_t,a_c) ~ a_rai, data = sbs0$all$all_emergency)
-res.fit0 <- survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rai)), data = sbs0$all$all_emergency)
-res.fit1 <- survfit(Surv(a_t,a_c) ~ I(a_rockwood>median(a_rockwood)), data = sbs0$all$all_emergency)
+# coxph is an analytic function so it goes into run.R. I realize that I probably
+# didn't communicate it very clearly because I also was talking about "keeping
+# everything in once place". I meant all the output-related functions in one 
+# place, but the clean separation between analysis and output such as 
+# vis/tabulation needs to maintained. I am commenting the coxph out and moving 
+# it to the end of run.R.
+#res.cox <- coxph(Surv(a_t,a_c) ~ a_rai, data = sbs0$all$all_emergency)
+# Now, the survfit() ones are a different story: they are not really analytic
+# they are for plots and tables, so they can stay here. But they need more 
+# descriptive names. Also, adding on an optional subset argument to get rid of
+# six negative time values. We need to investigate those later, but not time 
+# right now.
+surv.rai <- survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rai))
+                    , data = sbs0$all$all_emergency,subset=a_t>0);
+surv.rock <- survfit(Surv(a_t,a_c) ~ I(a_rockwood>median(a_rockwood))
+                     , data = sbs0$all$all_emergency,subset=a_t>0);
 #res.fit2 <- survfit(Surv(a_t,a_c) ~ cut(a_rai,3), data = sbs0$all$all_emergency)
-ggsurvplot(res.fit0)
-ggsurvplot(res.fit1)
-facet_wrap(ggsurvplot(res.fit0), ggsurvplot(res.fit1))
-ggsurvplot(res.cox) # doesn't run properly
+ggsurvplot(surv.rai);
+ggsurvplot(surv.rock);
+# The below is not actually doing facet_wrap for some reason-- the goal had been
+# to get them on one plot.
+#facet_wrap(ggsurvplot(surv.rai), ggsurvplot(surv.rock));
+# If it causes an error, don't leave it active.
+#ggsurvplot(res.cox) # doesn't run properly
 
 
-res.cox <- coxph(Surv(a_t,a_c) ~ I(a_rai>median(a_rai)), data = sbs0$all$all_emergency)
+# This overwrites the earlier res.cox with an incorrect predictor.
+#res.cox <- coxph(Surv(a_t,a_c) ~ I(a_rai>median(a_rai)), data = sbs0$all$all_emergency)
+# Why is this being created again? 
+#res.fit0 <- survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rai)), data = sbs0$all$all_emergency)
 
-res.fit0 <- survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rai)), data = sbs0$all$all_emergency)
+# Need a more descriptive name than theplotlist, making it pl_surv-- pl_ just like
+# the other pl_ objects created in this script indicates that it is plottable,
+# and surv means they are survival plots. Currently our only ones. As this evolves
+# beyond the February 2018 poster, we may later need to have an even more 
+# specific naming scheme
+pl_surv <-list(RAI=autoplot(surv.rai), Rockwood=autoplot(surv.rock));
 
-
-theplotlist<-list(RAI=autoplot(res.fit0), Rockwood=autoplot(res.fit1))
-plots_cph_numeric <- sapply(names(theplotlist)
-                            ,function(xx) theplotlist[[xx]] + 
-                              theme(legend.position = 'none') + 
-                              ggtitle(xx) + 
-                              labs(x='Time in Days', y = 'Survival'),simplify=F);
-multiplot(plotlist=plots_cph_numeric,cols=1);
+# These were not plots_cph_numeric, so renaming it. Actually reusing the pl_surv
+# object because the sapply result contains the same number and identities of
+# objects, with each one a superset of its respective original. If you disagree
+# and want to keep the previous step for debugging or whatever, please give it a 
+# prefix like .debug_ or .temp_ or .junk_ 
+pl_surv <- sapply(names(pl_surv)
+                  ,function(xx) pl_surv[[xx]] + 
+                    theme(legend.position = 'none') + 
+                    ggtitle(xx) +
+                    scale_y_continuous(limits=c(.5,1),labels = scales::percent) +
+                    labs(x='Time in Days', y = 'Survival'),simplify=F);
+multiplot(plotlist=pl_surv,cols=1);
