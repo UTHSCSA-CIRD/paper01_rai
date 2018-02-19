@@ -10,6 +10,7 @@ rq_libs <- c('compiler'                                   # just-in-time compila
              ,'MatchIt','DHARMa'                          # propensity scores and glm residuals
              ,'pscl'                                      # zero-inflated poisson, sigh
              ,'survival','MASS','Hmisc','zoo','coin'      # various analysis methods
+             ,'survAUC','survivalROC'
              ,'readr','dplyr','stringr','magrittr'        # data manipulation & piping
              ,'ggplot2','ggfortify','grid','GGally', 'survminer'       # plotting
              ,'gridExtra','scales'
