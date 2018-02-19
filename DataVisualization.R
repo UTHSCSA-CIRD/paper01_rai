@@ -154,6 +154,10 @@ ggsurvplot(surv.rock);
 # beyond the February 2018 poster, we may later need to have an even more 
 # specific naming scheme
 pl_surv <-list(RAI=autoplot(surv.rai), Rockwood=autoplot(surv.rock));
+# below not worth it: a_rai identical to above, a_rockwood very close
+#pl_surv_roc <-list(RAI=autoplot(update(surv.rai,.~I(a_rai>6)))
+#                   , Rockwood=autoplot(update(surv.rock,.~I(a_rockwood>0.26))));
+
 
 # These were not plots_cph_numeric, so renaming it. Actually reusing the pl_surv
 # object because the sapply result contains the same number and identities of
@@ -163,7 +167,8 @@ pl_surv <-list(RAI=autoplot(surv.rai), Rockwood=autoplot(surv.rock));
 pl_surv <- sapply(names(pl_surv)
                   ,function(xx) pl_surv[[xx]] + 
                     theme(legend.position = 'none') + 
-                    ggtitle(xx) +
+                    ggtitle(paste0(xx,', Split by Median')) +
                     scale_y_continuous(limits=c(.5,1),labels = scales::percent) +
                     labs(x='Time in Days', y = 'Survival'),simplify=F);
 multiplot(plotlist=pl_surv,cols=1);
+
