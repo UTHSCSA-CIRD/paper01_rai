@@ -15,12 +15,18 @@
 #' resulted after you ran `git clone git@github.com:UTHSCSA-CIRD/paper01_rai`
 #' Here is mine...
 workdir <- '/tmp/paper01_rai/';
-#' ### Used by run.R. Please put a path to your nsqip CSV file here.
+#' Used by run.R. Please put a path to your nsqip CSV file here.
 inputdata <- '/home/a/dx/16_rai.shireman/in/LDS_170817_NSQIP.csv';
-#' ### Please put a path to your NSQIP cost data here
+#' Please put a path to your NSQIP cost data here
 inputdata_cost <- '/home/a/dx/16_rai.shireman/in/LDS_NSQIPwithCostData.csv';
-#' ### What .rdata file to read instaed of running run.R each time
+#' What .rdata file to read instaed of running run.R each time
 incache_run <- './local/in/paper01_rai_run_223a939f011c3d6c6e05d6e107790346.rdata';
 outcache_path <- 'local/in/'
-#' ### Only used for Shiny/TABSIE, not currently active
+#' Whether to always generate a cache file
+create_outcache <- F;
+#' Whether to update `config.R` whenever a new cache file is created
+#' Set to NULL or comment out to disable auto-update. Otherwise give it a template
+#' string where %s will get replaced by the new 'incache_run' value
+update_incache_run <- "incache_run <-'%s';"
+#' Only used for Shiny/TABSIE, not currently active
 shinypw <- '';

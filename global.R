@@ -41,6 +41,9 @@ if(exists('outcache_path') && file_test('-d',outcache_path)){
   pi[['outcache_path']]<-normalizePath(outcache_path);
 } else stop("The 'outcache_path' variable either was not set or does not specify a valid directory path. Please set it in your config.R")
 
+options(runr.makeoutcache=if(exists('create_outcache')) create_outcache else F);
+if(exists('update_incache_run')) options(runr.updincacherun=update_incache_run);
+
 #' ## Load project-level metadata and functions
 source('./metadata.R'); 
 source('./functions.R');
