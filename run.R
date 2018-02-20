@@ -8,6 +8,7 @@
 #' you what you need to edit in order to proceed.
 #' 
 source('global.R');
+basefname <- gsub('.r$','',basename(parent.frame(2)$ofile),ignore.case = T);
 
 #' ## Load data if it exists 
 #' 
@@ -15,10 +16,10 @@ source('global.R');
 #'if(session %in% list.files()) load(session);
 #' Load your data. Notice that we're using `read_csv()` from the readr library.
 #' It is a little smarter than the built-in `read.csv()`
-dat0 <- read_tsv(inputdata,na=c('(null)',''));
+dat0 <- read_tsv(pi$inputdata[1],na=c('(null)',''));
 #' Read in the data dictionary
-dct0 <- read_csv(dctfile,na = '');
-dct1 <- read_csv(cptfile,na='');
+dct0 <- read_csv(pi$dctfile[1],na = '');
+dct1 <- read_csv(pi$cptfile[1],na='');
 colnames(dat0) <- tolower(colnames(dat0));
 
  
