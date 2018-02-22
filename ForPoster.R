@@ -2,6 +2,7 @@
 #' title: "RAI Main Analysis"
 #' author: "Wilson, Bokov, Shireman"
 #' date: "08/15/2017"
+#' bibliography: Frailty.bib
 #' ---
 #'
 #+ echo=FALSE, message=FALSE
@@ -43,7 +44,7 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' 
 #' # Introduction
 #' 
-#' * RAI-A good for predicting surgical risk
+#' * RAI-A good for predicting surgical risk [@HallDevelopmentInitialValidation2017]
 #' * ...but it cannot be used on live data because it's hard-coded to NSQIP
 #' * The availability of NSQIP variables can differ between sites with different
 #'   levels of participation and some variables may be discontinued.
@@ -105,7 +106,11 @@ countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>%
 countfrac(sbs0$all$all_emergency,groupcols = 'rai_range') %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);
 #' 
-#' ## RAI-A and Rockwood have very similar AUC metrics
+#' ## RAI-A and Rockwood have very similar Concordances and Specificities
 #' 
-#' ## 
+#' # Discussion and Conclusions
+#' 
+#' # Acknowledgments
+#' 
+#' # References
 
