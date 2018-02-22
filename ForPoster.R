@@ -20,6 +20,25 @@ source('global.R');
 #' 
 #+ cache=TRUE
 source('run.R');
+#+ poster_variables
+thecolnames1 <- c("RAI-A Score"='rai_range'
+                  ,"Rockwood Score"='a_rockwood_range'
+                  ,"Income"='income_final'
+                  ,"Gender"='gender'
+                  ,"Hispanic"='hispanic_ethnicity'
+                  ,"BMI"='bmi'
+                  ,"Age"='age_at_time_surg'
+                  ,"Count"='bin_n'
+                  ,"Cumulative Count"='cumul_count'
+                  ,"Died 30d"="postop_death_30_dy_proc_n"
+                  ,"Died 30d Frac."="postop_death_30_dy_proc_frac"
+                  ,"Readmission 30d"="a_readm_30_dy_n"
+                  ,"Readmission 30d Frac."="a_readm_30_dy_frac"
+);
+
+# We set the default value of the outcomes argument for the purposes of this 
+# script so we don't have to keep repeating it.
+formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' # Abstract
 #' 
 #' # Introduction
@@ -42,12 +61,22 @@ source('run.R');
 #' 
 #' ## Data Sources
 #' 
+#' ## Patient Demographics
+#+ table_demog,results='asis'
+mutate(sbs0$all$all_emergency,`RAI-A`=factor(a_rai>median(a_rai)
+                                             ,levels = c('FALSE','TRUE')
+                                             ,labels=c('Low','High'))) %>% 
+  mapnames(thecolnames1) %>% 
+  CreateTableOne(names(thecolnames1)[3:7],'RAI-A',.) %>% 
+  print(printToggle=F,noSpaces=T) %>% `[`(,-4) %>% 
+  kable(format='markdown');
 #' ## Analysis
 #' 
 #' # Results
 #' 
 #' ## RAI-A and Rockwood both are reasonable predictors of 30-day mortality and readmission
 #' 
+#+ plot_survfits
 fit_srvs <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rai))
                             , data = sbs0$all$all_emergency,subset=a_t>0)
                 ,Rockwood=survfit(Surv(a_t,a_c) ~ I(a_rockwood>median(a_rockwood))
@@ -64,45 +93,19 @@ pl_srvs <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30)) +
 #ggsurvplot(surv.rai);
 #ggsurvplot(surv.rock);
 multiplot(plotlist=pl_srvs,cols=1);
-#' ## RAI-A and Rockwood have very similar AUC metrics
-#' 
-#' 
-
 # This is the creation of an analytic variable. Therefore it should happen in run.R
 # Also, this should be done on dat1, right after a_rockwood gets created, so all
 # the other subsets can inherit it. I moved it there.
 #sbs0$all$all_emergency$a_rockwood_range <- cut(sbs0$all$all_emergency$a_rockwood, 7)
-
-thecolnames1 <- c("RAI-A Score"='rai_range'
-                  ,"Rockwood Score"='a_rockwood_range'
-                  ,"Income"='income_final'
-                  ,"Gender"='gender'
-                  ,"Hispanic"='hispanic_ethnicity'
-                  ,"BMI"='bmi'
-                  ,"Age"='age_at_time_surg'
-                  ,"Count"='bin_n'
-                  ,"Cumulative Count"='cumul_count'
-                  ,"Died 30d"="postop_death_30_dy_proc_n"
-                  ,"Died 30d Frac."="postop_death_30_dy_proc_frac"
-                  ,"Readmission 30d"="a_readm_30_dy_n"
-                  ,"Readmission 30d Frac."="a_readm_30_dy_frac"
-);
-
-# We set the default value of the outcomes argument for the purposes of this 
-# script so we don't have to keep repeating it.
-formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
+#
+#+ table_counts
 # Now we render the tables. You don't need all that stuff below.
 countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);
 countfrac(sbs0$all$all_emergency,groupcols = 'rai_range') %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);
+#' 
+#' ## RAI-A and Rockwood have very similar AUC metrics
+#' 
+#' ## 
 
-#' ### Demographics
-#+ results='asis'
-mutate(sbs0$all$all_emergency,`RAI-A`=factor(a_rai>median(a_rai)
-                                             ,levels = c('FALSE','TRUE')
-                                             ,labels=c('Low','High'))) %>% 
-  mapnames(thecolnames1) %>% 
-  CreateTableOne(names(thecolnames1)[3:7],'RAI-A',.) %>% 
-  print(printToggle=F,noSpaces=T) %>% `[`(,-4) %>% 
-  kable(format='markdown');
