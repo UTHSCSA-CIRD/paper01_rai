@@ -97,9 +97,23 @@ pl_srvs <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30)) +
 multiplot(plotlist=pl_srvs,cols=1);
 #'
 #+ results='asis'
-starkable(cox.rai.train,-1,searchrep = cbind(c('V1','Dependent variable','a_rai|a_rockwood'),c('Statistic','Value','Effect (SD)')));
+#starkable(cox.rai.train,-1,searchrep = cbind(c('V1','Dependent variable','a_rai|a_rockwood'),c('Statistic','Value','Effect (SD)')));
+#starkable(cox.rock.train,-1,searchrep = cbind(c('V1','Dependent variable','a_rai|a_rockwood'),c('Statistic','Value','Effect (SD)')));
+#' #### RAI-A
+#+ cox_raia, results='asis'
+capture.output(stargazer(cox.rai.train,type='html',omit.table.layout = 'n-!=!d'
+                         ,covariate.labels = 'Effect Size'
+                         ,omit.stat = c('wald','max.rsq')) %>% htmltab %>% 
+                 kable(col.names=c('Statistic','Value'),row.names=F) -> cox.rock.train.summary);
+cat(paste0(cox.rock.train.summary,'\n'));
+#' #### Rockwood Index
+#+ cox_rockwood, results='asis'
+capture.output(stargazer(cox.rock.train,type='html',omit.table.layout = 'n-!=!d'
+                         ,covariate.labels = 'Effect Size'
+                         ,omit.stat = c('wald','max.rsq')) %>% htmltab %>% 
+                 kable(col.names=c('Statistic','Value'),row.names=F) -> cox.rock.train.summary);
+cat(paste0(cox.rock.train.summary,'\n'));
 
-starkable(cox.rock.train,-1,searchrep = cbind(c('V1','Dependent variable','a_rai|a_rockwood'),c('Statistic','Value','Effect (SD)')));
 # This is the creation of an analytic variable. Therefore it should happen in run.R
 # Also, this should be done on dat1, right after a_rockwood gets created, so all
 # the other subsets can inherit it. I moved it there.
