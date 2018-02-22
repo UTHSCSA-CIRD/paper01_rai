@@ -15,6 +15,13 @@ cl_bintail <- function(xx,topn=4,binto='other'){
         ),levels=c(keep,binto)));
 }
 
+#' A sketch for a possible future function that converts stargazer tables into
+#' a universal markdown pipe format
+starkable <- function(xx,firstrowisdata=T,row.names=F,taildrop=1,...) stargazer(xx,type = 'html')  %>% 
+  htmltab(header=2) %>% `[`(firstrowisdata,,drop=F) %>% 
+  kable(format = 'markdown',row.names=row.names,...) %>% 
+  head(length(.)-1) %>% paste0('\n') %>% cat;
+
 #' Take a character vector and perform multiple search-replace 
 #' operations on it.
 #' @param xx A \code{vector} of type \code{character} (required)

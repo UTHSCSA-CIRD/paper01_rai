@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo=F,warning = F,cache=F,message=F);
 source('global.R');
 #' Report date: `r date()`.
 #'
-#' Revision: `r gitstamp()`.
+# Revision: `r gitstamp()`.
 #'
 #' Data file: `r inputdata`.
 #' 
@@ -94,6 +94,9 @@ pl_srvs <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30)) +
 #ggsurvplot(surv.rai);
 #ggsurvplot(surv.rock);
 multiplot(plotlist=pl_srvs,cols=1);
+#+ results='asis'
+starkable(cox.rai.train,-1);
+starkable(cox.rock.train,-1);
 # This is the creation of an analytic variable. Therefore it should happen in run.R
 # Also, this should be done on dat1, right after a_rockwood gets created, so all
 # the other subsets can inherit it. I moved it there.
