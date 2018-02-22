@@ -7,11 +7,12 @@
 #'
 #+ echo=FALSE, message=FALSE
 knitr::opts_chunk$set(echo=F,warning = F,cache=F,message=F);
+options(knitr.kable.NA='');
 #+ cache=FALSE
 source('global.R');
 #' Report date: `r date()`.
 #'
-# Revision: `r gitstamp()`.
+#' Revision: `r gitstamp()`.
 #'
 #' Data file: `r inputdata`.
 #' 
@@ -94,15 +95,17 @@ pl_srvs <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30)) +
 #ggsurvplot(surv.rai);
 #ggsurvplot(surv.rock);
 multiplot(plotlist=pl_srvs,cols=1);
+#'
 #+ results='asis'
-starkable(cox.rai.train,-1);
-starkable(cox.rock.train,-1);
+starkable(cox.rai.train,-1,searchrep = cbind(c('V1','Dependent variable','a_rai|a_rockwood'),c('Statistic','Value','Effect (SD)')));
+
+starkable(cox.rock.train,-1,searchrep = cbind(c('V1','Dependent variable','a_rai|a_rockwood'),c('Statistic','Value','Effect (SD)')));
 # This is the creation of an analytic variable. Therefore it should happen in run.R
 # Also, this should be done on dat1, right after a_rockwood gets created, so all
 # the other subsets can inherit it. I moved it there.
 #sbs0$all$all_emergency$a_rockwood_range <- cut(sbs0$all$all_emergency$a_rockwood, 7)
-#
-#+ table_counts
+#'
+#+ table_counts, results='asis'
 # Now we render the tables. You don't need all that stuff below.
 countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);

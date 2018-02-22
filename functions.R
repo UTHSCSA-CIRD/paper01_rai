@@ -17,10 +17,20 @@ cl_bintail <- function(xx,topn=4,binto='other'){
 
 #' A sketch for a possible future function that converts stargazer tables into
 #' a universal markdown pipe format
-starkable <- function(xx,firstrowisdata=T,row.names=F,taildrop=1,...) stargazer(xx,type = 'html')  %>% 
-  htmltab(header=2) %>% `[`(firstrowisdata,,drop=F) %>% 
-  kable(format = 'markdown',row.names=row.names,...) %>% 
-  head(length(.)-1) %>% paste0('\n') %>% cat;
+starkable <- function(xx,firstrowisdata=T,row.names=F,taildrop=1
+                      ,hrow=2
+                      ,sgoutput=F,kboutput=T,searchrep=matrix(c('V1',''),ncol=2)
+                      ,...){
+  output <- if(!sgoutput) capture.output else identity;
+  formals(htmltab)$header=hrow;
+  output(out <- stargazer(xx,type = 'html')  %>%
+           htmltab %>% `[`(firstrowisdata,,drop=F) %>%
+           kable(format = 'markdown',row.names=row.names,...) %>%
+           head(length(.)-taildrop) %>% paste0('\n') %>%
+           submulti(searchrep = searchrep));
+  if(kboutput) cat(out,'\n');
+  invisible(out);
+}
 
 #' Take a character vector and perform multiple search-replace 
 #' operations on it.
