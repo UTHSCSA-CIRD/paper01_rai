@@ -136,7 +136,7 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' Rockwood is that it is a robust frailty metric for missing lab values. 
 #' Missing lab values will not lead to an underestimate of a patient’s frailty 
 #' assessment determined by the Rockwood index [@MitnitskiAccumulationDeficitsProxy2001,]. 
-#' Both tools can be used retrospectively using EHRs. Our hypothesis ……
+#' Both tools can be used retrospectively using EHRs.…
 #' 
 #' 
 #' # Methods
@@ -193,8 +193,11 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 #' The remaining set (N=`r length(pat_samples$train)`) is being
 #' held out for future analysis and was not used in the work reported here.
 
-
 #' ## Analysis
+#' 
+#' For the remaining patients we fit Cox proportional hazard models with RAI-A 
+#' and the Rockwood index as predictors.
+
 #' 
 #' # Results
 #' 
