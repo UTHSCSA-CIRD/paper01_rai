@@ -45,11 +45,21 @@ source('run.R');
 #'   
 #' # Methods
 #' 
+#' A total of 6408 University Hospital System (UHS) cases were used in this study. These cases occurred between April 2013 to February 2017. A total of 140 annotated and highly curated variables were extracted from each EHR, among them was address. In order to determine a median income approximation for each case, we linked the census block group level data from the 2015 American Community Survey Median Income table to each cases’ address. To calculate the the RAI-A frailty score for each case, we used the calculation described in Hall DE, Arya S, Schmid KK, et al. Development and Initial Validation of the Risk Analysis Index for Measuring Frailty in Surgical Populations. JAMA Surg. 2017 Feb 1;152(2):175-182. doi: 10.1001/jamasurg.2016.4202. In short, the calculation can be seen here:
+#' <div id="rai">
+#'   <img src="RAI-Cv2.png" alt="">
+#' </div> 
+#' Additionally, the Rockwood index was calculated for each case using the following paper: Mitnitski AB, Mogilner AJ and Rockwood K. Accumulation of deficits as a proxy measure of aging. Scientific World Journal. 2001 Aug 8;1:323-36. Briefly, the Rockwood index for each patient is calculated by the following equation: 
+#' <div id="rai">
+#'   <img src="FormulaV2.png" alt="">
+#' </div>
+#' 
 #' ## Data Sources
 #' 
 #' The following data sources were used:
 #' *University Hospital System (UHS) electronic health records (EHR)
 #' *2015 American Community Survey 5-year estimates Median Income (from years 2011 to 2015) 
+#' 
 #' ## Analysis
 #' 
 #' # Results
