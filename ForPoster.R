@@ -98,7 +98,7 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' that the 45 to 64 age group has a higher percentage of ambulatory surgeries
 #' compared to the 65 and above age demographic, the risk of adverse surgical
 #' outcomes is higher in the latter compared to the former 
-#' [@hall2017ambulatory]; [@polanczyk2001impact]. Furthermore, the number of 
+#' [@hall2017ambulatory]; @polanczyk2001impact]. Furthermore, the number of
 #' overnight hospital stays increases with age [@lucas_nhis_2018]. Frailty is
 #' associated with increased risk of post-operative complications and does
 #' increase with age [@brahmbhatt2016gender]. Based on these findings, there
