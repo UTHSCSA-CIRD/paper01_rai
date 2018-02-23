@@ -118,8 +118,8 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' complication experienced by the patient. Since our strength is with EHR
 #' analysis, this study chose to focus on two frailty metrics that lend
 #' themselves well to EHR data: the Risk Analysis Index (RAI) and the Rockwood &
-#' Mitnitsky Frailty Index [@HallDevelopmentInitialValidation2017]; 
-#' [@mitnitski2001accumulation]. The RAI-A (RAI Administrative) frailty metric
+#' Mitnitsky Frailty Index [@HallDevelopmentInitialValidation2017; @mitnitski2001accumulation]. 
+#' The RAI-A (RAI Administrative) frailty metric
 #' is a frailty screening tool that uses administrative data (like EHR) to 
 #' differentiate between frail and fit patients opting for elective surgery
 #' [@HallDevelopmentInitialValidation2017]. The RAI-A score is calculated 
