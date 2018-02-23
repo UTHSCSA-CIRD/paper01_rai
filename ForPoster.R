@@ -25,6 +25,8 @@ source('run.R');
 #+ poster_variables
 thecolnames1 <- c("RAI-A Score"='rai_range'
                   ,"Rockwood Score"='a_rockwood_range'
+                  ,"RAI-A"='a_rai'
+                  ,"Rockwood"='a_rockwood'
                   ,"Income"='income_final'
                   ,"Gender"='gender'
                   ,"Hispanic"='hispanic_ethnicity'
@@ -36,6 +38,16 @@ thecolnames1 <- c("RAI-A Score"='rai_range'
                   ,"Died 30d Frac."="postop_death_30_dy_proc_frac"
                   ,"Readmission 30d"="a_readm_30_dy_n"
                   ,"Readmission 30d Frac."="a_readm_30_dy_frac"
+                  # here are the to-replace column names for tidy/glance
+                  ,"N"='n'
+                  ,"Events"='nevent'
+                  ,"Effect"='estimate'
+                  ,"Std. Err."='std.error'
+                  ,"Estimate/SE"='statistic'
+                  ,"P"='p.value'
+                  ,"R^2"='r.squared'
+                  ,"Concordance"='concordance'
+                  ,"Concordance Std. Err."='std.error.concordance'
 );
 
 # We set the default value of the outcomes argument for the purposes of this 
@@ -69,7 +81,7 @@ mutate(sbs0$all$all_emergency,`RAI-A`=factor(a_rai>median(a_rai)
                                              ,levels = c('FALSE','TRUE')
                                              ,labels=c('Low','High'))) %>% 
   mapnames(thecolnames1) %>% 
-  CreateTableOne(names(thecolnames1)[3:7],'RAI-A',.) %>% 
+  CreateTableOne(names(thecolnames1)[5:9],'RAI-A',.) %>% 
   print(printToggle=F,noSpaces=T) %>% `[`(,-4) %>% 
   kable(format='markdown');
 #' ## Analysis
@@ -97,36 +109,50 @@ pl_srvs <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30)) +
 multiplot(plotlist=pl_srvs,cols=1);
 #'
 #+ results='asis'
+sapply(fit_coxs<-list(`RAI-A`=cox.rai.train,`Rockwood`=cox.rock.train)
+       ,function(xx) cbind(tidy(xx),glance(xx)),simplify=F) %>% 
+  do.call('rbind',.) %>% `[`(,c('n','nevent','estimate','std.error','statistic'
+                                ,'p.value','r.squared','concordance'
+                                ,'std.error.concordance','AIC','BIC')) %>% 
+  mapnames(thecolnames1) %>% t %>% kable(format = 'markdown',digits=4);
 #starkable(cox.rai.train,-1,searchrep = cbind(c('V1','Dependent variable','a_rai|a_rockwood'),c('Statistic','Value','Effect (SD)')));
 #starkable(cox.rock.train,-1,searchrep = cbind(c('V1','Dependent variable','a_rai|a_rockwood'),c('Statistic','Value','Effect (SD)')));
-#' #### RAI-A
-#+ cox_raia, results='asis'
-capture.output(stargazer(cox.rai.train,type='html',omit.table.layout = 'n-!=!d'
-                         ,covariate.labels = 'Effect Size'
-                         ,omit.stat = c('wald','max.rsq')) %>% htmltab %>% 
-                 kable(col.names=c('Statistic','Value'),row.names=F) -> cox.rock.train.summary);
-cat(paste0(cox.rock.train.summary,'\n'));
-#' #### Rockwood Index
-#+ cox_rockwood, results='asis'
-capture.output(stargazer(cox.rock.train,type='html',omit.table.layout = 'n-!=!d'
-                         ,covariate.labels = 'Effect Size'
-                         ,omit.stat = c('wald','max.rsq')) %>% htmltab %>% 
-                 kable(col.names=c('Statistic','Value'),row.names=F) -> cox.rock.train.summary);
-cat(paste0(cox.rock.train.summary,'\n'));
-
-# This is the creation of an analytic variable. Therefore it should happen in run.R
-# Also, this should be done on dat1, right after a_rockwood gets created, so all
-# the other subsets can inherit it. I moved it there.
-#sbs0$all$all_emergency$a_rockwood_range <- cut(sbs0$all$all_emergency$a_rockwood, 7)
+# .junk<-capture.output(stargazer(cox.rai.train,type='html',omit.table.layout = 'n-!=!d'
+#                          ,covariate.labels = 'Effect Size'
+#                          ,omit.stat = c('wald','max.rsq')) %>% htmltab %>% 
+#                  kable(col.names=c('Statistic','Value'),row.names=F) -> cox.rai.train.summary);
+# cat(cox.rai.train.summary,sep='\n');
+# .junk<-capture.output(stargazer(cox.rai.train,type='html',omit.table.layout = 'n-!=!d'
+#                                 ,covariate.labels = 'Effect Size'
+#                                 ,omit.stat = c('wald','max.rsq')) %>% htmltab %>% 
+#                         kable(col.names=c('Statistic','Value'),row.names=F) -> cox.rock.train.summary);
+# cat(cox.rock.train.summary,sep='\n');
 #'
 #+ table_counts, results='asis'
-# Now we render the tables. You don't need all that stuff below.
 countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);
 countfrac(sbs0$all$all_emergency,groupcols = 'rai_range') %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);
 #' 
-#' ## RAI-A and Rockwood have very similar Concordances and Specificities
+#' ## RAI-A and Rockwood have equivalent concordances and AUCs
+#' 
+#' As can be seen from table 2, the concordances are `r paste0(paste(round(summary(cox.rai.train)$concordance,3),collapse=' (SE='),')')`
+#' and `r paste0(paste(round(summary(cox.rock.train)$concordance,3),collapse=' (SE='),')')` for
+#' the Cox models whose predictors are RAI-A and Rockwood, respectively. Their 
+#' Receiver-Operator Characteristic (ROC) curves can be seen in Figure 2, along 
+#' with their areas under the curve (AUCs).
+l_rocs <- with(sbs0$train,lapply(all_emergency[,c('a_rai','a_rockwood')]
+                                 ,function(xx) roc(response=all_emergency$a_c
+                                                   ,predictor=xx)));
+plot(l_rocs$a_rai,col='orange');
+lines(l_rocs$a_rockwood,col='darkgreen');
+legend('topleft',bty ='n',col=c('orange','darkgreen'),lwd=3
+       ,legend=sprintf('%s (AUC=%0.3f)',c('RAI-A','Rockwood'),sapply(l_rocs,auc)));
+#' 
+#' ## Finding optimal threshold values for RAI-A and Rockwood
+#' 
+#' In order to do a fair comparison between 
+#' 
 #' 
 #' # Discussion and Conclusions
 #' 
