@@ -18,7 +18,7 @@ options(knitr.kable.NA='');
 source('global.R');
 #' Report date: `r date()`.
 #'
-#' Revision: `r gitstamp(production=F)`.
+#' Revision: `r gitstamp(production=T)`.
 #'
 #' Data file: `r inputdata`.
 #' 
@@ -171,7 +171,7 @@ include_graphics('FormulaV2.png');
 #' strategically located in at-risk communities, and a Level I trauma center.
 #' UHS is the largest SNH in South Texas and treats a predominately Hispanic
 #' population. This is reflected in the patient counts in Table 1.
-
+#'
 #' #### Table 1. Patient Demographics
 #' 
 #+ table_demog,results='asis'
@@ -187,7 +187,11 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 #' Surgeries vary greatly by their level of invasiveness and risk. For the 
 #' results reported here we extracted only  surgeries in order to mitigate 
 #' possible selection bias due to frail patients and providers opting out of 
-#' elective surgeries. In the 2013-2017 NSQIP data there were 541 cases. These
+#' elective surgeries. Furthermore, though the at-risk sample size was smaller
+#' there were a larger proportion of observed deaths and readmissions making this
+#' a tractable dataset for initial model development.
+#' 
+#' In the 2013-2017 NSQIP data there were 541 emergency cases. These
 #' randomly assigned to one of three subsets: a training set 
 #' (N=`r length(pat_samples$train)`) and a test set (N=`r length(pat_samples$test)`). 
 #' The remaining set (N=`r length(pat_samples$train)`) is being
@@ -205,7 +209,7 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 #' 
 #' ## RAI-A and Rockwood both are reasonable predictors of 30-day mortality and readmission
 #' 
-#' #### Figure 1. Predicting post-surgical 
+#' #### Figure 1. Predicting post-surgical survival and recovery
 #+ plot_survfits
 fit_srvs <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rai))
                             , data = sbs0$all$all_emergency,subset=a_t>0)
@@ -232,6 +236,11 @@ pl_srvs_optcut <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30))
                   ,fit_srvs_optcut,names(fit_srvs),SIMPLIFY = F);
 
 multiplot(plotlist=pl_srvs,cols=1);
+#' The pink shaded areas represent 95% confidence intervals. On the x-axis day
+#' 0 represents the respective dates of surgeries for the patients, and continues
+#' out to 30 days.
+#'
+#' #### Table 2. Results of Cox survival model fits
 #'
 #+ results='asis'
 t_coxresults <- sapply(fit_coxs<-list(`RAI-A`=cox.rai.train,`Rockwood`=cox.rock.train)
@@ -241,25 +250,14 @@ t_coxresults <- sapply(fit_coxs<-list(`RAI-A`=cox.rai.train,`Rockwood`=cox.rock.
                                 ,'std.error.concordance','AIC','BIC'));
 mapnames(t_coxresults,thecolnames1) %>% t %>% kable(format = 'markdown',digits=4);
 cat('\n---\n');
-#starkable(cox.rai.train,-1,searchrep = cbind(c('V1','Dependent variable','a_rai|a_rockwood'),c('Statistic','Value','Effect (SD)')));
-#starkable(cox.rock.train,-1,searchrep = cbind(c('V1','Dependent variable','a_rai|a_rockwood'),c('Statistic','Value','Effect (SD)')));
-# .junk<-capture.output(stargazer(cox.rai.train,type='html',omit.table.layout = 'n-!=!d'
-#                          ,covariate.labels = 'Effect Size'
-#                          ,omit.stat = c('wald','max.rsq')) %>% htmltab %>% 
-#                  kable(col.names=c('Statistic','Value'),row.names=F) -> cox.rai.train.summary);
-# cat(cox.rai.train.summary,sep='\n');
-# .junk<-capture.output(stargazer(cox.rai.train,type='html',omit.table.layout = 'n-!=!d'
-#                                 ,covariate.labels = 'Effect Size'
-#                                 ,omit.stat = c('wald','max.rsq')) %>% htmltab %>% 
-#                         kable(col.names=c('Statistic','Value'),row.names=F) -> cox.rock.train.summary);
-# cat(cox.rock.train.summary,sep='\n');
-#' #### RAI-A event frequencies
+#' 
+#' #### Table 3a. Event frequencies broken down by RAI-A range.
 #' 
 #+ table_raicounts, results='asis'
 countfrac(sbs0$all$all_emergency,groupcols = 'rai_range') %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);
 
-#' #### Rockwood event frequencies
+#' #### Table 3b. Event frequencies broken down by Rockwood range
 #' 
 #+ table_rockcounts, results='asis'
 countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>% 
@@ -267,12 +265,15 @@ countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>%
 #' 
 #' ## RAI-A and Rockwood have equivalent concordances and AUCs
 #' 
-#' As can be seen from table 2, the concordances are 
+#' As can be seen from Tables 2, the concordances are 
 #' `r do.call(sprintf,c('%0.2f (SE=%0.2f)',t_coxresults['RAI-A',c('concordance','std.error.concordance')]))`
 #' and `r do.call(sprintf,c('%0.2f (SE=%0.2f)',t_coxresults['Rockwood',c('concordance','std.error.concordance')]))` for
 #' the Cox models whose predictors are RAI-A and Rockwood, respectively. Their 
 #' Receiver-Operator Characteristic (ROC) curves can be seen in Figure 2, along 
 #' with their areas under the curve (AUCs).
+#' 
+#' #### Figure 2. ROC curves for RAI-A and Rockwood
+#' 
 l_rocs <- with(sbs0$train,lapply(all_emergency[,c('a_rai','a_rockwood')]
                                  ,function(xx) roc(response=all_emergency$a_c
                                                    ,predictor=xx)));
@@ -287,13 +288,15 @@ legend('topleft',bty ='n',col=c('orange','darkgreen'),lwd=3
 #' Youden's Index [@YoudenIndexratingdiagnostic1950] to find for each of them
 #' the threshold value that maximized sensitivity and specificity.
 #' 
-#' #### Optimal threshold scores for RAI-A and Rockwood
+#' #### Table 4. Optimal threshold scores for RAI-A and Rockwood
 #+ tab_snsp, results='asis'
 lapply(l_rocs,coords,'b',ret=c('threshold','sensitivity','specificity','accuracy'
                                ,'npv','ppv','precision','recall')) %>% 
   lapply(mapnames,thecolnames1) %>% 
   lapply(function(xx) setNames(xx,capitalize(names(xx)))) %>% data.frame %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits=3);
+#' 
+#' #### Table 5a. and 5b.
 #' 
 #+ tab_errormtx, results='asis'
 lapply(l_rocs,coords,'b',ret=c('tn','fn','fp','tp')) %>% 
@@ -324,7 +327,8 @@ auc_coxs <- sapply(names(fit_coxs),function(xx) {
 t_auccox <- sapply(auc_coxs,sapply,function(xx) 
   if(length(xx)>1&&'iauc' %in% names(xx)) xx[['iauc']] else 
     if(length(xx)==1 && is.numeric(xx)) xx else NaN);
-#' #### Panel of predictive accuracy measures for RAI-A and Rockwood
+#' 
+#' #### Table 6. RAI-A and Rockwood compared on their ability to predict death or readmission in the validation sed using a panel of predictive accuracy metrics.
 #+ tab_coxauc, results='asis'
 kable(t_auccox,format='markdown',digits=3);
 #' # Discussion and Conclusions
