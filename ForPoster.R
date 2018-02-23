@@ -39,11 +39,11 @@ thecolnames1 <- c("RAI-A Score"='rai_range'
                   ,"BMI"='bmi'
                   ,"Age"='age_at_time_surg'
                   ,"Count"='bin_n'
-                  ,"Cumulative\nCount"='cumul_count'
+                  ,"Cum Count"='cumul_count'
                   ,"Died 30d"="postop_death_30_dy_proc_n"
-                  ,"Died 30d\nFrac."="postop_death_30_dy_proc_frac"
-                  ,"Readmit\n30d"="a_readm_30_dy_n"
-                  ,"Readmit\n30d Frac."="a_readm_30_dy_frac"
+                  ,"Died 30d Frac."="postop_death_30_dy_proc_frac"
+                  ,"Readmit 30d"="a_readm_30_dy_n"
+                  ,"Readmit 30d Frac."="a_readm_30_dy_frac"
                   # here are the to-replace column names for tidy/glance
                   ,"N"='n'
                   ,"Events"='nevent'
@@ -237,11 +237,13 @@ cat('\n---\n');
 #                         kable(col.names=c('Statistic','Value'),row.names=F) -> cox.rock.train.summary);
 # cat(cox.rock.train.summary,sep='\n');
 #' #### RAI-A event frequencies
+#' 
 #+ table_raicounts, results='asis'
 countfrac(sbs0$all$all_emergency,groupcols = 'rai_range') %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);
-cat('\n---\n');
+
 #' #### Rockwood event frequencies
+#' 
 #+ table_rockcounts, results='asis'
 countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);
