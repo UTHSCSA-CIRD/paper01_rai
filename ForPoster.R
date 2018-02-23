@@ -169,10 +169,16 @@ lines(l_rocs$a_rockwood,col='darkgreen');
 legend('topleft',bty ='n',col=c('orange','darkgreen'),lwd=3
        ,legend=sprintf('%s (AUC=%0.3f)',c('RAI-A','Rockwood'),sapply(l_rocs,auc)));
 #' 
-#' ## Finding optimal threshold values for RAI-A and Rockwood
+#' ## Optimal threshold values for RAI-A and Rockwood
 #' 
-#' In order to do a fair comparison between 
+#' To enable a fair comparison between the two frailty scores, we used 
+#' Youden's Index [@YoudenIndexratingdiagnostic1950] to find for each of them
+#' the threshold value that maximized sensitivity and specificity.
 #' 
+#' #### Optimal threshold scores for RAI-A and Rockwood
+#+ results='asis'
+sapply(l_rocs,coords,'b') %>% data.frame %>% mapnames(thecolnames1) %>% 
+  kable(format='markdown',digits=3);
 #' 
 #' # Discussion and Conclusions
 #' 
