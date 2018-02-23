@@ -10,11 +10,12 @@ rq_libs <- c('compiler'                                   # just-in-time compila
              ,'MatchIt','DHARMa'                          # propensity scores and glm residuals
              ,'pscl'                                      # zero-inflated poisson, sigh
              ,'survival','MASS','Hmisc','zoo','coin'      # various analysis methods
-             ,'survAUC','survivalROC'
+             ,'survAUC','survivalROC','pROC'
              ,'readr','dplyr','stringr','magrittr'        # data manipulation & piping
-             ,'ggplot2','ggfortify','grid','GGally', 'survminer'       # plotting
-             ,'gridExtra','scales'
-             ,'stargazer','broom', 'tableone','janitor', 'knitr'); # table formatting
+             ,'ggplot2','ggfortify','grid','GGally'       # plotting
+             ,'survminer','gridExtra','scales'
+             ,'stargazer','broom', 'tableone','janitor'   # table formatting
+             ,'knitr','htmltab');
 rq_installed <- sapply(rq_libs,require,character.only=T);
 rq_need <- names(rq_installed[!rq_installed]);
 if(length(rq_need)>0) install.packages(rq_need,repos='https://cran.rstudio.com/',dependencies = T);

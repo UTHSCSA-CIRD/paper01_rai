@@ -15,6 +15,23 @@ cl_bintail <- function(xx,topn=4,binto='other'){
         ),levels=c(keep,binto)));
 }
 
+#' A sketch for a possible future function that converts stargazer tables into
+#' a universal markdown pipe format
+starkable <- function(xx,firstrowisdata=T,row.names=F,taildrop=1
+                      ,hrow=2
+                      ,sgoutput=F,kboutput=T,searchrep=matrix(c('V1',''),ncol=2)
+                      ,...){
+  output <- if(!sgoutput) capture.output else identity;
+  formals(htmltab)$header=hrow;
+  output(out <- stargazer(xx,type = 'html')  %>%
+           htmltab %>% `[`(firstrowisdata,,drop=F) %>%
+           kable(format = 'markdown',row.names=row.names,...) %>%
+           head(length(.)-taildrop) %>% paste0('\n') %>%
+           submulti(searchrep = searchrep));
+  if(kboutput) cat(out,'\n');
+  invisible(out);
+}
+
 #' Take a character vector and perform multiple search-replace 
 #' operations on it.
 #' @param xx A \code{vector} of type \code{character} (required)
@@ -226,7 +243,7 @@ gitstamp <- function(production=T) {
       "\ngit message: %s\n\nYou have uncommitted changes. Please do 'git commit' and then try again."
       ,gitdiff));
     system("git push && git log --pretty=format:'%h' -n 1",intern=T);
-  } else system("git log --pretty=format:'%h' -n 1",intern=T);
+  } else return('TEST_OUTPUT_DO_NOT_USE');
 }
 
 #' This function can be called from `stat_summary()` as the

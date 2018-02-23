@@ -294,6 +294,7 @@ temp_truewords <- formals(truthy.default)$truewords;
                                 # created 'l_missing') earlier
                                 ,function(xx) sum(!xx %in% l_missing));
 dat1$a_rockwood <- (.junk_rock_numerator1+.junk_rock_numerator0)/.junk_rock_denominator;
+dat1$a_rockwood_range <- cut(dat1$a_rockwood, .09*(0:7),include.lowest = T);
 
 #+ task_rock_old
 dat1$a_rockwood_old <- with(dat1,(
