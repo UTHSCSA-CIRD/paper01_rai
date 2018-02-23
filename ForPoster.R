@@ -39,12 +39,14 @@ thecolnames1 <- c("RAI-A Score"='rai_range'
                   ,"Readmission 30d"="a_readm_30_dy_n"
                   ,"Readmission 30d Frac."="a_readm_30_dy_frac"
                   # here are the to-replace column names for tidy/glance
+                  ,"N"='n'
                   ,"Events"='nevent'
                   ,"Effect"='estimate'
                   ,"Std. Err."='std.error'
                   ,"Estimate/SE"='statistic'
                   ,"P"='p.value'
                   ,"R^2"='r.squared'
+                  ,"Concordance"='concordance'
                   ,"Concordance Std. Err."='std.error.concordance'
                   # these ones are for the ROC threshold values
                   ,"True Negative"='tn'
@@ -94,6 +96,7 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' </div>
 #' 
 #' ## Data Sources
+#' 
 #' The following data sources were used:
 #' 
 #' * University Hospital System (UHS) electronic health records (EHR)
@@ -106,8 +109,9 @@ mutate(sbs0$all$all_emergency,a_rai=factor(a_rai>median(a_rai)
                                              ,labels=c('Low','High'))) %>% 
   mapnames(thecolnames1) %>% 
   CreateTableOne(names(thecolnames1)[5:9],'RAI-A',.) %>% 
-  print(printToggle=F,noSpaces=T) %>% `[`(,-4) %>% 
+  print(printToggle=F,noSpaces=T) %>% `[`(-4) %>% 
   kable(format='markdown');
+
 #' ## Analysis
 #' 
 #' # Results
@@ -125,7 +129,7 @@ fit_srvs_optcut <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>9.5)
                  ,Rockwood=survfit(Surv(a_t,a_c) ~ I(a_rockwood>0.264245)
                                    , data = sbs0$all$all_emergency,subset=a_t>0));
 pl_srvs <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30)) + 
-                    ggtitle(paste0(bb,' as a predictor')) +
+                    ggtitle(paste0(bb,' as a predictor of  30-day outcomes')) +
                     scale_y_continuous(labels=scales::percent) +
                     scale_color_discrete(bb,labels=c('Low','High')) +
                     scale_fill_discrete(bb,labels=c('Low','High')) +
