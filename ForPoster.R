@@ -39,11 +39,11 @@ thecolnames1 <- c("RAI-A Score"='rai_range'
                   ,"BMI"='bmi'
                   ,"Age"='age_at_time_surg'
                   ,"Count"='bin_n'
-                  ,"Cumulative Count"='cumul_count'
+                  ,"Cumulative\nCount"='cumul_count'
                   ,"Died 30d"="postop_death_30_dy_proc_n"
-                  ,"Died 30d Frac."="postop_death_30_dy_proc_frac"
-                  ,"Readmission 30d"="a_readm_30_dy_n"
-                  ,"Readmission 30d Frac."="a_readm_30_dy_frac"
+                  ,"Died 30d\nFrac."="postop_death_30_dy_proc_frac"
+                  ,"Readmit\n30d"="a_readm_30_dy_n"
+                  ,"Readmit\n30d Frac."="a_readm_30_dy_frac"
                   # here are the to-replace column names for tidy/glance
                   ,"N"='n'
                   ,"Events"='nevent'
@@ -236,12 +236,14 @@ cat('\n---\n');
 #                                 ,omit.stat = c('wald','max.rsq')) %>% htmltab %>% 
 #                         kable(col.names=c('Statistic','Value'),row.names=F) -> cox.rock.train.summary);
 # cat(cox.rock.train.summary,sep='\n');
-#'
-#+ table_counts, results='asis'
-countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>% 
+#' #### RAI-A event frequencies
+#+ table_raicounts, results='asis'
+countfrac(sbs0$all$all_emergency,groupcols = 'rai_range') %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);
 cat('\n---\n');
-countfrac(sbs0$all$all_emergency,groupcols = 'rai_range') %>% 
+#' #### Rockwood event frequencies
+#+ table_rockcounts, results='asis'
+countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);
 #' 
 #' ## RAI-A and Rockwood have equivalent concordances and AUCs
@@ -285,7 +287,7 @@ lapply(l_rocs,coords,'b',ret=c('tn','fn','fp','tp')) %>%
   gsub('^[$`]{1,2}','\n\n#### ',.) %>% gsub('`','',.) %>% cat(sep='\n');
 # Now we create a data.frame containing predictors and outcomes for both the training
 # and the test data. First the outcomes and raw predictors.
-#+ tab_coxauc, results='asis'
+#+ prep_coxauc
 crossval_cox <- lapply(sbs0[c('train','test')],function(xx) {
   with(subset(xx$all_emergency,a_t>0)
        ,data.frame(resp=Surv(a_t,a_c),a_rai,a_rockwood))});
@@ -303,7 +305,8 @@ auc_coxs <- sapply(names(fit_coxs),function(xx) {
 t_auccox <- sapply(auc_coxs,sapply,function(xx) 
   if(length(xx)>1&&'iauc' %in% names(xx)) xx[['iauc']] else 
     if(length(xx)==1 && is.numeric(xx)) xx else NaN);
-
+#' #### Panel of predictive accuracy measures for RAI-A and Rockwood
+#+ tab_coxauc, results='asis'
 kable(t_auccox,format='markdown',digits=3);
 #' # Discussion and Conclusions
 #' 
