@@ -252,14 +252,17 @@ t_coxresults <- sapply(fit_coxs<-list(`RAI-A`=cox.rai.train,`Rockwood`=cox.rock.
                                 ,'p.value','r.squared','concordance'
                                 ,'std.error.concordance','AIC','BIC'));
 mapnames(t_coxresults,thecolnames1) %>% t %>% kable(format = 'markdown',digits=4);
-#'
-#' In Table 2 we can see that even on this relatively small sample size, both
-#' measures of frailty are significantly associated with risk of mortality or
-#' readmission. In both cases the 'Effect' row represents the natural logarithm
-#' of the increase in risk per unit change in the frailty score. These scores 
-#' have different so a more standardize comparison can be made of the effect 
-#' divided by its standard error 
-#'
+#' 
+#' In Table 2 we can see that even on this relatively small sample size, both 
+#' measures of frailty are significantly (RAI-A `r sprintf('p =
+#' %0.4f',t_coxresults['RAI-A','p.value'])`, Rockwood `r sprintf('p =
+#' %0.4f',t_coxresults['Rockwood','p.value'])`) associated with risk of
+#' mortality or readmission (). In both cases the 'Effect' row represents the
+#' natural logarithm of the increase in risk per unit change in the frailty
+#' score. These scores have different so a more standardize comparison can be
+#' made of the effect divided by its standard error ('Effect/SE', also known as
+#' the Wald statistic).
+#' 
 cat('\n---\n');
 #'Tables 3a and 3b show that the 
 #' fraction of patients dying as well as the fraction being readmitted within
