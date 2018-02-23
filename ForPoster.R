@@ -39,15 +39,20 @@ thecolnames1 <- c("RAI-A Score"='rai_range'
                   ,"Readmission 30d"="a_readm_30_dy_n"
                   ,"Readmission 30d Frac."="a_readm_30_dy_frac"
                   # here are the to-replace column names for tidy/glance
-                  ,"N"='n'
                   ,"Events"='nevent'
                   ,"Effect"='estimate'
                   ,"Std. Err."='std.error'
                   ,"Estimate/SE"='statistic'
                   ,"P"='p.value'
                   ,"R^2"='r.squared'
-                  ,"Concordance"='concordance'
                   ,"Concordance Std. Err."='std.error.concordance'
+                  # these ones are for the ROC threshold values
+                  ,"True Negative"='tn'
+                  ,"True Positive"='tp'
+                  ,"False Negative"='fn'
+                  ,"False Positive"='fp'
+                  ,"Negative Predictive Value"='npv'
+                  ,"Positive Predictive Value"='ppv'
 );
 
 # We set the default value of the outcomes argument for the purposes of this 
@@ -180,8 +185,12 @@ legend('topleft',bty ='n',col=c('orange','darkgreen'),lwd=3
 #' 
 #' #### Optimal threshold scores for RAI-A and Rockwood
 #+ results='asis'
-sapply(l_rocs,coords,'b') %>% data.frame %>% mapnames(thecolnames1) %>% 
-  kable(format='markdown',digits=3);
+lapply(l_rocs,coords,'b',ret=c('threshold','sensitivity','specificity','accuracy'
+                               #,'tn','tp','fn','fp'
+                               ,'npv','ppv','precision','recall')) %>% 
+  lapply(mapnames,thecolnames1) %>% 
+  lapply(function(xx) setNames(xx,capitalize(names(xx)))) %>% data.frame %>% 
+  mapnames(thecolnames1) %>% kable(format='markdown',digits=3);
 #' 
 #' # Discussion and Conclusions
 #' 
