@@ -254,21 +254,25 @@ t_coxresults <- sapply(fit_coxs<-list(`RAI-A`=cox.rai.train,`Rockwood`=cox.rock.
 mapnames(t_coxresults,thecolnames1) %>% t %>% kable(format = 'markdown',digits=4);
 #' 
 #' In Table 2 we can see that even on this relatively small sample size, both 
-#' measures of frailty are significantly (RAI-A `r sprintf('p =
-#' %0.4f',t_coxresults['RAI-A','p.value'])`, Rockwood `r sprintf('p =
-#' %0.4f',t_coxresults['Rockwood','p.value'])`) associated with risk of
-#' mortality or readmission (). In both cases the 'Effect' row represents the
-#' natural logarithm of the increase in risk per unit change in the frailty
-#' score. These scores have different so a more standardize comparison can be
-#' made of the effect divided by its standard error ('Effect/SE', also known as
-#' the Wald statistic).
+#' measures of frailty are significantly (RAI-A `r sprintf('p = 
+#' %0.4f',t_coxresults['RAI-A','p.value'])`, Rockwood `r sprintf('p = 
+#' %0.4f',t_coxresults['Rockwood','p.value'])`) associated with risk of 
+#' mortality or readmission.. In both cases the 'Effect' row represents the 
+#' natural logarithm of the increase in risk per unit change in the frailty 
+#' score. These scores have different scales but a comparison can be made by
+#' dividing them by their standard errors ('Effect/SE', also known as the Wald
+#' statistic).and these standardized values are close to each other. Their 
+#' Akaike Information Criteria and Bayes Information Criteria are also close to
+#' each other.
 #' 
-cat('\n---\n');
-#'Tables 3a and 3b show that the 
-#' fraction of patients dying as well as the fraction being readmitted within
-#' 30 days increases with increasing RAI-A and increasing rockwood. In the highest
-#' risk brackets there are too few patients reliably measure a rate.
+
 #' 
+#' Tables 3a and 3b show that the fraction of patients dying as well as the
+#' fraction being readmitted within 30 days increases with increasing RAI-A and
+#' increasing rockwood. In the highest risk brackets there are too few patients
+#' reliably measure a rate.
+#' 
+
 #' #### Table 3a. Event frequencies broken down by RAI-A range.
 #' 
 #+ table_raicounts, results='asis'
@@ -283,12 +287,16 @@ countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>%
 #' 
 #' ## RAI-A and Rockwood have equivalent concordances and AUCs
 #' 
-#' As can be seen from Tables 2, the concordances are 
-#' `r do.call(sprintf,c('%0.2f (SE=%0.2f)',t_coxresults['RAI-A',c('concordance','std.error.concordance')]))`
-#' and `r do.call(sprintf,c('%0.2f (SE=%0.2f)',t_coxresults['Rockwood',c('concordance','std.error.concordance')]))` for
-#' the Cox models whose predictors are RAI-A and Rockwood, respectively. Their 
-#' Receiver-Operator Characteristic (ROC) curves can be seen in Figure 2, along 
-#' with their areas under the curve (AUCs).
+#' As can be seen from Tables 2, the concordances are `r
+#' do.call(sprintf,c('%0.2f
+#' (SE=%0.2f)',t_coxresults['RAI-A',c('concordance','std.error.concordance')]))`
+#' and `r do.call(sprintf,c('%0.2f
+#' (SE=%0.2f)',t_coxresults['Rockwood',c('concordance','std.error.concordance')]))`
+#' for the Cox models whose predictors are RAI-A and Rockwood, respectively.
+#' Their Receiver-Operator Characteristic (ROC) curves can be seen in Figure 2,
+#' along with their areas under the curve (AUCs).
+#' 
+
 #' 
 #' #### Figure 2. ROC curves for RAI-A and Rockwood
 #' 
@@ -302,9 +310,13 @@ legend('topleft',bty ='n',col=c('orange','darkgreen'),lwd=3
 #' 
 #' ## Optimal threshold values for RAI-A and Rockwood
 #' 
-#' To enable a fair comparison between the two frailty scores, we used 
-#' Youden's Index [@YoudenIndexratingdiagnostic1950] to find for each of them
-#' the threshold value that maximized sensitivity and specificity.
+
+#' 
+#' To enable a fair comparison between the two frailty scores, we used Youden's
+#' Index [@YoudenIndexratingdiagnostic1950] to find for each of them the
+#' threshold value that maximized sensitivity and specificity.
+#' 
+
 #' 
 #' #### Table 4. Optimal threshold scores for RAI-A and Rockwood
 #+ tab_snsp, results='asis'
