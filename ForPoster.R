@@ -314,7 +314,9 @@ legend('topleft',bty ='n',col=c('orange','darkgreen'),lwd=3
 #' 
 #' To enable a fair comparison between the two frailty scores, we used Youden's
 #' Index [@YoudenIndexratingdiagnostic1950] to find for each of them the
-#' threshold value that maximized sensitivity and specificity.
+#' threshold value that maximized sensitivity and specificity.. The thresholds,
+#' sensitivities and specificities are shown in Table 4. Rockwood has a small
+#' advantage in sensitivity and RAI-A in specificity.
 #' 
 
 #' 
@@ -337,6 +339,12 @@ lapply(l_rocs,coords,'b',ret=c('tn','fn','fp','tp')) %>%
   lapply(kable,format='markdown') %>% mapnames(thecolnames1) %>% 
   setNames(.,paste0(names(.),' Error Matrix')) %>% capture.output() %>% 
   gsub('^[$`]{1,2}','\n\n#### ',.) %>% gsub('`','',.) %>% cat(sep='\n');
+
+#'
+#' These are the error-matrices corresponding to the thresholds, sensitivities
+#' specificities, and other metrics from Table 4.
+#'
+
 # Now we create a data.frame containing predictors and outcomes for both the training
 # and the test data. First the outcomes and raw predictors.
 #+ prep_coxauc
