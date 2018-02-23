@@ -22,7 +22,7 @@ source('global.R');
 source('run.R');
 #' # Abstract
 #' 
-#' # Introduction#'
+#' # Introduction
 #' 
 #' * RAI-A good for predicting surgical risk
 #' * ...but it cannot be used on live data because it's hard-coded to NSQIP
