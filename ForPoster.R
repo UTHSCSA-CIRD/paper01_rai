@@ -18,7 +18,7 @@ options(knitr.kable.NA='');
 source('global.R');
 #' Report date: `r date()`.
 #'
-#' Revision: `r gitstamp(production=T)`.
+#' Revision: `r gitstamp(production=F)`.
 #'
 #' Data file: `r inputdata`.
 #' 
@@ -62,6 +62,8 @@ thecolnames1 <- c("RAI-A Score"='rai_range'
                   ,"Negative Predictive Value"='npv'
                   ,"Positive Predictive Value"='ppv'
 );
+# this is a list of functions from survAUC that return predictive accuracy metrics
+c_auclist<-c('AUC.cd','AUC.hc','AUC.sh','AUC.uno','BeggC','GHCI','Nagelk','OXS','UnoC','XO');
 
 # We set the default value of the outcomes argument for the purposes of this 
 # script so we don't have to keep repeating it.
@@ -281,9 +283,28 @@ lapply(l_rocs,coords,'b',ret=c('tn','fn','fp','tp')) %>%
   lapply(kable,format='markdown') %>% mapnames(thecolnames1) %>% 
   setNames(.,paste0(names(.),' Error Matrix')) %>% capture.output() %>% 
   gsub('^[$`]{1,2}','\n\n#### ',.) %>% gsub('`','',.) %>% cat(sep='\n');
-# TODO
-# * survROC cross-validation
-# * change TableOne-- all, survivors, and non-survivors
+# Now we create a data.frame containing predictors and outcomes for both the training
+# and the test data. First the outcomes and raw predictors.
+#+ tab_coxauc, results='asis'
+crossval_cox <- lapply(sbs0[c('train','test')],function(xx) {
+  with(subset(xx$all_emergency,a_t>0)
+       ,data.frame(resp=Surv(a_t,a_c),a_rai,a_rockwood))});
+# now the Cox linear predictors
+for(ii in names(crossval_cox)) for(jj in names(fit_coxs)) 
+  crossval_cox[[ii]][[jj]] <- predict(fit_coxs[[jj]],newdata = crossval_cox[[ii]]);
+# run the panel of AUC tests on them
+auc_coxs <- sapply(names(fit_coxs),function(xx) {
+  with(crossval_cox
+       ,survAUC(Surv.rsp=train$resp,Surv.rsp.new = test$resp
+                ,lp=eval(train[[xx]]),lpnew = eval(test[[xx]])
+                ,times=1:30,FUNS=auclist))
+  },simplify=F);
+# Now tabulate the results;
+t_auccox <- sapply(auc_coxs,sapply,function(xx) 
+  if(length(xx)>1&&'iauc' %in% names(xx)) xx[['iauc']] else 
+    if(length(xx)==1 && is.numeric(xx)) xx else NaN);
+
+kable(t_auccox,format='markdown',digits=3);
 #' # Discussion and Conclusions
 #' 
 #' # Acknowledgments
