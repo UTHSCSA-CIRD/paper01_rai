@@ -363,6 +363,44 @@ t_auccox <- sapply(auc_coxs,sapply,function(xx)
 kable(t_auccox,format='markdown',digits=3);
 #' # Discussion and Conclusions
 #' 
+#' In the population demographic table, approximately 22% of the 541 cases
+#' resulted in death or hospital readmission within 30 days after surgery.
+#' There appears to be a significant difference between “No Event” vs “Event” 
+#' RAI-A and Rockwood scores. The RAI-A and Rockwood scores are higher in the
+#' “Event” cases compared to “No Event.” Additionally, age is higher in the
+#' “Event” population in comparison. Interestingly, it appears that the Rockwood 
+#' has a higher standard error margin compared to RAI-A. 
+#'
+#' Both the RAI-A and Rockwood survival curves depict a significant difference
+#' between the upper 50% RAI-A and Rockwood scores compared to the lower 50%.
+#' Unlike the confidence intervals (the shaded regions) of the RAI-A survival
+#' curves, the Rockwood survival curves overlap slightly. This seems to
+#' corroborate the earlier observation of a slightly larger standard error margin
+#' with the Rockwood metric compared to RAI-A. The subsequent survival curve
+#' model summary table also depicts the same story. Even on the training set,
+#' the RAI-A model performs slightly better than Rockwood, as evidenced by the
+#' standard error and AIC score.
+#'
+#' A visible trend that can be seen in the Event Frequencies tables. Generally
+#' speaking, the death and readmission incidence increases as the frailty score
+#' increases. 
+#'
+#' Finally we calculated the predictive ability of both frailty metrics. Although
+#' the AUC demonstrates that both models are comparable in detecting 30 day
+#' post-operative complications, the subsequent table reveals that the RAI-A is
+#' more specific in detecting true post-operative complication events. 
+#'
+#' Both Rockwood and the RAI-A frailty metrics are powerful frailty metrics that
+#' can be implemented using EHR data. Based on our results, it appears that the
+#' RAI-A slightly outperforms the Rockwood however due to a low event rate (~22%),
+#' more data points need to be added and therefore more validation is needed.
+#' Nevertheless, we are the first to demonstrate the predictive power both frailty
+#' metrics have in detecting post-operative complications. Based on the results
+#' from this study, RAI-A may have slightly more power in detecting real
+#' post-operative complication rates and therefore increased ability to pre-emptively
+#' identify high-need patients prior to death and a hospital readmission. In doing
+#' so will lead to optimized patient care as we strive for precision medicine.
+#' 
 #' # Acknowledgments
 #' 
 #' # References
