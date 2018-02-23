@@ -49,7 +49,7 @@ thecolnames1 <- c("RAI-A Score"='rai_range'
                   ,"Events"='nevent'
                   ,"Effect"='estimate'
                   ,"Std. Err."='std.error'
-                  ,"Estimate/SE"='statistic'
+                  ,"Effect/SE"='statistic'
                   ,"P"='p.value'
                   ,"R^2"='r.squared'
                   ,"Concordance"='concordance'
@@ -192,7 +192,7 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 #' a tractable dataset for initial model development.
 #' 
 #' In the 2013-2017 NSQIP data there were 541 emergency cases. These
-#' randomly assigned to one of three subsets: a training set 
+#' were randomly assigned to one of three subsets: a training set 
 #' (N=`r length(pat_samples$train)`) and a test set (N=`r length(pat_samples$test)`). 
 #' The remaining set (N=`r length(pat_samples$train)`) is being
 #' held out for future analysis and was not used in the work reported here.
@@ -236,10 +236,13 @@ pl_srvs_optcut <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30))
                   ,fit_srvs_optcut,names(fit_srvs),SIMPLIFY = F);
 
 multiplot(plotlist=pl_srvs,cols=1);
-#' The pink shaded areas represent 95% confidence intervals. On the x-axis day
+#' The shaded areas represent 95% confidence intervals. On the x-axis day
 #' 0 represents the respective dates of surgeries for the patients, and continues
-#' out to 30 days.
-#'
+#' out to 30 days. In each plot, the patients are grouped according to whether the
+#' corresponding frailty score is above the median (blue) or below the median 
+#' (pink). For both RAI-A and Rockwood, patients scores in the upper half for
+#' the cohor die earlier and higher rates.
+#'   
 #' #### Table 2. Results of Cox survival model fits
 #'
 #+ results='asis'
@@ -249,7 +252,19 @@ t_coxresults <- sapply(fit_coxs<-list(`RAI-A`=cox.rai.train,`Rockwood`=cox.rock.
                                 ,'p.value','r.squared','concordance'
                                 ,'std.error.concordance','AIC','BIC'));
 mapnames(t_coxresults,thecolnames1) %>% t %>% kable(format = 'markdown',digits=4);
+#'
+#' In Table 2 we can see that even on this relatively small sample size, both
+#' measures of frailty are significantly associated with risk of mortality or
+#' readmission. In both cases the 'Effect' row represents the natural logarithm
+#' of the increase in risk per unit change in the frailty score. These scores 
+#' have different so a more standardize comparison can be made of the effect 
+#' divided by its standard error 
+#'
 cat('\n---\n');
+#'Tables 3a and 3b show that the 
+#' fraction of patients dying as well as the fraction being readmitted within
+#' 30 days increases with increasing RAI-A and increasing rockwood. In the highest
+#' risk brackets there are too few patients reliably measure a rate.
 #' 
 #' #### Table 3a. Event frequencies broken down by RAI-A range.
 #' 
