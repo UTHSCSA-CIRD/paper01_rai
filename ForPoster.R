@@ -202,6 +202,15 @@ lapply(l_rocs,coords,'b',ret=c('threshold','sensitivity','specificity','accuracy
   lapply(function(xx) setNames(xx,capitalize(names(xx)))) %>% data.frame %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits=3);
 #' 
+#+ results='asis'
+lapply(l_rocs,coords,'b',ret=c('tn','fn','fp','tp')) %>% 
+  lapply(mapnames,thecolnames1) %>% 
+  lapply(function(xx) paste(names(xx),'=',xx)) %>% 
+  lapply(matrix,nrow=2,dimnames=list(c('No Events','Death/Readmission')
+                                     ,c('Low Risk','High Risk'))) %>% 
+  lapply(kable,format='markdown') %>% mapnames(thecolnames1) %>% 
+  setNames(.,paste0(names(.),' Error Matrix')) %>% capture.output() %>% 
+  gsub('^[$`]{1,2}','\n\n#### ',.) %>% gsub('`','',.) %>% cat(sep='\n');
 #' # Discussion and Conclusions
 #' 
 #' # Acknowledgments
