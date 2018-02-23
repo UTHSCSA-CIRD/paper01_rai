@@ -98,7 +98,7 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' is true that the 45 to 64 age group has a higher percentage of ambulatory
 #' surgeries compared to the 65 and above age demographic, the risk of adverse
 #' surgical outcomes is higher in the latter compared to the former 
-#' [@hall2017ambulatory]; [@polanczyk2001impact]. Furthermore, the number of
+#' [@hall2017ambulatory]; @polanczyk2001impact]. Furthermore, the number of
 #' overnight hospital stays increases with age [@lucas_nhis_2018]. Frailty is associated
 #' with increased risk of post-operative complications and does increase with
 #' age [@brahmbhatt2016gender]. Based on these findings, there seems to be
@@ -146,18 +146,14 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' for each case, we linked the census block group level data from the 2015
 #' American Community Survey Median Income table to each cases’ address. To
 #' calculate the the RAI-A frailty score for each case, we used the calculation
-#' described in Hall DE, Arya S, Schmid KK, et al. Development and Initial
-#' Validation of the Risk Analysis Index for Measuring Frailty in Surgical
-#' Populations. JAMA Surg. 2017 Feb 1;152(2):175-182. doi:
-#' 10.1001/jamasurg.2016.4202. In short, the calculation can be seen here:
+#' detailed in [@HallDevelopmentInitialValidation2017]. In short, the calculation
+#' can be seen here:
 # Using the include_graphics() command rather than HTML allows this to render 
 # properly in Word (and hopefully PDF?)
 include_graphics('RAI-Cv2.png');
-#' Additionally, the Rockwood index was calculated for each case using the
-#' following paper: Mitnitski AB, Mogilner AJ and Rockwood K. Accumulation of
-#' deficits as a proxy measure of aging. Scientific World Journal. 2001 Aug
-#' 8;1:323-36. Briefly, the Rockwood index for each patient is calculated by the
-#' following equation:
+#' Additionally, the Rockwood index was calculated for each case as previously
+#' described [@mitnitski2001accumulation]. Briefly, the Rockwood index for each
+#' patient is calculated by the following equation:
 #+ eqn_rock, out.width="20%"
 include_graphics('FormulaV2.png');
 #' 
