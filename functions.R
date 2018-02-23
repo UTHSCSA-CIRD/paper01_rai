@@ -1,3 +1,65 @@
+survAUC<-function(Surv.rsp,Surv.rsp.new,lp,lpnew,times,time,lp0=0
+                  ,nonstdSurv=c('OXS','Nagelk','XO')
+                  ,...,FUNS){
+  if(is.null(info<-getOption('survAUCinfo'))){
+    # create a lookup table for these functions if one doesn't exist
+    info<-sapply(ls(package:survAUC),get) %>% lapply(formals) %>%
+      lapply(sapply,class) %>% lapply(bind_rows) %>% bind_rows(.id='fun');
+    options(survAUCinfo=survAUCinfo);
+  }
+  if(!missing(FUNS)) info <- subset(info,fun %in% FUNS);
+  args <- list();
+  for(ii in names(match.call())[-1]) args[[ii]] <- get(ii);
+  #for(ii in names(args)) if(is.language(environment()))
+  # get the arguments that are capable of being missing
+  # screw the formargs stuff
+  #formargs <- sapply(realformals<-formals(sys.function()),is.name);
+  #for(ii in names(formargs[!formargs])) args[[ii]] <- realformals[[ii]];
+  #formargs<-setdiff(names(formargs[formargs]),c('FUNS','...'));
+  # create a value for 'time' if it's missing but there are 'times'
+  if(!'time' %in% names(args) && 'times' %in% names(args)) args$time <- max(eval(args$times));
+  # make sure lp0 is the right length (seriously people? You're going to make me
+  # do this in R of all languages?). BTW, Surv.rsp.new not an error-- for all
+  # functions requiring lp0, there is also that departure from standard names
+  # and for those three Surv.rsp.new becomes Surv.rsp
+  #browser();
+  if(missing(lp0)&&!missing(Surv.rsp.new)) args$lp0 <- rep_len(0,nrow(args$Surv.rsp.new));
+  #if(args$lp0==1 && args$lp0==0) args$lp0 <- rep_len(0,nrow(args$Surv.rsp.new));
+  # which arguments are we missing on our current invokation?
+  #missargs <- setdiff(formargs,names(args));
+  if(!'lp'%in%names(args)) browser();
+  # find the arguments that each function can accept
+  allowedargs<-setNames(apply(info[,-1],1,function(xx) names(info)[-1][!is.na(xx)])
+                        ,unlist(info[,1]));
+  # find the names of the non-optional arguments for each function
+  nonoptargs<- sapply(info$fun,function(ii) subset(info,fun==ii),simplify=F) %>% 
+    lapply(function(jj) na.omit(names(jj)[jj=='name']));
+  # based on the above, here are the functions we can run with the data we have
+  # for the ones that are FALSE we will return NAs
+  canrun <- lapply(nonoptargs,setdiff,names(args)) %>% sapply(length) == 0;
+  # and for each of the rest we will do.call along with an alist of compatible 
+  # arguments. Lets first unpack that list.
+  # for(ii in intersect(names(args),ls())) 
+  #   args[[ii]] <- if(is.language(environment()[[ii]]))
+  #     eval(args[[ii]]) else get(ii);
+  # and filter it down to just the ones that are valid arguments for functions 
+  # that can be run
+  args2use <- sapply(names(canrun)
+                     ,function(xx) if(canrun[xx])
+                       args[intersect(allowedargs[[xx]],names(args))] else NA
+                     ,simplify=F);
+  # correct the inconsistent argument names in the functions names by the 
+  # nonstdSurv variable
+  for(ii in intersect(nonstdSurv,names(canrun[canrun]))) {
+    args2use[[ii]][c('Surv.rsp','lp')] <- args[c('Surv.rsp.new','lpnew')];
+  }
+  # return output!
+  invisible(sapply(names(args2use),function(xx) if(is.na(args2use[[xx]])) NA else {
+    try(do.call(xx,args2use[[xx]]))}));
+}
+
+
+
 #' into the specified existing or new level. That level is listed last
 #' in the resulting factor.
 #' @param xx A \code{vector} (required).
