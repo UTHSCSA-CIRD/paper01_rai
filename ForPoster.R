@@ -3,9 +3,6 @@
 #' author: "Wilson, Bokov, Shireman"
 #' date: "08/15/2017"
 #' output: 
-#'   word_document:
-#'     keep_md: true
-#'     reference_docx: styletemplate0.docx
 #' bibliography: Frailty.bib
 #' ---
 #'
@@ -13,6 +10,9 @@
 # output params backup
 #   html_document:
 #     keep_md: true
+#   word_document:
+#     keep_md: true
+#     reference_docx: styletemplate.docx
 knitr::opts_chunk$set(echo=F,warning = F,cache=F,message=F);
 options(knitr.kable.NA='');
 #+ cache=FALSE
