@@ -85,37 +85,21 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #'   for predicting surgical outcomes.
 #' 
 #' Frailty is the inability to maintain homeostasis when the human body becomes
-#' challenged by a daily stressor [Torpy JM, Lymn C and Glass RM. Frailty in
-#' Older Adults. JAMA. 2006;296(18):2280. doi:10.1001/jama.296.18.2280].  Low
-#' physical activity, muscle weakness, slowed performance, fatigue and
-#' unintentional weight loss are all characteristics of frailty [Torpy JM, Lymn
-#' C and Glass RM. Frailty in Older Adults. JAMA. 2006;296(18):2280.
-#' doi:10.1001/jama.296.18.2280]. As the U.S. population ages, frailty will be a
-#' growing concern for the US. According to the U.S. Census Bureau Population
-#' Division, the U.S. population aged 65 and older is projected to increase by
-#' 45% (from 55 million to 80 million) by 2050 [U.S. Census Bureau, Population
-#' Division. 2012. “Table 12. Projections of the Population by Age and Sex for
-#' the United States: 2015 to 2060 (NP2012-T12)”]. This population group alone
-#' will make up approximately 20% of the U.S. population in 2050 [U.S. Census
-#' Bureau, Population Division. 2012. “Table 12. Projections of the Population
-#' by Age and Sex for the United States: 2015 to 2060 (NP2012-T12)”]. While it
+#' challenged by a daily stressor [@torpy2006frailty]. Low physical activity,
+#' muscle weakness, slowed performance, fatigue and unintentional weight loss
+#' are all characteristics of frailty [@torpy2006frailty]. As the U.S. population
+#' ages, frailty will be a growing concern for the US. According to the U.S. 
+#' Census Bureau Population Division, the U.S. population aged 65 and older is 
+#' projected to increase by 45% (from 55 million to 80 million) by 2050 
+#' [@bureau_2014_nodate]. This population group alone will make up approximately
+#' 20% of the U.S. population in 2050 [@bureau_2014_nodate]. While it
 #' is true that the 45 to 64 age group has a higher percentage of ambulatory
 #' surgeries compared to the 65 and above age demographic, the risk of adverse
-#' surgical outcomes is higher in the latter compared to the former [Hall MJ,
-#' Schwartzman A, Zhang J and Liu X. Ambulatory Surgery Data From Hospitals and
-#' Ambulatory Surgery Centers: United States, 2010. Natl Health Stat Report.
-#' 2017 Feb;(102):1-15;  Polanczyk CA, Marcantonio E, Goldman L, et al. Impact
-#' of age on perioperative complications and length of stay in patients
-#' undergoing noncardiac surgery. Ann Intern Med. 2001;134(8):637- 643.
-#' doi:10.7326/0003-4819-134-8-200104170-00008]. Furthermore, the number of
-#' overnight hospital stays increases with age [Lucas JW, Benson V. Tables of
-#' Summary Health Statistics for the U.S. Population: 2015 National Health
-#' Interview Survey. National Center for Health Statistics. 2017. Available
-#' from:  http://www.cdc.gov/nchs/nhis/SHS/tables.htm ]. Frailty is associated
+#' surgical outcomes is higher in the latter compared to the former 
+#' [@hall2017ambulatory]; [@polanczyk2001impact]. Furthermore, the number of
+#' overnight hospital stays increases with age [@lucas_nhis_2018]. Frailty is associated
 #' with increased risk of post-operative complications and does increase with
-#' age [Brahmbhatt R, Brewster LP, Shafii S, et al. Gender and frailty predict
-#' poor outcomes in infrainguinal vascular surgery. J Surg Res. 201(1), 156-165.
-#' DOI: 10.1016/j.jss.2015.10.026]. Based on these findings, there seems to be
+#' age [@brahmbhatt2016gender]. Based on these findings, there seems to be
 #' an overlap between the frail population and the high medical need population
 #' (i.e. individuals that repeatedly visit the hospitals for serious health
 #' concerns). Therefore, frailty could be one way to identify a subpopulation of
@@ -132,13 +116,23 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' complication experienced by the patient. Since our strength is with EHR
 #' analysis, this study chose to focus on two frailty metrics that lend
 #' themselves well to EHR data: the Risk Analysis Index (RAI) and the Rockwood &
-#' Mitnitsky Frailty Index [Hall DE, Arya S, Schmid KK, et al. Development and
-#' Initial Validation of the Risk Analysis Index for Measuring Frailty in
-#' Surgical Populations. JAMA Surg. 2017 Feb 1;152(2):175-182. doi:
-#' 10.1001/jamasurg.2016.4202;  Mitnitski AB, Mogilner AJ and Rockwood K.
-#' Accumulation of deficits as a proxy measure of aging. Scientific World
-#' Journal. 2001 Aug 8;1:323-36]. The RAI-A (RAI Administrative) frailty metric
-#' is a frailty screening tool
+#' Mitnitsky Frailty Index [@HallDevelopmentInitialValidation2017]; 
+#' [@mitnitski2001accumulation]. The RAI-A (RAI Administrative) frailty metric
+#' is a frailty screening tool that uses administrative data (like EHR) to 
+#' differentiate between frail and fit patients opting for elective surgery
+#' [@HallDevelopmentInitialValidation2017]. The RAI-A score is calculated 
+#' using 11 variables that can be extracted from the EHR, such as 
+#' medical co-morbidities, cognitive decline and activities of daily living
+#' (ADLs) [@HallDevelopmentInitialValidation2017]. This frailty metric was developed
+#' to be implemented quickly and efficiently [@HallDevelopmentInitialValidation2017].
+#' If one variable is missing, however, the RAI-A score could lead to an underestimate
+#' of a patient’s frailty assessment. The Rockwood index, on the other hand, uses
+#' 30 unique lab values (such as serum creatinine levels, serum albumin level, etc.)
+#' found in a patient’s EHR to calculate a patient’s frailty score. An advantage
+#' to the Rockwood is that it is a robust frailty metric for missing lab values. 
+#' Missing lab values will not lead to an underestimate of a patient’s frailty
+#' assessment determined by the Rockwood index [@mitnitski2001accumulation]. 
+#' Both tools can be used retrospectively using EHRs. Our hypothesis ……
 #' 
 #' 
 #' # Methods
