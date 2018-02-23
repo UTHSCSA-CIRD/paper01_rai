@@ -46,3 +46,11 @@ If you are preparing a plot, edit `DataVisualization.R` and if you are preparing
     * `ModelingAssessment.R`
     * `Modeling.R`
     * `Production.R`
+
+
+## Storage area for useful snippets
+
+* How PanDoc does Word: /usr/bin/pandoc +RTS -K512m -RTS ForPoster.utf8.md --to docx --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output ForPoster.docx --smart --highlight-style tango --reference-docx styletemplate.docx --filter /usr/bin/pandoc-citeproc 
+* How PanDoc does PDF: * PDF: /usr/bin/pandoc +RTS -K512m -RTS ForPoster.utf8.md --to latex --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output ForPoster.pdf --template /home/a/R/x86_64-pc-linux-gnu-library/3.4/rmarkdown/rmd/latex/default-1.17.0.2.tex --highlight-style tango --latex-engine pdflatex --variable graphics=yes --variable 'geometry:margin=1in' --filter /usr/bin/pandoc-citeproc 
+* How PanDoc does HTML: /usr/bin/pandoc +RTS -K512m -RTS ForPoster.utf8.md --to html --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output ForPoster.html --smart --email-obfuscation none --self-contained --standalone --section-divs --template /home/a/R/x86_64-pc-linux-gnu-library/3.4/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --variable 'theme:bootstrap' --include-in-header /tmp/Rtmp7wH6Et/rmarkdown-str4b4e79a6a7e7.html --mathjax --variable 'mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --filter /usr/bin/pandoc-citeproc 
+

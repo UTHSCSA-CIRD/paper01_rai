@@ -2,7 +2,6 @@
 #' title: "RAI Main Analysis"
 #' author: "Wilson, Bokov, Shireman"
 #' date: "08/15/2017"
-#' output: 
 #' bibliography: Frailty.bib
 #' ---
 #'
@@ -163,6 +162,7 @@ include_graphics('RAI-Cv2.png');
 #' deficits as a proxy measure of aging. Scientific World Journal. 2001 Aug
 #' 8;1:323-36. Briefly, the Rockwood index for each patient is calculated by the
 #' following equation:
+#+ eqn_rock, out.width="20%"
 include_graphics('FormulaV2.png');
 #' 
 #' ## Data Sources
