@@ -119,7 +119,7 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' analysis, this study chose to focus on two frailty metrics that lend 
 #' themselves well to EHR data: the Risk Analysis Index (RAI) and the Rockwood &
 #' Mitnitsky Frailty Index [@HallDevelopmentInitialValidation2017;
-#' @mitnitski2001accumulation]. The RAI-A (RAI Administrative) frailty metric is
+#' @MitnitskiAccumulationDeficitsProxy2001,]. The RAI-A (RAI Administrative) frailty metric is
 #' a frailty screening tool that uses administrative data (like EHR) to 
 #' differentiate between frail and fit patients opting for elective surgery 
 #' [@HallDevelopmentInitialValidation2017]. The RAI-A score is calculated using
@@ -134,7 +134,7 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' patient’s EHR to calculate a patient’s frailty score. An advantage to the
 #' Rockwood is that it is a robust frailty metric for missing lab values. 
 #' Missing lab values will not lead to an underestimate of a patient’s frailty 
-#' assessment determined by the Rockwood index [@mitnitski2001accumulation]. 
+#' assessment determined by the Rockwood index [@MitnitskiAccumulationDeficitsProxy2001,]. 
 #' Both tools can be used retrospectively using EHRs. Our hypothesis ……
 #' 
 #' 
@@ -149,7 +149,7 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' each case, we linked the census block group level data from the 2015 American
 #' Community Survey Median Income table to each cases’ address. To calculate the
 #' the RAI-A frailty score for each case, we used the calculation described in
-#' [@HallDevelopmentInitialValidation2017] and [@mitnitski2001accumulation] 
+#' [@HallDevelopmentInitialValidation2017] and [@MitnitskiAccumulationDeficitsProxy2001,] 
 #' respectively. The RAI-A was calculated as follows:
 
 # Using the include_graphics() command rather than HTML allows this to render 
@@ -169,9 +169,9 @@ include_graphics('FormulaV2.png');
 #' UHS is a nationally recognized academic medical center, network of outpatient clinics
 #' strategically located in at-risk communities, and a Level I trauma center.
 #' UHS is the largest SNH in South Texas and treats a predominately Hispanic
-#' population. Many patients are seen in UTHSCSA outpatient clinics before and
-#' after surgical procedures at UHS.
+#' population. This is reflected in the patient counts in Table 1.
 
+#' #### Table 1. Patient Demographics
 #' 
 #+ table_demog,results='asis'
 mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
@@ -181,6 +181,17 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
   CreateTableOne(names(thecolnames1)[3:9],'t_strata',.) %>% 
   print(printToggle=F,noSpaces=T) %>% `[`(,-4) %>% 
   kable(format='markdown');
+
+#' 
+#' Surgeries vary greatly by their level of invasiveness and risk. For the 
+#' results reported here we extracted only  surgeries in order to mitigate 
+#' possible selection bias due to frail patients and providers opting out of 
+#' elective surgeries. In the 2013-2017 NSQIP data there were 541 cases. These
+#' randomly assigned to one of three subsets: a training set 
+#' (N=`r length(pat_samples$train)`) and a test set (N=`r length(pat_samples$test)`). 
+#' The remaining set (N=`r length(pat_samples$train)`) is being
+#' held out for future analysis and was not used in the work reported here.
+
 
 #' ## Analysis
 #' 
