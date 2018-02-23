@@ -12,7 +12,7 @@ options(knitr.kable.NA='');
 source('global.R');
 #' Report date: `r date()`.
 #'
-#' Revision: `r gitstamp()`.
+#' Revision: `r gitstamp(production=F)`.
 #'
 #' Data file: `r inputdata`.
 #' 
@@ -109,12 +109,12 @@ pl_srvs <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30)) +
 multiplot(plotlist=pl_srvs,cols=1);
 #'
 #+ results='asis'
-sapply(fit_coxs<-list(`RAI-A`=cox.rai.train,`Rockwood`=cox.rock.train)
-       ,function(xx) cbind(tidy(xx),glance(xx)),simplify=F) %>% 
+t_coxresults <- sapply(fit_coxs<-list(`RAI-A`=cox.rai.train,`Rockwood`=cox.rock.train)
+                       ,function(xx) cbind(tidy(xx),glance(xx)),simplify=F) %>% 
   do.call('rbind',.) %>% `[`(,c('n','nevent','estimate','std.error','statistic'
                                 ,'p.value','r.squared','concordance'
-                                ,'std.error.concordance','AIC','BIC')) %>% 
-  mapnames(thecolnames1) %>% t %>% kable(format = 'markdown',digits=4);
+                                ,'std.error.concordance','AIC','BIC'));
+mapnames(t_coxresults,thecolnames1) %>% t %>% kable(format = 'markdown',digits=4);
 #starkable(cox.rai.train,-1,searchrep = cbind(c('V1','Dependent variable','a_rai|a_rockwood'),c('Statistic','Value','Effect (SD)')));
 #starkable(cox.rock.train,-1,searchrep = cbind(c('V1','Dependent variable','a_rai|a_rockwood'),c('Statistic','Value','Effect (SD)')));
 # .junk<-capture.output(stargazer(cox.rai.train,type='html',omit.table.layout = 'n-!=!d'
@@ -136,8 +136,8 @@ countfrac(sbs0$all$all_emergency,groupcols = 'rai_range') %>%
 #' 
 #' ## RAI-A and Rockwood have equivalent concordances and AUCs
 #' 
-#' As can be seen from table 2, the concordances are `r paste0(paste(round(summary(cox.rai.train)$concordance,3),collapse=' (SE='),')')`
-#' and `r paste0(paste(round(summary(cox.rock.train)$concordance,3),collapse=' (SE='),')')` for
+#' As can be seen from table 2, the concordances are `r do.call(sprintf,c('%0.2f (SE=%0.2f)',t_coxresults['RAI-A',c('concordance','std.error.concordance')]))`
+#' and `r do.call(sprintf,c('%0.2f (SE=%0.2f)',t_coxresults['Rockwood',c('concordance','std.error.concordance')]))` for
 #' the Cox models whose predictors are RAI-A and Rockwood, respectively. Their 
 #' Receiver-Operator Characteristic (ROC) curves can be seen in Figure 2, along 
 #' with their areas under the curve (AUCs).
