@@ -5,7 +5,7 @@ survAUC<-function(Surv.rsp,Surv.rsp.new,lp,lpnew,times,time,lp0=0
     # create a lookup table for these functions if one doesn't exist
     info<-sapply(ls(package:survAUC),get) %>% lapply(formals) %>%
       lapply(sapply,class) %>% lapply(bind_rows) %>% bind_rows(.id='fun');
-    options(survAUCinfo=survAUCinfo);
+    options(survAUCinfo=info);
   }
   if(!missing(FUNS)) info <- subset(info,fun %in% FUNS);
   args <- list();
