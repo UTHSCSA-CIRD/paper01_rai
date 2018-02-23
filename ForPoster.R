@@ -95,18 +95,32 @@ fit_srvs <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rai))
                             , data = sbs0$all$all_emergency,subset=a_t>0)
                 ,Rockwood=survfit(Surv(a_t,a_c) ~ I(a_rockwood>median(a_rockwood))
                             , data = sbs0$all$all_emergency,subset=a_t>0));
+# what if we cut them along their optimal thresholds?
+fit_srvs_optcut <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>9.5)
+                                 , data = sbs0$all$all_emergency,subset=a_t>0)
+                 ,Rockwood=survfit(Surv(a_t,a_c) ~ I(a_rockwood>0.264245)
+                                   , data = sbs0$all$all_emergency,subset=a_t>0));
 pl_srvs <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30)) + 
-                    ggtitle(paste0(bb,' as a predictor of  30-day outcomes')) +
+                    ggtitle(paste0(bb,' as a predictor')) +
                     scale_y_continuous(labels=scales::percent) +
                     scale_color_discrete(bb,labels=c('Low','High')) +
                     scale_fill_discrete(bb,labels=c('Low','High')) +
                     labs(x='Days Post-Surgery',y='Readmission-Free Survival')
                   ,fit_srvs,names(fit_srvs),SIMPLIFY = F);
+pl_srvs_optcut <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30)) + 
+                    ggtitle(paste0(bb,' as a predictor, OPTCUT')) +
+                    scale_y_continuous(labels=scales::percent) +
+                    scale_color_discrete(bb,labels=c('Low','High')) +
+                    scale_fill_discrete(bb,labels=c('Low','High')) +
+                    labs(x='Days Post-Surgery',y='Readmission-Free Survival')
+                  ,fit_srvs_optcut,names(fit_srvs),SIMPLIFY = F);
+
 # these are duplicates of the plots created above and rendered by multiplot() 
 # below
 #ggsurvplot(surv.rai);
 #ggsurvplot(surv.rock);
-multiplot(plotlist=pl_srvs,cols=1);
+#multiplot(plotlist=c(pl_srvs,pl_srvs_optcut),cols=2);
+multiplot(plotlist=pl_srvs,cols=2);
 #'
 #+ results='asis'
 t_coxresults <- sapply(fit_coxs<-list(`RAI-A`=cox.rai.train,`Rockwood`=cox.rock.train)
