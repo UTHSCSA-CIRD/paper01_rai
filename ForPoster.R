@@ -57,8 +57,8 @@ source('run.R');
 #' ## Data Sources
 #' 
 #' The following data sources were used:
-#' *University Hospital System (UHS) electronic health records (EHR)
-#' *2015 American Community Survey 5-year estimates Median Income (from years 2011 to 2015) 
+#' * University Hospital System (UHS) electronic health records (EHR)
+#' * 2015 American Community Survey 5-year estimates Median Income (from years 2011 to 2015) 
 #' 
 #' ## Analysis
 #' 
