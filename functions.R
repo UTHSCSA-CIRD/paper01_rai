@@ -243,7 +243,7 @@ gitstamp <- function(production=T) {
       "\ngit message: %s\n\nYou have uncommitted changes. Please do 'git commit' and then try again."
       ,gitdiff));
     system("git push && git log --pretty=format:'%h' -n 1",intern=T);
-  } else system("git log --pretty=format:'%h' -n 1",intern=T);
+  } else return('TEST_OUTPUT_DO_NOT_USE');
 }
 
 #' This function can be called from `stat_summary()` as the
