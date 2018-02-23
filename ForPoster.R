@@ -48,7 +48,7 @@ thecolnames1 <- c("RAI-A Score"='rai_range'
                   ,"N"='n'
                   ,"Events"='nevent'
                   ,"Effect"='estimate'
-                 ,"Std. Err."='std.error'
+                  ,"Std. Err."='std.error'
                   ,"Estimate/SE"='statistic'
                   ,"P"='p.value'
                   ,"R^2"='r.squared'
@@ -72,67 +72,68 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' 
 #' # Introduction
 #' 
-#' * RAI-A good for predicting surgical risk [@HallDevelopmentInitialValidation2017] 
-#' * ...but it cannot be used on live data because it's hard-coded to NSQIP 
-#' * The availability of NSQIP variables can differ between sites with different 
-#'   levels of participation and some variables may be discontinued. 
-#' * Rockwood Index can be calculated on anything, tolerates missing data, and 
-#'   therefore it can be calculated not only on manually curated registry data 
-#'   but on any other sources of laboratory values and diagnoses including 
-#'   billing records and EMR systems
-#' * Rockwood has been thoroughly vetted by geriatricians and its statistical 
-#'   assumptions have been explicitly tested. 
-#' * Rockwood could be used for automated risk-calculation to support surgical 
-#'   decisions it it could be shown that it is as good as or better than RAI-A 
-#'   for predicting surgical outcomes.
+#' * RAI-A good for predicting surgical risk
+#' [@HallDevelopmentInitialValidation2017] * ...but it cannot be used on live
+#' data because it's hard-coded to NSQIP * The availability of NSQIP variables
+#' can differ between sites with different levels of participation and some
+#' variables may be discontinued. * Rockwood Index can be calculated on
+#' anything, tolerates missing data, and therefore it can be calculated not only
+#' on manually curated registry data but on any other sources of laboratory
+#' values and diagnoses including billing records and EMR systems * Rockwood has
+#' been thoroughly vetted by geriatricians and its statistical assumptions have
+#' been explicitly tested. * Rockwood could be used for automated
+#' risk-calculation to support surgical decisions it it could be shown that it
+#' is as good as or better than RAI-A for predicting surgical outcomes.
 #' 
-#' Frailty is the inability to maintain homeostasis when the human body becomes
-#' challenged by a daily stressor [@torpy2006frailty]. Low physical activity,
-#' muscle weakness, slowed performance, fatigue and unintentional weight loss
-#' are all characteristics of frailty [@torpy2006frailty]. As the U.S. population
-#' ages, frailty will be a growing concern for the US. According to the U.S. 
-#' Census Bureau Population Division, the U.S. population aged 65 and older is 
-#' projected to increase by 45% (from 55 million to 80 million) by 2050 
+#' Frailty is the inability to maintain homeostasis when the human body becomes 
+#' challenged by a daily stressor [@torpy2006frailty]. Low physical activity, 
+#' muscle weakness, slowed performance, fatigue and unintentional weight loss 
+#' are all characteristics of frailty [@torpy2006frailty]. As the U.S.
+#' population ages, frailty will be a growing concern for the US. According to
+#' the U.S. Census Bureau Population Division, the U.S. population aged 65 and
+#' older is projected to increase by 45% (from 55 million to 80 million) by 2050
 #' [@bureau_2014_nodate]. This population group alone will make up approximately
-#' 20% of the U.S. population in 2050 [@bureau_2014_nodate]. While it
-#' is true that the 45 to 64 age group has a higher percentage of ambulatory
-#' surgeries compared to the 65 and above age demographic, the risk of adverse
-#' surgical outcomes is higher in the latter compared to the former 
-#' [@hall2017ambulatory]; [@polanczyk2001impact]. Furthermore, the number of
-#' overnight hospital stays increases with age [@lucas_nhis_2018]. Frailty is associated
-#' with increased risk of post-operative complications and does increase with
-#' age [@brahmbhatt2016gender]. Based on these findings, there seems to be
-#' an overlap between the frail population and the high medical need population
-#' (i.e. individuals that repeatedly visit the hospitals for serious health
-#' concerns). Therefore, frailty could be one way to identify a subpopulation of
-#' high-need patients prior to 30 day post-operative readmission.
+#' 20% of the U.S. population in 2050 [@bureau_2014_nodate]. While it is true
+#' that the 45 to 64 age group has a higher percentage of ambulatory surgeries
+#' compared to the 65 and above age demographic, the risk of adverse surgical
+#' outcomes is higher in the latter compared to the former 
+#' [@hall2017ambulatory]; [@polanczyk2001impact]. Furthermore, the number of 
+#' overnight hospital stays increases with age [@lucas_nhis_2018]. Frailty is
+#' associated with increased risk of post-operative complications and does
+#' increase with age [@brahmbhatt2016gender]. Based on these findings, there
+#' seems to be an overlap between the frail population and the high medical need
+#' population (i.e. individuals that repeatedly visit the hospitals for serious
+#' health concerns). Therefore, frailty could be one way to identify a
+#' subpopulation of high-need patients prior to 30 day post-operative
+#' readmission.
 #' 
-#' There are many frailty metrics that were developed to identify frail
+#' There are many frailty metrics that were developed to identify frail 
 #' patients. Generally, these metrics fall in two major categories: metrics that
-#' require a physical interaction with the patient (such as a physical
-#' assessment or completion of a questionnaire); and metrics obtained from a
-#' patient’s electronic health record (i.e. no patient contact). Inside an
-#' electronic health record (EHR) lies a wealth of billing, medical and
+#' require a physical interaction with the patient (such as a physical 
+#' assessment or completion of a questionnaire); and metrics obtained from a 
+#' patient’s electronic health record (i.e. no patient contact). Inside an 
+#' electronic health record (EHR) lies a wealth of billing, medical and 
 #' sociodemographic information that could be used to 1) classify patients based
-#' on a frailty score and 2) predict the likelihood of a post-operative
-#' complication experienced by the patient. Since our strength is with EHR
-#' analysis, this study chose to focus on two frailty metrics that lend
+#' on a frailty score and 2) predict the likelihood of a post-operative 
+#' complication experienced by the patient. Since our strength is with EHR 
+#' analysis, this study chose to focus on two frailty metrics that lend 
 #' themselves well to EHR data: the Risk Analysis Index (RAI) and the Rockwood &
-#' Mitnitsky Frailty Index [@HallDevelopmentInitialValidation2017; @mitnitski2001accumulation]. 
-#' The RAI-A (RAI Administrative) frailty metric
-#' is a frailty screening tool that uses administrative data (like EHR) to 
-#' differentiate between frail and fit patients opting for elective surgery
-#' [@HallDevelopmentInitialValidation2017]. The RAI-A score is calculated 
-#' using 11 variables that can be extracted from the EHR, such as 
-#' medical co-morbidities, cognitive decline and activities of daily living
-#' (ADLs) [@HallDevelopmentInitialValidation2017]. This frailty metric was developed
-#' to be implemented quickly and efficiently [@HallDevelopmentInitialValidation2017].
-#' If one variable is missing, however, the RAI-A score could lead to an underestimate
-#' of a patient’s frailty assessment. The Rockwood index, on the other hand, uses
-#' 30 unique lab values (such as serum creatinine levels, serum albumin level, etc.)
-#' found in a patient’s EHR to calculate a patient’s frailty score. An advantage
-#' to the Rockwood is that it is a robust frailty metric for missing lab values. 
-#' Missing lab values will not lead to an underestimate of a patient’s frailty
+#' Mitnitsky Frailty Index [@HallDevelopmentInitialValidation2017;
+#' @mitnitski2001accumulation]. The RAI-A (RAI Administrative) frailty metric is
+#' a frailty screening tool that uses administrative data (like EHR) to 
+#' differentiate between frail and fit patients opting for elective surgery 
+#' [@HallDevelopmentInitialValidation2017]. The RAI-A score is calculated using
+#' 11 variables that can be extracted from the EHR, such as medical
+#' co-morbidities, cognitive decline and activities of daily living (ADLs)
+#' [@HallDevelopmentInitialValidation2017]. This frailty metric was developed to
+#' be implemented quickly and efficiently
+#' [@HallDevelopmentInitialValidation2017]. If one variable is missing, however,
+#' the RAI-A score could lead to an underestimate of a patient’s frailty
+#' assessment. The Rockwood index, on the other hand, uses 30 unique lab values
+#' (such as serum creatinine levels, serum albumin level, etc.) found in a
+#' patient’s EHR to calculate a patient’s frailty score. An advantage to the
+#' Rockwood is that it is a robust frailty metric for missing lab values. 
+#' Missing lab values will not lead to an underestimate of a patient’s frailty 
 #' assessment determined by the Rockwood index [@mitnitski2001accumulation]. 
 #' Both tools can be used retrospectively using EHRs. Our hypothesis ……
 #' 
@@ -141,34 +142,37 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' 
 #' A total of 6408 University Hospital System (UHS) cases were used in this 
 #' study. These cases occurred between April 2013 to February 2017. A total of 
-#' 140 annotated and highly curated variables were extracted from each EHR, 
-#' among them was address. In order to determine a median income approximation
-#' for each case, we linked the census block group level data from the 2015
-#' American Community Survey Median Income table to each cases’ address. To
-#' calculate the the RAI-A frailty score for each case, we used the calculation
-#' described in Hall DE, Arya S, Schmid KK, et al. Development and Initial
-#' Validation of the Risk Analysis Index for Measuring Frailty in Surgical
-#' Populations. JAMA Surg. 2017 Feb 1;152(2):175-182. doi:
-#' 10.1001/jamasurg.2016.4202. In short, the calculation can be seen here:
+#' 140 variables were extracted from the local copy of the data reported to
+#' NSQIP, and supplemented with address data (for purposes of linking
+#' socioeconomic variables) from the UHS and UTMedicine electronic medical
+#' record (EMR) systems. In order to determine a median income approximation for
+#' each case, we linked the census block group level data from the 2015 American
+#' Community Survey Median Income table to each cases’ address. To calculate the
+#' the RAI-A frailty score for each case, we used the calculation described in
+#' [@HallDevelopmentInitialValidation2017] and [@mitnitski2001accumulation] 
+#' respectively. The RAI-A was calculated as follows:
+
 # Using the include_graphics() command rather than HTML allows this to render 
 # properly in Word (and hopefully PDF?)
 include_graphics('RAI-Cv2.png');
-#' Additionally, the Rockwood index was calculated for each case using the
-#' following paper: Mitnitski AB, Mogilner AJ and Rockwood K. Accumulation of
-#' deficits as a proxy measure of aging. Scientific World Journal. 2001 Aug
-#' 8;1:323-36. Briefly, the Rockwood index for each patient is calculated by the
-#' following equation:
+
+#' Additionally, the Rockwood index was calculated as follows:
 #+ eqn_rock, out.width="20%"
 include_graphics('FormulaV2.png');
 #' 
-#' ## Data Sources
-#' 
-#' The following data sources were used:
-#' 
-#' * University Hospital System (UHS) electronic health records (EHR)
-#' * 2015 American Community Survey 5-year estimates Median Income (from years 2011 to 2015) 
-#' 
 #' ## Patient Demographics
+#' 
+
+#' The UTHSCSA data warehouse contains EHR and billing data from our faculty
+#' practice plan and from University Hospital System (UHS) linked into one
+#' coherent dataset in an i2b2 data warehouse [MurphyInstrumentinghealthcare2009]. 
+#' UHS is a nationally recognized academic medical center, network of outpatient clinics
+#' strategically located in at-risk communities, and a Level I trauma center.
+#' UHS is the largest SNH in South Texas and treats a predominately Hispanic
+#' population. Many patients are seen in UTHSCSA outpatient clinics before and
+#' after surgical procedures at UHS.
+
+#' 
 #+ table_demog,results='asis'
 mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
                                              ,levels = c('FALSE','TRUE')
