@@ -297,7 +297,7 @@ auc_coxs <- sapply(names(fit_coxs),function(xx) {
   with(crossval_cox
        ,survAUC(Surv.rsp=train$resp,Surv.rsp.new = test$resp
                 ,lp=eval(train[[xx]]),lpnew = eval(test[[xx]])
-                ,times=1:30,FUNS=auclist))
+                ,times=1:30,FUNS=c_auclist))
   },simplify=F);
 # Now tabulate the results;
 t_auccox <- sapply(auc_coxs,sapply,function(xx) 
