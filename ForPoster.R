@@ -80,6 +80,9 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' # Methods
 #' 
 #' ## Data Sources
+#' The following data sources were used:
+#' *University Hospital System (UHS) electronic health records (EHR)
+#' *2015 American Community Survey 5-year estimates Median Income (from years 2011 to 2015) 
 #' 
 #' ## Patient Demographics
 #+ table_demog,results='asis'
