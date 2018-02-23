@@ -18,7 +18,7 @@ options(knitr.kable.NA='');
 source('global.R');
 #' Report date: `r date()`.
 #'
-#' Revision: `r gitstamp(production=F)`.
+#' Revision: `r gitstamp(production=T)`.
 #'
 #' Data file: `r inputdata`.
 #' 
