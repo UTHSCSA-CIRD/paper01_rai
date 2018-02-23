@@ -77,7 +77,7 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' 
 #' ## Patient Demographics
 #+ table_demog,results='asis'
-mutate(sbs0$all$all_emergency,`RAI-A`=factor(a_rai>median(a_rai)
+mutate(sbs0$all$all_emergency,a_rai=factor(a_rai>median(a_rai)
                                              ,levels = c('FALSE','TRUE')
                                              ,labels=c('Low','High'))) %>% 
   mapnames(thecolnames1) %>% 
