@@ -109,7 +109,7 @@ mutate(sbs0$all$all_emergency,a_rai=factor(a_rai>median(a_rai)
                                              ,labels=c('Low','High'))) %>% 
   mapnames(thecolnames1) %>% 
   CreateTableOne(names(thecolnames1)[5:9],'RAI-A',.) %>% 
-  print(printToggle=F,noSpaces=T) %>% `[`(,-4) %>% 
+  print(printToggle=F,noSpaces=T) %>% `[`(-4) %>% 
   kable(format='markdown');
 
 #' ## Analysis
