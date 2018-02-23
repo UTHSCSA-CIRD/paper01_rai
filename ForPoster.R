@@ -195,14 +195,17 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 
 #' ## Analysis
 #' 
-#' For the remaining patients we fit Cox proportional hazard models with RAI-A 
-#' and the Rockwood index as predictors.
+#' For the `r length(pat_samples$train)` surgery cases in the training set we fit
+#' Cox proportional hazard models using RAI-A  and the Rockwood index as
+#' predictors. The outcome being measured was time until readmission or all-cause
+#' after surgery, with a 30-day followup. 
 
 #' 
 #' # Results
 #' 
 #' ## RAI-A and Rockwood both are reasonable predictors of 30-day mortality and readmission
 #' 
+#' #### Figure 1. Predicting post-surgical 
 #+ plot_survfits
 fit_srvs <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rai))
                             , data = sbs0$all$all_emergency,subset=a_t>0)
@@ -228,11 +231,6 @@ pl_srvs_optcut <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30))
                     labs(x='Days Post-Surgery',y='Readmission-Free Survival')
                   ,fit_srvs_optcut,names(fit_srvs),SIMPLIFY = F);
 
-# these are duplicates of the plots created above and rendered by multiplot() 
-# below
-#ggsurvplot(surv.rai);
-#ggsurvplot(surv.rock);
-#multiplot(plotlist=c(pl_srvs,pl_srvs_optcut),cols=2);
 multiplot(plotlist=pl_srvs,cols=1);
 #'
 #+ results='asis'
