@@ -193,8 +193,11 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 #' 
 #' In the 2013-2017 NSQIP data there were 541 emergency cases. These
 #' were randomly assigned to one of three subsets: a training set 
-#' (N=`r length(pat_samples$train)`) and a test set (N=`r length(pat_samples$test)`). 
-#' The remaining set (N=`r length(pat_samples$train)`) is being
+#' (N=`r sum(sbs0$all$all_emergency$idn_mrn %in% pat_samples$train)`) and a 
+#' validation set 
+#' (N=`r sum(sbs0$all$all_emergency$idn_mrn %in% pat_samples$test)`). 
+#' The remaining test set 
+#' (N=`r sum(sbs0$all$all_emergency$idn_mrn %in% pat_samples$val)`) is being
 #' held out for future analysis and was not used in the work reported here.
 
 #' ## Analysis
