@@ -292,7 +292,11 @@ countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>%
 #' (SE=%0.2f)',t_coxresults['RAI-A',c('concordance','std.error.concordance')]))`
 #' and `r do.call(sprintf,c('%0.2f
 #' (SE=%0.2f)',t_coxresults['Rockwood',c('concordance','std.error.concordance')]))`
-#' for the Cox models whose predictors are RAI-A and Rockwood, respectively.
+#' for the Cox models whose predictors are RAI-A and Rockwood, respectively. Both
+#' concordances pass the traditional threshold because the lower bounds of both
+#' their 95%$ confidence intervals are greater than 0.5
+#' 
+#' 
 #' Their Receiver-Operator Characteristic (ROC) curves can be seen in Figure 2,
 #' along with their areas under the curve (AUCs).
 #' 
@@ -314,7 +318,9 @@ legend('topleft',bty ='n',col=c('orange','darkgreen'),lwd=3
 #' 
 #' To enable a fair comparison between the two frailty scores, we used Youden's
 #' Index [@YoudenIndexratingdiagnostic1950] to find for each of them the
-#' threshold value that maximized sensitivity and specificity.
+#' threshold value that maximized sensitivity and specificity.. The thresholds,
+#' sensitivities and specificities are shown in Table 4. Rockwood has a small
+#' advantage in sensitivity and RAI-A in specificity.
 #' 
 
 #' 
@@ -337,6 +343,12 @@ lapply(l_rocs,coords,'b',ret=c('tn','fn','fp','tp')) %>%
   lapply(kable,format='markdown') %>% mapnames(thecolnames1) %>% 
   setNames(.,paste0(names(.),' Error Matrix')) %>% capture.output() %>% 
   gsub('^[$`]{1,2}','\n\n#### ',.) %>% gsub('`','',.) %>% cat(sep='\n');
+
+#'
+#' These are the error-matrices corresponding to the thresholds, sensitivities
+#' specificities, and other metrics from Table 4.
+#'
+
 # Now we create a data.frame containing predictors and outcomes for both the training
 # and the test data. First the outcomes and raw predictors.
 #+ prep_coxauc
@@ -358,9 +370,19 @@ t_auccox <- sapply(auc_coxs,sapply,function(xx)
   if(length(xx)>1&&'iauc' %in% names(xx)) xx[['iauc']] else 
     if(length(xx)==1 && is.numeric(xx)) xx else NaN);
 #' 
-#' #### Table 6. RAI-A and Rockwood compared on their ability to predict death or readmission in the validation sed using a panel of predictive accuracy metrics.
+#' #### Table 6. RAI-A and Rockwood compared on their ability to predict death or readmission in the out-of-sample validation set using a panel of predictive accuracy metrics.
 #+ tab_coxauc, results='asis'
 kable(t_auccox,format='markdown',digits=3);
+
+#' 
+#' Survival analysis models, such as Cox, incorporate information not only about
+#' whether or not a death or readmission has occurred but also when it occurred.
+#' So AUC calculation is more complex than for logistic models and several
+#' alternative methods exist. In Table 6 is a panel with results from seven
+#' AUC/C-statistic estimators (Chambless and Diao, Song and Zhou, Hung and
+#' Chiang, Uno, Begg, and Gonen and Heller) and three statiscial measures
+#' similar toR^2 (OXS,Nagel-k, and XO).
+
 #' # Discussion and Conclusions
 #' 
 #' In the population demographic table, approximately 22% of the 541 cases
