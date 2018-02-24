@@ -287,8 +287,8 @@ countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>%
 #' 
 #' ## RAI-A and Rockwood have equivalent concordances and AUCs
 #' 
-#' As can be seen from Tables 2, the concordances are `r
-#' do.call(sprintf,c('%0.2f
+#' As can be seen from Tables 2, the concordances are 
+#' `r do.call(sprintf,c('%0.2f
 #' (SE=%0.2f)',t_coxresults['RAI-A',c('concordance','std.error.concordance')]))`
 #' and `r do.call(sprintf,c('%0.2f
 #' (SE=%0.2f)',t_coxresults['Rockwood',c('concordance','std.error.concordance')]))`
@@ -381,8 +381,9 @@ kable(t_auccox,format='markdown',digits=3);
 #' alternative methods exist. In Table 6 is a panel with results from seven
 #' AUC/C-statistic estimators (Chambless and Diao, Song and Zhou, Hung and
 #' Chiang, Uno, Begg, and Gonen and Heller) and three statiscial measures
-#' similar toR^2 (OXS,Nagel-k, and XO).
+#' similar to R^2 (OXS,Nagel-k, and XO).
 
+#'
 #' # Discussion and Conclusions
 #' 
 #' In the population demographic table, approximately 22% of the 541 cases
