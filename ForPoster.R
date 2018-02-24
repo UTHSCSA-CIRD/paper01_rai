@@ -203,7 +203,8 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 #' 
 #' ## Analysis
 #' 
-#' For the `r length(pat_samples$train)` surgery cases in the training set we fit
+#' For the `r sum(sbs0$all$all_emergency$idn_mrn %in% pat_samples$train)` 
+#' surgery cases in the training set we fit
 #' Cox proportional hazard models using RAI-A  and the Rockwood index as
 #' predictors. The outcome being measured was time until readmission or all-cause
 #' after surgery, with a 30-day followup. 
