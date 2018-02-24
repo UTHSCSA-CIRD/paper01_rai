@@ -1,7 +1,7 @@
 #' ---
-#' title: "RAI Main Analysis"
-#' author: "Wilson, Bokov, Shireman"
-#' date: "08/15/2017"
+#' title: "Side by Side Comparison of Rockwood Index and Risk Assessment Index as Predictors of Surgical Complications at a Texas Safety Net Hospital Serving a Large Hispanic Population"
+#' author: "Alex F. Bokov, PhD, MS, Desiree S. Wilson, PhD, Sara E. Espinoza, MD, Paula K. Shireman, MD"
+#' date: "02/23/2018"
 #' bibliography: Frailty.bib
 #' ---
 #'
