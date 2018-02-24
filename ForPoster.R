@@ -200,6 +200,7 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 #' (N=`r sum(sbs0$all$all_emergency$idn_mrn %in% pat_samples$val)`) is being
 #' held out for future analysis and was not used in the work reported here.
 
+#' 
 #' ## Analysis
 #' 
 #' For the `r length(pat_samples$train)` surgery cases in the training set we fit
