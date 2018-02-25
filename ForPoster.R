@@ -161,20 +161,8 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' strategically located in at-risk communities, and a Level I trauma center.
 #' UHS is the largest safety net hospital in South Texas and treats a predominately Hispanic
 #' population. 
-#'
-#' #### Table 1. Patient Demographics
 #' 
-#+ table_demog,results='asis'
-mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
-                                             ,levels = c('FALSE','TRUE')
-                                             ,labels=c('No Event','Death/Readmission'))) %>% 
-  mapnames(thecolnames1) %>% 
-  CreateTableOne(names(thecolnames1)[3:9],'t_strata',.) %>% 
-  print(printToggle=F,noSpaces=T) %>% `[`(,-4) %>% 
-  kable(format='markdown');
-
-#' 
-#' Surgeries vary greatly by their level of invasiveness and risk. For the 
+#' Surgeries vary greatly by their level of invasiveness, risk, and urgency. For the 
 #' results reported here we extracted only  surgeries in order to mitigate 
 #' possible selection bias due to frail patients and providers opting out of 
 #' elective surgeries. Furthermore, though the at-risk sample size was smaller
@@ -189,6 +177,19 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 #' The remaining test set 
 #' (N=`r sum(sbs0$all$all_emergency$idn_mrn %in% pat_samples$val)`) is being
 #' held out for future analysis and was not used in the work reported here.
+#' 
+#'
+#' #### Table 1. Patient Demographics
+#' 
+#+ table_demog,results='asis'
+mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
+                                             ,levels = c('FALSE','TRUE')
+                                             ,labels=c('No Event','Death/Readmission'))) %>% 
+  mapnames(thecolnames1) %>% 
+  CreateTableOne(names(thecolnames1)[3:9],'t_strata',.) %>% 
+  print(printToggle=F,noSpaces=T) %>% `[`(,-4) %>% 
+  kable(format='markdown');
+
 
 #' 
 #' ## Analysis
