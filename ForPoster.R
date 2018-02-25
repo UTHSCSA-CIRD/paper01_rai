@@ -115,41 +115,19 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' 
 #' RAI-A uses 11 variables extracted from the administrative data, such as 
 #' medical co-morbidities, cognitive decline and activities of daily living 
-#' (ADLs) (D. E. Hall et al. 2017). If one variable is missing, however, the
-#' RAI-A could lead to an underestimate of a patient’s frailty.
+#' (ADLs) (D. E. Hall et al. 2017). If one variable is missing, however, the 
+#' RAI-A could lead to an underestimate of a patient’s frailty. On the other 
+#' hand the Rockwood Index does not depend on one specific set of variables-- 
+#' the only stipulation is that the data elements represent many different
+#' physiological systems..The Rockwood Index is the number of data elements (e.g.
+#' diagnosis codes or out-of-reference lab-values) indicating deficiencies 
+#' divided by the total number of data elements available for a given 
+#' patient. For this reason the Rockwood index is robust against missing data 
+#' and different variables being available from different data sources. We 
+#' wanted to validate RAI-A against the Rockwood index because it is more 
+#' broadly used in the medical field and in order to determine the leve of 
+#' agreement between these two frameworks for frailty assessment.
 #' 
-#' `r c(v(c_rock_tf),v(c_refval)) %>% length`
-#' 
-#' metrics that require a physical interaction with the patient (such as a 
-#' physical assessment or completion of a questionnaire); and metrics obtained 
-#' from a patient’s electronic health record (i.e. no patient contact). Inside 
-#' an electronic health record (EHR) lies a wealth of billing, medical and 
-#' sociodemographic information that could be used to 1) classify patients based
-#' on a frailty score and 2) predict the likelihood of a post-operative 
-#' complication experienced by the patient. Since our strength is with EHR 
-#' analysis, this study chose to focus on two frailty metrics that lend 
-#' themselves well to EHR data: the Risk Analysis Index (RAI) and the Rockwood &
-#' Mitnitsky Frailty Index [@HallDevelopmentInitialValidation2017; 
-#' [@MitnitskiAccumulationDeficitsProxy2001]. The RAI-A (RAI Administrative) 
-#' frailty metric is a frailty screening tool that uses administrative data 
-#' (like EHR) to differentiate between frail and fit patients opting for 
-#' elective surgery [@HallDevelopmentInitialValidation2017]. The RAI-A score is 
-#' calculated using 11 variables that can be extracted from the EHR, such as 
-#' medical co-morbidities, cognitive decline and activities of daily living 
-#' (ADLs) [@HallDevelopmentInitialValidation2017]. This frailty metric was 
-#' developed to be implemented quickly and efficiently 
-#' [@HallDevelopmentInitialValidation2017]. If one variable is missing, however,
-#' the RAI-A score could lead to an underestimate of a patient’s frailty 
-#' assessment. The Rockwood index, on the other hand, uses 30 unique lab values 
-#' (such as serum creatinine levels, serum albumin level, etc.) found in a 
-#' patient’s EHR to calculate a patient’s frailty score. An advantage to the 
-#' Rockwood is that it is a robust frailty metric for missing lab values. 
-#' Missing lab values will not lead to an underestimate of a patient’s frailty 
-#' assessment determined by the Rockwood index 
-#' [@MitnitskiAccumulationDeficitsProxy2001,]. Both tools can be used 
-#' retrospectively using EHRs.…
-#' 
-
 #' 
 #' # Methods
 #' 
