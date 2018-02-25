@@ -3,6 +3,7 @@
 #' author: "Alex F. Bokov, PhD, MS, Desiree S. Wilson, PhD, Sara E. Espinoza, MD, Paula K. Shireman, MD"
 #' date: "02/23/2018"
 #' bibliography: Frailty.bib
+#' csl: ieee.csl
 #' ---
 #'
 #+ echo=FALSE, message=FALSE
@@ -18,7 +19,7 @@ options(knitr.kable.NA='');
 source('global.R');
 #' Report date: `r date()`.
 #'
-#' Revision: `r gitstamp(production=T)`.
+#' Revision: `r gitstamp(production=F)`.
 #'
 #' Data file: `r inputdata`.
 #' 
@@ -87,18 +88,16 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #'   for predicting surgical outcomes.
 #' 
 #' Frailty is the inability to maintain homeostasis when the human body becomes 
-#' challenged by a daily stressor [@torpy2006frailty]. Low physical activity, 
+#' challenged by a daily stressor. Low physical activity, 
 #' muscle weakness, slowed performance, fatigue and unintentional weight loss 
-#' are all characteristics of frailty [@torpy2006frailty]. As the U.S.
-#' population ages, frailty will be a growing concern for the US. According to
-#' the U.S. Census Bureau Population Division, the U.S. population aged 65 and
-#' older is projected to increase by 45% (from 55 million to 80 million) by 2050
-#' [@bureau_2014_nodate]. This population group alone will make up approximately
-#' 20% of the U.S. population in 2050 [@bureau_2014_nodate]. While it is true
+#' are all characteristics of frailty [@torpy2006frailty]. With the 65 and
+#' older population increasing 45% (from 55 million to 80 million, approximately
+#' 20% of the total population) by 2050 in the US [@bureau_2014_nodate] frailty 
+#' will become even more important.
 #' that the 45 to 64 age group has a higher percentage of ambulatory surgeries
 #' compared to the 65 and above age demographic, the risk of adverse surgical
 #' outcomes is higher in the latter compared to the former 
-#' [@hall2017ambulatory]; @polanczyk2001impact]. Furthermore, the number of
+#' [@hall2017ambulatory; @polanczyk2001impact]. Furthermore, the number of
 #' overnight hospital stays increases with age [@lucas_nhis_2018]. Frailty is
 #' associated with increased risk of post-operative complications and does
 #' increase with age [@brahmbhatt2016gender]. Based on these findings, there
@@ -166,7 +165,7 @@ include_graphics('FormulaV2.png');
 
 #' The UTHSCSA data warehouse contains EHR and billing data from our faculty
 #' practice plan and from University Hospital System (UHS) linked into one
-#' coherent dataset in an i2b2 data warehouse [MurphyInstrumentinghealthcare2009]. 
+#' coherent dataset in an i2b2 data warehouse [@MurphyInstrumentinghealthcare2009]. 
 #' UHS is a nationally recognized academic medical center, network of outpatient clinics
 #' strategically located in at-risk communities, and a Level I trauma center.
 #' UHS is the largest SNH in South Texas and treats a predominately Hispanic
