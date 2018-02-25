@@ -131,25 +131,25 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #' 
 #' # Methods
 #' 
-#' A total of 6408 University Hospital System (UHS) cases were used in this 
-#' study. These cases occurred between April 2013 to February 2017. A total of 
-#' 140 variables were extracted from the local copy of the data reported to
-#' NSQIP, and supplemented with address data (for purposes of linking
-#' socioeconomic variables) from the UHS and UTMedicine electronic medical
-#' record (EMR) systems. In order to determine a median income approximation for
-#' each case, we linked the census block group level data from the 2015 American
-#' Community Survey Median Income table to each cases’ address. To calculate the
-#' the RAI-A frailty score for each case, we used the calculation described in
-#' [@HallDevelopmentInitialValidation2017] and [@MitnitskiAccumulationDeficitsProxy2001,] 
-#' respectively. The RAI-A was calculated as follows:
+# A total of 6408 University Hospital System (UHS) cases were used in this 
+# study. These cases occurred between April 2013 to February 2017. A total of 
+# 140 variables were extracted from the local copy of the data reported to
+# NSQIP, and supplemented with address data (for purposes of linking
+# socioeconomic variables) from the UHS and UTMedicine electronic medical
+# record (EMR) systems. In order to determine a median income approximation for
+# each case, we linked the census block group level data from the 2015 American
+# Community Survey Median Income table to each cases’ address. To calculate the
+# the RAI-A frailty score for each case, we used the calculation described in
+# [@HallDevelopmentInitialValidation2017] and [@MitnitskiAccumulationDeficitsProxy2001,] 
+# respectively. The RAI-A was calculated as follows:
 
 # Using the include_graphics() command rather than HTML allows this to render 
 # properly in Word (and hopefully PDF?)
-include_graphics('RAI-Cv2.png');
+#include_graphics('RAI-Cv2.png');
 
 #' Additionally, the Rockwood index was calculated as follows:
-#+ eqn_rock, out.width="20%"
-include_graphics('FormulaV2.png');
+# eqn_rock, out.width="20%"
+#include_graphics('FormulaV2.png');
 #' 
 #' ## Patient Demographics
 #' 
@@ -159,8 +159,8 @@ include_graphics('FormulaV2.png');
 #' coherent dataset in an i2b2 data warehouse [@MurphyInstrumentinghealthcare2009]. 
 #' UHS is a nationally recognized academic medical center, network of outpatient clinics
 #' strategically located in at-risk communities, and a Level I trauma center.
-#' UHS is the largest SNH in South Texas and treats a predominately Hispanic
-#' population. This is reflected in the patient counts in Table 1.
+#' UHS is the largest safety net hospital in South Texas and treats a predominately Hispanic
+#' population. 
 #'
 #' #### Table 1. Patient Demographics
 #' 
