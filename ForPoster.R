@@ -87,56 +87,69 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #'   decisions it it could be shown that it is as good as or better than RAI-A 
 #'   for predicting surgical outcomes.
 #' 
-#' Frailty is the inability to maintain homeostasis when the human body becomes 
-#' challenged by a daily stressor. Low physical activity, 
-#' muscle weakness, slowed performance, fatigue and unintentional weight loss 
-#' are all characteristics of frailty [@torpy2006frailty]. With the 65 and
-#' older population increasing 45% (from 55 million to 80 million, approximately
-#' 20% of the total population) by 2050 in the US [@bureau_2014_nodate] frailty 
-#' will become even more important.
-#' that the 45 to 64 age group has a higher percentage of ambulatory surgeries
-#' compared to the 65 and above age demographic, the risk of adverse surgical
-#' outcomes is higher in the latter compared to the former 
-#' [@hall2017ambulatory; @polanczyk2001impact]. Furthermore, the number of
-#' overnight hospital stays increases with age [@lucas_nhis_2018]. Frailty is
-#' associated with increased risk of post-operative complications and does
-#' increase with age [@brahmbhatt2016gender]. Based on these findings, there
-#' seems to be an overlap between the frail population and the high medical need
-#' population (i.e. individuals that repeatedly visit the hospitals for serious
-#' health concerns). Therefore, frailty could be one way to identify a
-#' subpopulation of high-need patients prior to 30 day post-operative
-#' readmission.
+
 #' 
-#' There are many frailty metrics that were developed to identify frail 
-#' patients. Generally, these metrics fall in two major categories: metrics that
-#' require a physical interaction with the patient (such as a physical 
-#' assessment or completion of a questionnaire); and metrics obtained from a 
-#' patient’s electronic health record (i.e. no patient contact). Inside an 
-#' electronic health record (EHR) lies a wealth of billing, medical and 
+#' Frailty is the inability to maintain homeostasis when the human body becomes 
+#' challenged by a daily stressor. Low physical activity, muscle weakness, 
+#' slowed performance, fatigue and unintentional weight loss are all 
+#' characteristics of frailty [@torpy2006frailty]. With the 65 and older 
+#' population increasing 45% (from 55 million to 80 million, approximately 20% 
+#' of the total population) by 2050 in the US [@bureau_2014_nodate] frailty will
+#' become even more important. Frailty is associated with increased risk of 
+#' post-operative complications and while frailty increases with age, age alone 
+#' does not predict frailty [@brahmbhatt2016gender]. Screening for frailty and 
+#' designing care pathways more suitable for frail patients could lead to better
+#' outcomes in this vulnerable patient population.
+#' 
+#' 
+#' Multiple frailty metrics have been developed and fall in two major 
+#' categories: 1) functional phenotype by Fried [@FriedFrailtyOlderAdults2001] 
+#' with a focus on physical function assessment and 2) the deficit accumulation 
+#' model developed by Rockwood [@MitnitskiAccumulationDeficitsProxy2001] which 
+#' can use retrospective data including electronic health records (EHR). Our 
+#' study compares the Rockwood Index with the Risk Analysis Index (RAI). The 
+#' RAI-A (administrative RAI) can be ascertained retrospectively while the RAI-C
+#' (clinical RAI) can be collected prospectively in clinics with brief 
+#' questionnaires that are minimally disruptive to patient flow 
+#' [@HallDevelopmentInitialValidation2017].
+#' 
+#' RAI-A uses 11 variables extracted from the administrative data, such as 
+#' medical co-morbidities, cognitive decline and activities of daily living 
+#' (ADLs) (D. E. Hall et al. 2017). If one variable is missing, however, the
+#' RAI-A could lead to an underestimate of a patient’s frailty.
+#' 
+#' `r c(v(c_rock_tf),v(c_refval)) %>% length`
+#' 
+#' metrics that require a physical interaction with the patient (such as a 
+#' physical assessment or completion of a questionnaire); and metrics obtained 
+#' from a patient’s electronic health record (i.e. no patient contact). Inside 
+#' an electronic health record (EHR) lies a wealth of billing, medical and 
 #' sociodemographic information that could be used to 1) classify patients based
 #' on a frailty score and 2) predict the likelihood of a post-operative 
 #' complication experienced by the patient. Since our strength is with EHR 
 #' analysis, this study chose to focus on two frailty metrics that lend 
 #' themselves well to EHR data: the Risk Analysis Index (RAI) and the Rockwood &
-#' Mitnitsky Frailty Index [@HallDevelopmentInitialValidation2017;
-#' @MitnitskiAccumulationDeficitsProxy2001,]. The RAI-A (RAI Administrative) frailty metric is
-#' a frailty screening tool that uses administrative data (like EHR) to 
-#' differentiate between frail and fit patients opting for elective surgery 
-#' [@HallDevelopmentInitialValidation2017]. The RAI-A score is calculated using
-#' 11 variables that can be extracted from the EHR, such as medical
-#' co-morbidities, cognitive decline and activities of daily living (ADLs)
-#' [@HallDevelopmentInitialValidation2017]. This frailty metric was developed to
-#' be implemented quickly and efficiently
+#' Mitnitsky Frailty Index [@HallDevelopmentInitialValidation2017; 
+#' [@MitnitskiAccumulationDeficitsProxy2001]. The RAI-A (RAI Administrative) 
+#' frailty metric is a frailty screening tool that uses administrative data 
+#' (like EHR) to differentiate between frail and fit patients opting for 
+#' elective surgery [@HallDevelopmentInitialValidation2017]. The RAI-A score is 
+#' calculated using 11 variables that can be extracted from the EHR, such as 
+#' medical co-morbidities, cognitive decline and activities of daily living 
+#' (ADLs) [@HallDevelopmentInitialValidation2017]. This frailty metric was 
+#' developed to be implemented quickly and efficiently 
 #' [@HallDevelopmentInitialValidation2017]. If one variable is missing, however,
-#' the RAI-A score could lead to an underestimate of a patient’s frailty
-#' assessment. The Rockwood index, on the other hand, uses 30 unique lab values
-#' (such as serum creatinine levels, serum albumin level, etc.) found in a
-#' patient’s EHR to calculate a patient’s frailty score. An advantage to the
+#' the RAI-A score could lead to an underestimate of a patient’s frailty 
+#' assessment. The Rockwood index, on the other hand, uses 30 unique lab values 
+#' (such as serum creatinine levels, serum albumin level, etc.) found in a 
+#' patient’s EHR to calculate a patient’s frailty score. An advantage to the 
 #' Rockwood is that it is a robust frailty metric for missing lab values. 
 #' Missing lab values will not lead to an underestimate of a patient’s frailty 
-#' assessment determined by the Rockwood index [@MitnitskiAccumulationDeficitsProxy2001,]. 
-#' Both tools can be used retrospectively using EHRs.…
+#' assessment determined by the Rockwood index 
+#' [@MitnitskiAccumulationDeficitsProxy2001,]. Both tools can be used 
+#' retrospectively using EHRs.…
 #' 
+
 #' 
 #' # Methods
 #' 
