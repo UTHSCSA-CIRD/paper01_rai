@@ -69,25 +69,24 @@ c_auclist<-c('AUC.cd','AUC.hc','AUC.sh','AUC.uno','BeggC','GHCI','Nagelk','OXS',
 # We set the default value of the outcomes argument for the purposes of this 
 # script so we don't have to keep repeating it.
 formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
-#' # Abstract
+# # Abstract
 #' 
 #' # Introduction
 #' 
-#' * RAI-A good for predicting surgical risk [@HallDevelopmentInitialValidation2017] 
-#' * ...but it cannot be used on live data because it's hard-coded to NSQIP 
-#' * The availability of NSQIP variables can differ between sites with different 
-#'   levels of participation and some variables may be discontinued. 
-#' * Rockwood Index can be calculated on anything, tolerates missing data, and 
-#'   therefore it can be calculated not only on manually curated registry data 
-#'   but on any other sources of laboratory values and diagnoses including 
-#'   billing records and EMR systems
-#' * Rockwood has been thoroughly vetted by geriatricians and its statistical 
-#'   assumptions have been explicitly tested. 
-#' * Rockwood could be used for automated risk-calculation to support surgical 
-#'   decisions it it could be shown that it is as good as or better than RAI-A 
-#'   for predicting surgical outcomes.
-#' 
-
+# * RAI-A good for predicting surgical risk [@HallDevelopmentInitialValidation2017] 
+# * ...but it cannot be used on live data because it's hard-coded to NSQIP 
+# * The availability of NSQIP variables can differ between sites with different 
+#   levels of participation and some variables may be discontinued. 
+# * Rockwood Index can be calculated on anything, tolerates missing data, and 
+#   therefore it can be calculated not only on manually curated registry data 
+#   but on any other sources of laboratory values and diagnoses including 
+#   billing records and EMR systems
+# * Rockwood has been thoroughly vetted by geriatricians and its statistical 
+#   assumptions have been explicitly tested. 
+# * Rockwood could be used for automated risk-calculation to support surgical 
+#   decisions it it could be shown that it is as good as or better than RAI-A 
+#   for predicting surgical outcomes.
+# 
 #' 
 #' Frailty is the inability to maintain homeostasis when the human body becomes 
 #' challenged by a daily stressor. Low physical activity, muscle weakness, 
