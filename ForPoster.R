@@ -207,7 +207,7 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 #' surgery cases in the training set we fit
 #' Cox proportional hazard models using either RAI-A  or the Rockwood Index as
 #' predictors. The outcome being measured was time until readmission _or_ all-cause
-#' mortality. The survival plots in Figure 1 show the time elaplsed until either
+#' mortality. The survival plots in Figure 1 show the time elapsed until either
 #' even, whichever happened first during the 30 days after the date of 
 #' surgery.
 #' 
