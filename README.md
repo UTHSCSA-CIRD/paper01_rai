@@ -5,6 +5,12 @@ The data analysis portion of the RAI code.
 
 If you are preparing a plot, edit `DataVisualization.R` and if you are preparing a table, edit `SummaryTables.R`. Use `dat1`, `dat1subs`, or one of the other objects created by `run.R` as your data-source. If none of them meet your needs, please update `run.R` using the information below. The `v()` function should be used to grab multiple columns of interest. To create the working environment in an interactive console, all you need to do is source `run.R`. You don't even need to do that when adding to an existing script because they should all already source it in the beginning.
 
+In the Espinoza series of branches, the thing to run is ForPoster.R, which should be run as an R-Notebook from within RStudio. If the Word output format is chosen when doing this, there is an additional step to turn it into a presentable final format rather than the default Pandoc styles:
+
+    pandoc -s -S ForPoster.docx --reference-docx ./styletemplate.docx -o Formatted_ForPoster.docx
+
+After that there is one manual step, unfortunately, where you have to select each table and set the size of its columns to "Optimal". On the other hand this isn't required for generating content for the poster-- there we just copy-paste the text and some figures from Word, but the tables come from PDF anyway. The way to get PDF tables to behave is to open them from LibreOffice Draw, drag to select entire columns at a time, and use arrow keys to move them closer together as a unit. Draw opens PDFs as if they are vector images in which almost every item is ungrouped.
+
 ## What file does what.
 
 * `global.R`: Loads/installs all needed libraries. Turns on just-in-time (JIT) compilation for speed. Sets names of output files that will be created by scripts or input files *that are part of the repository* (i.e. metadata... the actual data is maintained separately and your local name/path should be set in your local `config.R`). This script sources `config.R` (see below) and `functions.R`. In turn, `run.R` sources this script, so you don't need to source them both.
