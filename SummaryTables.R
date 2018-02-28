@@ -401,4 +401,31 @@ racesex <- dat1 %>%
   ) 
 kable(racesex)
 
+#' sex totals by etnicity
+#' non-hispanic:
+racesexnh <- dat1 %>% 
+  filter(duplicated(idn_mrn)!=TRUE, hispanic_ethnicity=="No") %>% 
+  select(race, gender) %>% 
+  table(useNA="always") 
+kable(racesexnh)
 
+#' hispanic:
+racesexh <- dat1 %>% 
+  filter(duplicated(idn_mrn)!=TRUE, hispanic_ethnicity=="Yes") %>% 
+  select(race, gender) %>% 
+  table(useNA="always") 
+kable(racesexh)
+
+#' unknown:
+racesexu <- dat1 %>% 
+  filter(duplicated(idn_mrn)!=TRUE, hispanic_ethnicity=="Unknown") %>% 
+  select(race, gender) %>% 
+  table(useNA="always") 
+kable(racesexu)
+
+#' total:
+racesext <- dat1 %>% 
+  filter(duplicated(idn_mrn)!=TRUE) %>% 
+  select(race) %>% 
+  table(useNA="always") 
+kable(racesext)
