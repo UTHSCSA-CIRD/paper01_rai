@@ -406,26 +406,26 @@ kable(racesex)
 racesexnh <- dat1 %>% 
   filter(duplicated(idn_mrn)!=TRUE, hispanic_ethnicity=="No") %>% 
   select(race, gender) %>% 
-  table(useNA="always") 
+  table(useNA="always") %>% addmargins()
 kable(racesexnh)
 
 #' hispanic:
 racesexh <- dat1 %>% 
   filter(duplicated(idn_mrn)!=TRUE, hispanic_ethnicity=="Yes") %>% 
   select(race, gender) %>% 
-  table(useNA="always") 
+  table(useNA="always") %>% addmargins()
 kable(racesexh)
 
 #' unknown:
 racesexu <- dat1 %>% 
   filter(duplicated(idn_mrn)!=TRUE, hispanic_ethnicity=="Unknown") %>% 
   select(race, gender) %>% 
-  table(useNA="always") 
+  table(useNA="always") %>% addmargins()
 kable(racesexu)
 
 #' total:
 racesext <- dat1 %>% 
   filter(duplicated(idn_mrn)!=TRUE) %>% 
   select(race) %>% 
-  table(useNA="always") 
+  table(useNA="always") %>% addmargins()
 kable(racesext)
