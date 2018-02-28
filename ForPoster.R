@@ -188,7 +188,7 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #+ table_demog,results='asis'
 mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
                                              ,levels = c('FALSE','TRUE')
-                                             ,labels=c('No Event','Death/Readmission'))) %>% 
+                                             ,labels=c('Event-Free','Death/Readmission'))) %>% 
   mapnames(thecolnames1) %>% 
   CreateTableOne(names(thecolnames1)[3:9],'t_strata',.) %>% 
   print(printToggle=F,noSpaces=T) %>% `[`(,-4) %>% 
