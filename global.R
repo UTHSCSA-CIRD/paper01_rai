@@ -12,6 +12,7 @@ rq_libs <- c('compiler'                                   # just-in-time compila
              ,'survival','MASS','Hmisc','zoo','coin'      # various analysis methods
              ,'survAUC','survivalROC','pROC'
              ,'readr','dplyr','stringr','magrittr'        # data manipulation & piping
+             ,'lubridate'
              ,'ggplot2','ggfortify','grid','GGally'       # plotting
              ,'survminer','gridExtra','scales'
              ,'stargazer','broom', 'tableone','janitor'   # table formatting
