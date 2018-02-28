@@ -265,7 +265,8 @@ mapnames(t_coxresults,thecolnames1) %>% t %>% kable(format = 'markdown',digits=4
 #' measures of frailty are significantly (RAI-A `r sprintf('p = 
 #' %0.4f',t_coxresults['RAI-A','p.value'])`, Rockwood `r sprintf('p = 
 #' %0.4f',t_coxresults['Rockwood','p.value'])`) associated with risk of 
-#' mortality or readmission. 
+#' mortality or readmission. The 'Events' row represents the number of cases
+#' of the 193 where the patient either died or was readmitted.
 #' 
 # In both cases the 'Effect' row represents the 
 # natural logarithm of the increase in risk per unit change in the frailty 
