@@ -370,13 +370,13 @@ racesexhispl <- data.frame(racesexall) %>%
 kable(t(racesexhispl))
 
 ##overall totals (one-liner "l" for line):
-racesextotl <- data.frame(racesex) %>% 
+racesextotl <- data.frame(racesexall) %>% 
   select(y2013, y2014, y2015, y2016, y2017) %>%
   colSums()
 kable(t(racesextotl))
 
 ##hispanic ethnicity totals:
-racesexhisptot <- data.frame(racesex) %>% 
+racesexhisptot <- data.frame(racesexall) %>% 
   select(hispanic_ethnicity, y2013, y2014, y2015, y2016, y2017) %>%
   group_by(hispanic_ethnicity) %>%
   summarise(y2013=sum(y2013)
