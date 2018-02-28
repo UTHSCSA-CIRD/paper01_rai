@@ -11,6 +11,7 @@ rq_libs <- c('compiler'                                   # just-in-time compila
              ,'pscl'                                      # zero-inflated poisson, sigh
              ,'survival','MASS','Hmisc','zoo','coin'      # various analysis methods
              ,'survAUC','survivalROC','pROC'
+             ,'Matrix'                                    # for pd matrices needed by faker()
              ,'readr','dplyr','stringr','magrittr'        # data manipulation & piping
              ,'lubridate'
              ,'ggplot2','ggfortify','grid','GGally'       # plotting
