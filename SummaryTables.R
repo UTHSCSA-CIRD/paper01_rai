@@ -332,22 +332,22 @@ savetablelist(table_06,'UHS_ACSNSQIP_SSI-DSW-');
 kable(table_06) 
 
 ####################### CIA Grant Tables #######################
-#functional status table (unique patients = 5914)
+#'functional status table (unique patients = 5914)
 fxnstatus <- dat1 %>% 
   filter(duplicated(idn_mrn)!=TRUE) %>% 
   select(functnal_heath_status, rai_range) %>% 
   table() %>% addmargins()
 kable(fxnstatus)
 
-#origin status table (unique patients = 5914)
+#' origin status table (unique patients = 5914)
 origstatus <- dat1 %>% 
   filter(duplicated(idn_mrn)!=TRUE) %>% 
   select(origin_status, rai_range) %>% 
   table() %>% addmargins()
 kable(origstatus)
 
-#race, ethnicity, and sex table (unique patients = 5914)
-##overall table:
+#' race, ethnicity, and sex table (unique patients = 5914)
+#' overall table:
 racesexall <- dat1 %>% 
   filter(duplicated(idn_mrn)!=TRUE) %>% 
   select(race, hispanic_ethnicity, hospital_admissn_dt) %>% 
@@ -362,20 +362,20 @@ racesexall <- dat1 %>%
   ) %>% arrange(hispanic_ethnicity)
 kable(racesexall)
 
-##hispanic totals (one-liner "l" for line):
+#' hispanic totals (one-liner "l" for line):
 racesexhispl <- data.frame(racesexall) %>% 
   filter(hispanic_ethnicity=="Yes") %>%
   select(y2013, y2014, y2015, y2016, y2017) %>%
   colSums()
 kable(t(racesexhispl))
 
-##overall totals (one-liner "l" for line):
+#' overall totals (one-liner "l" for line):
 racesextotl <- data.frame(racesexall) %>% 
   select(y2013, y2014, y2015, y2016, y2017) %>%
   colSums()
 kable(t(racesextotl))
 
-##hispanic ethnicity totals:
+#' hispanic ethnicity totals:
 racesexhisptot <- data.frame(racesexall) %>% 
   select(hispanic_ethnicity, y2013, y2014, y2015, y2016, y2017) %>%
   group_by(hispanic_ethnicity) %>%
@@ -387,7 +387,7 @@ racesexhisptot <- data.frame(racesexall) %>%
   )
 kable(racesexhisptot)
 
-##sex totals:
+#' sex totals:
 racesex <- dat1 %>% 
   filter(duplicated(idn_mrn)!=TRUE) %>% 
   select(gender, hospital_admissn_dt) %>% 
