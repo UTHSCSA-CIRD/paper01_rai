@@ -44,7 +44,12 @@ tryCatch(pi[['incache_run']] <-c(value=normalizePath(incache_run),hash=unname(md
 cat('Checking for valid outcache_path...\n');
 if(exists('outcache_path') && file_test('-d',outcache_path)){
   pi[['outcache_path']]<-c(value=normalizePath(outcache_path));
-} else stop("The 'outcache_path' variable either was not set or does not specify a valid directory path. Please set it in your config.R")
+} else stop("The 'outcache_path' variable either was not set or does not specify a valid directory path. Please set it in your config.R");
+
+pi$revision <- c(value='gitstamp',hash='TEST_OUTPUT_DO_NOT_USE');
+tryCatch(pi$revision <- c(value='gitsamp',hash=gitstamp())
+         ,error=function(ee) warning(ee,immediate. =T)
+         ,finally=cat('Checking to see if code is properly checked in...\n'));
 
 options(runr.makeoutcache=if(exists('create_outcache')) create_outcache else F);
 if(exists('update_incache_run')) options(runr.updincacherun=update_incache_run);

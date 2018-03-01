@@ -22,7 +22,7 @@ source('global.R');
 #' Revision: `r gitstamp(production=F)`.
 #' 
 #' #### Audit Info
-#+ projinfo,results='asis'
+#+ projinfo,results='markup',echo=TRUE,cache=FALSE
 lapply(pi,rbind) %>% lapply(as.character) %>% lapply(`length<-`,2) %>% 
   bind_cols %>% t %>% kable(format = 'markdown',col.names = c('value','hash'));
 #' 
