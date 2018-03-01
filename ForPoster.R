@@ -188,7 +188,7 @@ formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
 #+ table_demog,results='asis'
 mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
                                              ,levels = c('FALSE','TRUE')
-                                             ,labels=c('No Event','Death/Readmission'))) %>% 
+                                             ,labels=c('Event-Free','Death/Readmission'))) %>% 
   mapnames(thecolnames1) %>% 
   CreateTableOne(names(thecolnames1)[3:9],'t_strata',.) %>% 
   print(printToggle=F,noSpaces=T) %>% `[`(,-4) %>% 
@@ -265,7 +265,8 @@ mapnames(t_coxresults,thecolnames1) %>% t %>% kable(format = 'markdown',digits=4
 #' measures of frailty are significantly (RAI-A `r sprintf('p = 
 #' %0.4f',t_coxresults['RAI-A','p.value'])`, Rockwood `r sprintf('p = 
 #' %0.4f',t_coxresults['Rockwood','p.value'])`) associated with risk of 
-#' mortality or readmission. 
+#' mortality or readmission. The 'Events' row represents the number of cases
+#' of the 193 where the patient either died or was readmitted.
 #' 
 # In both cases the 'Effect' row represents the 
 # natural logarithm of the increase in risk per unit change in the frailty 
