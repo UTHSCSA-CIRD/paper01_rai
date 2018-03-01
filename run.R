@@ -7,8 +7,10 @@
 #' Please read this file through before trying to run it. The comments tell
 #' you what you need to edit in order to proceed.
 #' 
+#+ source_global
 source('global.R');
-project_seed <- 20180218;
+pi$project_seed <- c(value=20180218);
+basefname <- gsub('.r$','',basename(parent.frame(2)$ofile),ignore.case = T);
 
 #' ## Load data if it exists 
 #' 
@@ -16,12 +18,13 @@ project_seed <- 20180218;
 #'if(session %in% list.files()) load(session);
 #' Load your data. Notice that we're using `read_csv()` from the readr library.
 #' It is a little smarter than the built-in `read.csv()`
-cost0 <- read_tsv(inputdata_cost,na=c('(null)',''));
-dat0 <- read_tsv(inputdata,na=c('(null)',''));
+cost0 <- read_tsv(pi$inputdata_cost[1],na=c('(null)',''));
+dat0 <- read_tsv(pi$inputdata[1],na=c('(null)',''));
 
 #' Read in the data dictionary
-dct0 <- read_csv(dctfile,na = '');
-dct1 <- read_csv(cptfile,na='');
+dct0 <- read_csv(pi$dctfile[1],na = '');
+dct1 <- read_csv(pi$cptfile[1],na='');
+
 colnames(dat0) <- tolower(colnames(dat0));
 colnames(cost0) <- tolower(colnames(cost0));
 
@@ -86,7 +89,7 @@ dat1[dat0$height_unit=='in','height_unit'] <- c('cm');
 #' 
 #' As long as the seed is the same, all random values will be generated the same
 #' reproducibly.
-set.seed(project_seed);
+set.seed(pi$project_seed);
 #' Randomly assign IDN_MRNs to training, testing, or validation sets
 pat_samples <- split(dat1$idn_mrn,sample(c('train','test','val')
                                          ,size=nrow(dat1),rep=T));

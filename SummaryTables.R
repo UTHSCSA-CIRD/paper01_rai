@@ -7,7 +7,7 @@
 #'
 #+ echo=FALSE, message=FALSE
 knitr::opts_chunk$set(echo=F,warning = F,cache=T,message=F);
-#+ cache=FALSE
+#+ source_global,cache=FALSE,results='hide'
 source('global.R');
 # Note: if the lanscape classoption errors on your machine, you need an
 # additional LaTeX package, which you can install as follows, from bash:
@@ -18,14 +18,13 @@ source('global.R');
 # Report date: `r Sys.Date()`.
 #
 # Revision: `r gitstamp()`.
-#
-# Data file: `r inputdata`.
-# 
-# Cost data file: `r inputdata_cost`.
-# 
-# 
-# 
-#+ cache=TRUE
+#' 
+#' #### Audit Info
+#+ projinfo,results='asis'
+lapply(pi,rbind) %>% lapply(as.character) %>% lapply(`length<-`,2) %>% 
+  bind_cols %>% t %>% kable(format = 'markdown',col.names = c('value','hash'));
+#'
+#+ source_run,cache=TRUE,results='hide'
 source('run.R');
 # Variable Summary Table:
 #test <- variable_summary(sbs0$all2016$all_colon_all)
@@ -403,6 +402,7 @@ kable(racesex)
 
 #' sex totals by etnicity
 #' non-hispanic:
+#+ t_nonhispanic
 racesexnh <- dat1 %>% 
   filter(duplicated(idn_mrn)!=TRUE, hispanic_ethnicity=="No") %>% 
   select(race, gender) %>% 
@@ -410,6 +410,7 @@ racesexnh <- dat1 %>%
 kable(racesexnh)
 
 #' hispanic:
+#+ t_hispanic
 racesexh <- dat1 %>% 
   filter(duplicated(idn_mrn)!=TRUE, hispanic_ethnicity=="Yes") %>% 
   select(race, gender) %>% 
@@ -417,6 +418,7 @@ racesexh <- dat1 %>%
 kable(racesexh)
 
 #' unknown:
+#+ t_unknown
 racesexu <- dat1 %>% 
   filter(duplicated(idn_mrn)!=TRUE, hispanic_ethnicity=="Unknown") %>% 
   select(race, gender) %>% 
@@ -424,8 +426,9 @@ racesexu <- dat1 %>%
 kable(racesexu)
 
 #' total:
+#+ t_total
 racesext <- dat1 %>% 
   filter(duplicated(idn_mrn)!=TRUE) %>% 
   select(race) %>% 
-  table(useNA="always") %>% addmargins()
-kable(racesext)
+  table(useNA="always") %>% addmargins();
+kable(cbind(racesext));

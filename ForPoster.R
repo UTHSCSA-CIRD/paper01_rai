@@ -15,19 +15,18 @@
 #     reference_docx: styletemplate.docx
 knitr::opts_chunk$set(echo=F,warning = F,cache=F,message=F);
 options(knitr.kable.NA='');
-#+ cache=FALSE
+#+ source_global,results='hide'
 source('global.R');
 #' Report date: `r Sys.Date()`.
 #'
-#' Revision: `r gitstamp(production=T)`.
-#'
-#' Data file: `r inputdata`.
+#' Revision: `r gitstamp(production=F)`.
 #' 
-#' Cost data file: `r inputdata_cost`.
+#' #### Audit Info
+#+ projinfo,results='asis'
+lapply(pi,rbind) %>% lapply(as.character) %>% lapply(`length<-`,2) %>% 
+  bind_cols %>% t %>% kable(format = 'markdown',col.names = c('value','hash'));
 #' 
-#' 
-#' 
-#+ cache=TRUE
+#+ cache=TRUE,echo=FALSE,results='hide'
 source('run.R');
 #+ poster_variables
 thecolnames1 <- c("RAI-A Score"='rai_range'

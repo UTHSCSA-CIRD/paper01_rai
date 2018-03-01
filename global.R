@@ -26,22 +26,24 @@ sapply(rq_need,require,character.only=T);
 enableJIT(3);
 
 #' ## Load local configurations.
-#+ global_val, results='asis'
+#' 
+#' To turn on debug messages for this chunk, set results to 'markup' or 'as-is'
+#+ global_val, message=FALSE
 tryCatch(source('./config.R'),error=function(ee) stop(ee)
          ,finally=cat('\nValidating config.R file:\n'));
 pi<-list(); comment(pi) <- "Project Info";
-tryCatch(pi[['inputdata']] <-c(file=normalizePath(inputdata),hash=md5sum(inputdata))
+tryCatch(pi[['inputdata']] <-c(value=normalizePath(inputdata),hash=unname(md5sum(inputdata)))
          ,error=function(ee) stop(ee)
          ,finally=cat('Checking for valid inputdata file...\n'));
-tryCatch(pi[['inputdata_cost']] <-c(file=normalizePath(inputdata_cost),hash=md5sum(inputdata_cost))
+tryCatch(pi[['inputdata_cost']] <-c(value=normalizePath(inputdata_cost),hash=unname(md5sum(inputdata_cost)))
          ,error=function(ee) stop(ee)
          ,finally=cat('Checking for valid inputdata_cost file...\n'));
-tryCatch(pi[['incache_run']] <-c(file=normalizePath(incache_run),hash=md5sum(incache_run))
+tryCatch(pi[['incache_run']] <-c(value=normalizePath(incache_run),hash=unname(md5sum(incache_run)))
          ,error=function(ee) warning(ee,immediate. = T)
          ,finally=cat('Checking for valid incache_run file...\n'));
 cat('Checking for valid outcache_path...\n');
 if(exists('outcache_path') && file_test('-d',outcache_path)){
-  pi[['outcache_path']]<-normalizePath(outcache_path);
+  pi[['outcache_path']]<-c(value=normalizePath(outcache_path));
 } else stop("The 'outcache_path' variable either was not set or does not specify a valid directory path. Please set it in your config.R")
 
 options(runr.makeoutcache=if(exists('create_outcache')) create_outcache else F);
@@ -54,14 +56,14 @@ source('./functions.R');
 #' 
 #' data dictionary:
 dctfile <- 'VariableNamesFromUHSNSQIP.csv';
-tryCatch(pi$dctfile <- c(file=normalizePath(dctfile),hash=md5sum(dctfile))
+tryCatch(pi$dctfile <- c(value=normalizePath(dctfile),hash=unname(md5sum(dctfile)))
          ,error=function(ee) stop(ee)
          ,finally=cat('Checking for valid dctfile...\n'));
 rm(dctfile);
 
 #' CPT code dictionary
 cptfile <- 'cpt_dictionary.csv';
-tryCatch(pi$cptfile <- c(file=normalizePath(cptfile),hash=md5sum(cptfile))
+tryCatch(pi$cptfile <- c(value=normalizePath(cptfile),hash=unname(md5sum(cptfile)))
          ,error=function(ee) stop(ee)
          ,finally=cat('Checking for valid cptfile...\n'));
 rm(cptfile);

@@ -6,19 +6,18 @@
 #'
 #+ echo=FALSE, message=FALSE
 knitr::opts_chunk$set(echo=F,warning = F,cache=T,message=F);
-#+ cache=FALSE
+#+ cache=FALSE,results='hide'
 source('global.R');
 #' Report date: `r Sys.Date()`.
 #'
-#' Revision: `r gitstamp()`.
-#'
-#' Data file: `r inputdata`.
+#' Revision: `r gitstamp(production=F)`.
 #' 
-#' Cost data file: `r inputdata_cost`.
+#' #### Audit Info
+#+ projinfo,results='asis'
+lapply(pi,rbind) %>% lapply(as.character) %>% lapply(`length<-`,2) %>% 
+  bind_cols %>% t %>% kable(format = 'markdown',col.names = c('value','hash'));
 #' 
-#' 
-#' 
-#+ cache=TRUE
+#+ cache=TRUE,results='hide'
 source('run.R');
 
 # Note: above I set the global options so that the code is hidden in this report.
