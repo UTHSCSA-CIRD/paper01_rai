@@ -8,7 +8,7 @@
 knitr::opts_chunk$set(echo=F,warning = F,cache=T,message=F);
 #+ cache=FALSE
 source('global.R');
-#' Report date: `r date()`.
+#' Report date: `r Sys.Date()`.
 #'
 #' Revision: `r gitstamp()`.
 #'

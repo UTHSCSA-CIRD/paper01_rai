@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo=F,warning = F,cache=F,message=F);
 options(knitr.kable.NA='');
 #+ cache=FALSE
 source('global.R');
-#' Report date: `r date()`.
+#' Report date: `r Sys.Date()`.
 #'
 #' Revision: `r gitstamp(production=T)`.
 #'
