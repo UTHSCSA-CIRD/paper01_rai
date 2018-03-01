@@ -19,10 +19,10 @@ options(knitr.kable.NA='');
 source('global.R');
 #' Report date: `r Sys.Date()`.
 #'
-#' Revision: `r gitstamp(production=F)`.
+#' Revision: `r gitstamp(production=T)`.
 #' 
 #' #### Audit Info
-#+ projinfo,results='markup',echo=TRUE,cache=FALSE
+#+ projinfo,results='asis',cache=FALSE
 lapply(pi,rbind) %>% lapply(as.character) %>% lapply(`length<-`,2) %>% 
   bind_cols %>% t %>% kable(format = 'markdown',col.names = c('value','hash'));
 #' 
