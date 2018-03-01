@@ -281,7 +281,8 @@ temp_truewords <- formals(truthy.default)$truewords;
 #' ### Rockwood: counts for pre-op conditions (i.e. TRUE/FALSE)
 #+ task_rock_num1
 .junk_rock_numerator1 <- apply(dat1[,v(c_rock_tf)],1
-                               ,function(xx) sum(truthy(xx,truewords=l_rockwood_true),na.rm = T));
+                               ,function(xx) sum(truthy(xx,truewords=l_rockwood_true)
+                                                 ,na.rm = T));
 #' ### Rockwood: number of non-missing values for each case (denominator)
 #+ task_rock_denom
 # include both the discrete columns from numerator0 and the numeric columns 
@@ -296,6 +297,12 @@ temp_truewords <- formals(truthy.default)$truewords;
 dat1$a_rockwood <- (.junk_rock_numerator1+.junk_rock_numerator0)/.junk_rock_denominator;
 dat1$a_rockwood_range <- cut(dat1$a_rockwood, .09*(0:7),include.lowest = T);
 
+dat1$a_mfi <-apply(dat1[,v(c_mfi)],1
+                      ,function(xx) sum(truthy(xx,truewords = l_rockwood_true)
+                                        ,na.rm=T)) / 
+  apply(dat1[,v(c_mfi)],1,function(xx) sum(!xx %in% l_missing));
+dat1$a_mfi_range <- cut(dat1$a_mfi,c(0,1e-16,.17,1/3,.5,2/3,Inf)
+                        ,include.lowest = T);
 #+ task_rock_old
 dat1$a_rockwood_old <- with(dat1,(
   as.numeric(bmi>=25)+

@@ -15,9 +15,9 @@ source('global.R');
 # tlmgr install wrapfig
 # tlmgr install tabu
 # 
-# Report date: `r Sys.Date()`.
-#
-# Revision: `r gitstamp()`.
+#' Report date: `r Sys.Date()`.
+#'
+#' Revision: `r gitstamp(production=F)`.
 #
 # Data file: `r inputdata`.
 # 
@@ -428,4 +428,9 @@ racesext <- dat1 %>%
   filter(duplicated(idn_mrn)!=TRUE) %>% 
   select(race) %>% 
   table(useNA="always") %>% addmargins()
-kable(racesext)
+kable(cbind(racesext));
+
+#' Correlation matrix for Rockwood, mFI, RAI-A, and ASA class
+dat2[,c('a_rockwood','a_mfi','a_rai','asa_class')] %>% 
+  mutate(asa_class=factor(asa_class)) %>% data.matrix %>% cor %>% 
+  kable(format='markdown');
