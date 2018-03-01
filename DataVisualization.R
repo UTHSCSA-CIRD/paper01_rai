@@ -3,303 +3,174 @@
 #' author: "Wilson, Bokov, Shireman"
 #' date: "10/20/2017"
 #' ---
-#' 
+#'
 #+ echo=FALSE, message=FALSE
+knitr::opts_chunk$set(echo=F,warning = F,cache=T,message=F);
+#+ cache=FALSE
 source('global.R');
-#' Report date: `r date()`.
-#' 
+#' Report date: `r Sys.Date()`.
+#'
 #' Revision: `r gitstamp()`.
-#' 
+#'
 #' Data file: `r inputdata`.
-#+ cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE
+#' 
+#' Cost data file: `r inputdata_cost`.
+#' 
+#' 
+#' 
+#+ cache=TRUE
 source('run.R');
 
+# Note: above I set the global options so that the code is hidden in this report.
+# Comments beginning with # are code and therefore get hidden (only the output
+# is shown). Comments with #' however are turned into markdown. So you should 
+# only have the #' comments below in places where you want those comments to 
+# be visible in the final product. I suspect everything after line 64 or so should
+# be a regular comment.
+#
+# I am commenting out the line below because the PDF files it generates seem to
+# have stopped working. However, you could just render this notebook as a PDF
+# file instead of HTML, and that will look better than using the built-in PDF
+# device anyway. If you really need to generate a parallel PDF copy in this manner
+# maybe experiment with dev.copy2pdf() but the below do not work.
+#pdf(height = 10, width = 7.5, onefile = TRUE, file = paste0(outputpath,"UHS_ACSNSQIP_CD4comps_boxplots-DSW-", format(Sys.Date(), '%m-%d-%Y'),".pdf"))
 
-#exploring the relationship between income and frailty incidence in all colectomy patients
-#that have a Clavien-Dindo Grade 4 complication (TRUE) or not (FALSE)
-thedata <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai, a_any_cd4, income_final) %>% group_by( a_discrete_rai, a_any_cd4)
-ggplot(data = thedata, aes(x = factor(a_discrete_rai)
-                          ,y = income_final,fill=a_any_cd4)) + 
-geom_boxplot(coef=100) + labs(title = "Income Vs Frailty Vs Clavien-Dindo Grade 4 Complications in All UHS Colectomy Patients") +
-scale_fill_discrete(name = "Clavien-Dindo\nGrade4"
-                    ,breaks = c("FALSE", "TRUE")
-                    ,labels = c("No", "Yes")
-                    ) -> plot_any_cd4;
-#' I should figure out how to print this table too:
-thecounts <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai, a_any_cd4, income_final) %>% group_by( a_discrete_rai, a_any_cd4) %>% count()
-plot_any_cd4 + annotate("text", x = c(0.8, 1.2, 1.8, 2.2, 2.8, 3.2)
-                        ,y = 10000, label = as.character(thecounts$n)
-                        ,size = 6)
- 
+# Income VS Frailty VS Clavien-Dindo Grade 4 complications 
+# in ALL UHS colectomy patients:
+#+ cache=FALSE
+plt_frl_inc_cd4 <- autoboxplot(sbs0$all$all_colon_all
+                               ,xx='a_discrete_rai',yy='income_final'
+                               ,zz='a_any_cd4'
+                               ,subset=!is.na(income_final)
+                               ,fill.name=wrap_format(14)("Clavien-Dindo\n Grade 4")
+                               ,fill.labels = c('Yes', 'No')
+                               ,xx.name='Frailty Group',yy.name='Household Income',title='');
+grid.arrange(plt_frl_inc_cd4
+             ,top=wrap_format(30)("Income Vs Frailty VS CD4 Complications in ALL UHS Colectomy Patients")
+             );
 
-#selecting patients that DO NOT have Clavien-Dindo Grade 4 complications
-thedata2 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
-            filter(a_any_cd4=='FALSE')
-ggplot(data = thedata2, aes(x = a_discrete_rai
-                           ,y = income_final, fill = hispanic_ethnicity)) + 
-geom_boxplot(coef=100) + labs(title = "Income Vs Frailty Vs Hispanic Ethnicity in All UHS Colectomy Patients with No CD4 Complications") +
-scale_fill_discrete(name = "Ethnicity"
-                    ,breaks = c("No", "Unknown", "Yes")
-                    ,labels = c("Non-Hispanic", "Unknown", "Hispanic")
-                    )-> plot_no_cd4;
- 
+# Income VS Hispanic Ethnicity VS Clavien-Dindo Grade 4 complications
+# in ALL UHS colectomy patients:
+plt_eth_inc_cd4 <- autoboxplot(sbs0$all$all_colon_all
+                               ,xx='hispanic_ethnicity',yy='income_final'
+                               ,zz='a_any_cd4'
+                               ,subset=hispanic_ethnicity!='Unknown'&!is.na(income_final)
+                               ,fill.name=wrap_format(14)("Clavien-Dindo\n Grade 4")
+                               ,fill.labels = c('Yes', 'No')
+                               ,xx.name='Hispanic Ethnicity',yy.name=NA,title='');
 
-#' I should figure out how to print this table too:
-thecounts2 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
-              filter(a_any_cd4=='FALSE') %>% count()
-plot_no_cd4 + annotate("text", x = c(0.75, 1.0, 1.25, 1.8, 2.2, 3.0)
-                        ,y = 10000, label = as.character(thecounts2$n)
-                        ,size = 5)
+plt_all_inc_cd4 <- update(plt_eth_inc_cd4, xx=T, subset=!is.na(income_final), fill.name=NA, xx.name='All', yy.name='Household Income');
 
-#selecting patients that HAVE Clavien-Dindo Grade 4 complications
-thedata3 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
-            filter(a_any_cd4=='TRUE')
-ggplot(data = thedata3, aes(x = a_discrete_rai, y = income_final,fill=hispanic_ethnicity)) + 
-geom_boxplot(coef=100) + labs(title = "Income Vs Frailty Vs Hispanic Ethnicity in All UHS Colectomy Patients with CD4 Complications") +
-scale_fill_discrete(name = "Ethnicity"
-                    ,breaks = c("No", "Unknown", "Yes")
-                    ,labels = c("Non-Hispanic", "Unknown", "Hispanic")
-                    )-> plot_cd4;
-#' I should figure out how to print this table too:
-thecounts3 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
-              filter(a_any_cd4=='TRUE') %>% count()
-plot_cd4 + annotate("text", x = c(0.75, 1.0, 1.25, 1.8, 2.2, 3.0)
-                       ,y = 10000, label = as.character(thecounts3$n)
-                       ,size = 5)
+grid.arrange(plt_all_inc_cd4,plt_eth_inc_cd4
+             ,top=wrap_format(30)("Income Vs CD4 Complications in all UHS Colectomy Patients")
+             ,nrow=1,widths=1:2);
 
-#selecting patients that DO NOT have Clavien-Dindo Grade 4 complications
-#and are not hispanic
-thedata4 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai) %>% 
-  filter(hispanic_ethnicity=='No')
-  ggplot(data = thedata4, aes(x = a_discrete_rai
-                            ,y = income_final, fill = a_any_cd4)) + 
-  geom_boxplot(coef=100) + 
-  labs(title = "Income Vs Frailty Vs CD4 Complications in Non-Hispanic UHS Colectomy Patients") +
-  scale_fill_discrete(name = "Clavien-Dindo Grade4"
-                      ,breaks = c("FALSE", "TRUE")
-                      ,labels = c("No", "Yes")
-  )-> plot_no_cd4_nohisp;
+# 
+# Income VS Frailty VS Hispanic Ethnicty with NO CD4 Complications
+plt_frl_inc_eth_noc4 <- autoboxplot(sbs0$all$all_colon_all
+                               ,xx='a_discrete_rai',yy='income_final'
+                               ,zz='hispanic_ethnicity'
+                               ,subset=a_any_cd4==FALSE&!is.na(income_final)
+                               ,fill.name='Hispanic Ethnicity'
+                               ,fill.labels = c('Hispanic', 'Non-Hispanic', 'Unknown')
+                               ,xx.name='Frailty Group',yy.name='Household Income',title='');
 
-#' I should figure out how to print this table too:
-thecounts4 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai, a_any_cd4) %>% 
-  filter(hispanic_ethnicity=='No') %>% count()
-plot_no_cd4_nohisp + annotate("text", x = c(0.75, 1.2, 1.8, 2.2)
-                              ,y = 10000, label = as.character(thecounts4$n)
-                              ,size = 5)
-#selecting patients that DO NOT have Clavien-Dindo Grade 4 complications
-#and are hispanic
-thedata5 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai) %>% 
-  filter(hispanic_ethnicity=='Yes')
-  ggplot(data = thedata5, aes(x = a_discrete_rai
-                            ,y = income_final, fill = a_any_cd4)) + 
-  geom_boxplot(coef=100) + 
-  labs(title = "Income Vs Frailty Vs CD4 Complications in UHS Hispanic Colectomy Patients") +
-  scale_fill_discrete(name = "Clavien-Dindo Grade4"
-                      ,breaks = c("FALSE", "TRUE")
-                      ,labels = c("No", "Yes")
-  )-> plot_no_cd4_hisp;
+grid.arrange(plt_frl_inc_eth_noc4
+             ,top=wrap_format(60)("Income Vs Frailty VS Hispanic Ethnicity in all UHS Colectomy Patients with NO CD4 Complications")
+             );
 
-#' I should figure out how to print this table too:
-thecounts5 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by(a_discrete_rai, a_any_cd4) %>% 
-  filter(hispanic_ethnicity=='Yes') %>% count()
-plot_no_cd4_hisp + annotate("text", x = c(0.75, 1.2, 1.8, 2.2, 2.8, 3.2)
-                            ,y = 10000, label = as.character(thecounts5$n)
-                            ,size = 5)
+#' 
+#' 
+# Income VS Frailty VS Hispanic Ethnicty WITH CD4 Complications
+plt_frl_inc_eth_c4 <- update(plt_frl_inc_eth_noc4, subset=a_any_cd4==TRUE&!is.na(income_final));
 
-#selecting patients that DO NOT have Clavien-Dindo Grade 4 complications
-#and are hispanic
-d2 <- rbind(dat1subs[["all_colon_all"]], dat1subs[["all_colon_all"]])
-d2$hispanic_ethnicity2 <- c(rep("All", times=nrow(dat1subs[["all_colon_all"]])), dat1subs[["all_colon_all"]]$hispanic_ethnicity)
-#re-leveling ethnicity
-d2$hispanic_ethnicity3 <- factor(d2$hispanic_ethnicity2, levels = c("All", "No", "Yes", "Unknown"))
+grid.arrange(plt_frl_inc_eth_c4
+             ,top=wrap_format(60)("Income Vs Frailty VS Hispanic Ethnicity in all UHS Colectomy Patients WITH CD4 Complications")
+);
 
 
-thedata6 <- d2 %>% select(hispanic_ethnicity3, income_final, a_any_cd4) %>% 
-  filter(hispanic_ethnicity3 %in% c("All", "No", "Yes")) %>% group_by( hispanic_ethnicity3, a_any_cd4) 
+# Income VS Hispanic Ethnicity VS SSI (surgical site infection)
+#+ cache=FALSE
+plt_ssi_inc_eth <- autoboxplot(sbs0$all$full
+                               ,xx='hispanic_ethnicity',yy='income_final'
+                               ,zz='a_any_ssi'
+                               ,subset=hispanic_ethnicity!='Unknown'&!is.na(income_final)
+                               ,fill.name=wrap_format(14)("SSI")
+                               ,fill.labels=c("No", "Yes")
+                               ,xx.name='Hispanic',yy.name=NA,title='');
 
-ggplot(data = thedata6, aes(x = hispanic_ethnicity3
-                            ,y = income_final, fill = a_any_cd4)) + 
-  geom_boxplot(coef=100) + 
-  labs(title = "Income Vs CD4 Complications in UHS Hispanic Colectomy Patients") +
-  scale_y_continuous(labels = comma) +
-  scale_fill_discrete(name = "Clavien-Dindo Grade4"
-                      ,breaks = c("FALSE", "TRUE")
-                      ,labels = c("No", "Yes")) +
-  scale_x_discrete(name = "Ethnicity"
-                   ,breaks = c("All", "No", "Yes")
-                   ,labels = c("All", "Non-Hispanic", "Hispanic")
-  ) -> plot_no_rai_cd4_hisp;
+plt_ssi_inc_eth2 <- update(plt_ssi_inc_eth, xx=T, subset=!is.na(income_final), fill.name=NA, xx.name='All', yy.name='Household Income');
 
-#' I should figure out how to print this table too:
-thecounts6 <- thedata6 %>% group_by(hispanic_ethnicity3, a_any_cd4) %>% count()
-plot_no_rai_cd4_hisp + annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2)
-                                       ,y = 5000, label = as.character(thecounts6$n)
-                                       ,size = 5)
-
-pdf(height = 10, width = 7.5, onefile = TRUE, file = paste0(outputpath,"UHS_ACSNSQIP_CD4comps_boxplots-DSW-", format(Sys.Date(), '%m-%d-%Y'),".pdf"))
-plot_any_cd4 + annotate("text", x = c(0.8, 1.2, 1.8, 2.2, 2.8, 3.2)
-                        ,y = 10000, label = as.character(thecounts$n)
-                        ,size = 6)
-plot_no_cd4 + annotate("text", x = c(0.75, 1.0, 1.25, 1.8, 2.2, 3.0)
-                       ,y = 10000, label = as.character(thecounts2$n)
-                       ,size = 5)
-plot_cd4 +annotate("text", x = c(0.75, 1.0, 1.25, 1.8, 2.2, 3.0)
-                   ,y = 10000, label = as.character(thecounts3$n)
-                   ,size = 5)
-plot_no_cd4_nohisp + annotate("text", x = c(0.75, 1.2, 1.8, 2.2)
-                              ,y = 10000, label = as.character(thecounts4$n)
-                              ,size = 5)
-plot_no_cd4_hisp + annotate("text", x = c(0.75, 1.2, 1.8, 2.2, 2.8, 3.2)
-                            ,y = 10000, label = as.character(thecounts5$n)
-                            ,size = 5)
-plot_no_rai_cd4_hisp + annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2)
-                                ,y = 5000, label = as.character(thecounts6$n)
-                                ,size = 5)
-
-dev.off()
+grid.arrange(plt_ssi_inc_eth2,plt_ssi_inc_eth
+             ,top=wrap_format(30)("Income Vs SSI VS Hispanic Ethnicty\n in all UHS Patients")
+             ,nrow=1,widths=1:2);
+# The following code checks the counts in the graph:
+sbs0$all$full %>% filter(!is.na(income_final)) %>% select(hispanic_ethnicity, a_any_ssi) %>% group_by(hispanic_ethnicity, a_any_ssi) %>% count() %>% View()
+# the numbers do check out. Unfortunately, there is nothing interesting
+# going on here.
+# 
 
 
-#exploring the relationship between income and frailty incidence in all colectomy patients
-#that have a Clavien-Dindo Grade 4 complication (TRUE) or not (FALSE)
-thedata <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai, a_any_cd4, income_final) %>% group_by( a_discrete_rai, a_any_cd4)
-ggplot(data = thedata, aes(x = factor(a_discrete_rai)
-                           ,y = income_final,fill=a_any_cd4)) + 
-  geom_violin(coef=100) + labs(title = "Income Vs Frailty Vs Clavien-Dindo Grade 4 Complications in All UHS Colectomy Patients") +
-  scale_fill_discrete(name = "Clavien-Dindo Grade4"
-                      ,breaks = c("FALSE", "TRUE")
-                      ,labels = c("No", "Yes")
-  ) -> plot_any_cd4_violin;
-#' I should figure out how to print this table too:
-thecounts <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai, a_any_cd4, income_final) %>% group_by( a_discrete_rai, a_any_cd4) %>% count()
-plot_any_cd4_violin + annotate("text", x = c(0.8, 1.2, 1.8, 2.2, 2.8, 3.2)
-                        ,y = 10000, label = as.character(thecounts$n)
-                        ,size = 6)
+#trying to create the survival plots:
+#plt_rai_surv_death <-autoplot(coxph(Surv(a_t,a_c) ~ I(a_rai>median(a_rai)), data = sbs0$all$all_emergency)) # doesn't run at all
+# If it errors, don't leave it in uncommented-- that will cause it to fail
+# our RMarkdown test. Please either delete it or if you need it for future 
+# reference comment it out (plain comments, not #').
+
+# coxph is an analytic function so it goes into run.R. I realize that I probably
+# didn't communicate it very clearly because I also was talking about "keeping
+# everything in once place". I meant all the output-related functions in one 
+# place, but the clean separation between analysis and output such as 
+# vis/tabulation needs to maintained. I am commenting the coxph out and moving 
+# it to the end of run.R.
+#res.cox <- coxph(Surv(a_t,a_c) ~ a_rai, data = sbs0$all$all_emergency)
+# Now, the survfit() ones are a different story: they are not really analytic
+# they are for plots and tables, so they can stay here. But they need more 
+# descriptive names. Also, adding on an optional subset argument to get rid of
+# six negative time values. We need to investigate those later, but not time 
+# right now.
+surv.rai <- survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rai))
+                    , data = sbs0$all$all_emergency,subset=a_t>0);
+surv.rock <- survfit(Surv(a_t,a_c) ~ I(a_rockwood>median(a_rockwood))
+                     , data = sbs0$all$all_emergency,subset=a_t>0);
+#res.fit2 <- survfit(Surv(a_t,a_c) ~ cut(a_rai,3), data = sbs0$all$all_emergency)
+ggsurvplot(surv.rai);
+ggsurvplot(surv.rock);
+# The below is not actually doing facet_wrap for some reason-- the goal had been
+# to get them on one plot.
+#facet_wrap(ggsurvplot(surv.rai), ggsurvplot(surv.rock));
+# If it causes an error, don't leave it active.
+#ggsurvplot(res.cox) # doesn't run properly
 
 
-#selecting patients that DO NOT have Clavien-Dindo Grade 4 complications
-thedata2 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
-  filter(a_any_cd4=='FALSE')
-ggplot(data = thedata2, aes(x = a_discrete_rai
-                            ,y = income_final, fill = hispanic_ethnicity)) + 
-  geom_violin(coef=100) + labs(title = "Income Vs Frailty Vs Hispanic Ethnicity in All UHS Colectomy Patients with No CD4 Complications") +
-  scale_fill_discrete(name = "Ethnicity"
-                      ,breaks = c("No", "Unknown", "Yes")
-                      ,labels = c("Non-Hispanic", "Unknown", "Hispanic")
-  )-> plot_no_cd4_violin;
+# This overwrites the earlier res.cox with an incorrect predictor.
+#res.cox <- coxph(Surv(a_t,a_c) ~ I(a_rai>median(a_rai)), data = sbs0$all$all_emergency)
+# Why is this being created again? 
+#res.fit0 <- survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rai)), data = sbs0$all$all_emergency)
 
-#' I should figure out how to print this table too:
-thecounts2 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
-  filter(a_any_cd4=='FALSE') %>% count()
-plot_no_cd4_violin + annotate("text", x = c(0.75, 1.0, 1.25, 1.8, 2.2, 3.0)
-                       ,y = 10000, label = as.character(thecounts2$n)
-                       ,size = 5)
-
-#selecting patients that HAVE Clavien-Dindo Grade 4 complications
-thedata3 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
-  filter(a_any_cd4=='TRUE')
-ggplot(data = thedata3, aes(x = a_discrete_rai, y = income_final,fill=hispanic_ethnicity)) + 
-  geom_violin(coef=100) + labs(title = "Income Vs Frailty Vs Hispanic Ethnicity in All UHS Colectomy Patients with CD4 Complications") +
-  scale_fill_discrete(name = "Ethnicity"
-                      ,breaks = c("No", "Unknown", "Yes")
-                      ,labels = c("Non-Hispanic", "Unknown", "Hispanic")
-  )-> plot_cd4_violin;
-#' I should figure out how to print this table too:
-thecounts3 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai,hispanic_ethnicity) %>% 
-  filter(a_any_cd4=='TRUE') %>% count()
-plot_cd4_violin + annotate("text", x = c(0.75, 1.0, 1.25, 1.8, 2.2, 3.0)
-                    ,y = 10000, label = as.character(thecounts3$n)
-                    ,size = 5)
-
-#selecting patients that DO NOT have Clavien-Dindo Grade 4 complications
-#and are not hispanic
-thedata4 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai) %>% 
-  filter(hispanic_ethnicity=='No')
-ggplot(data = thedata4, aes(x = a_discrete_rai
-                            ,y = income_final, fill = a_any_cd4)) + 
-  geom_violin(coef=100) + 
-  labs(title = "Income Vs Frailty Vs CD4 Complications in Non-Hispanic UHS Colectomy Patients") +
-  scale_fill_discrete(name = "Clavien-Dindo Grade4"
-                      ,breaks = c("FALSE", "TRUE")
-                      ,labels = c("No", "Yes")
-  )-> plot_no_cd4_nohisp_violin;
-
-#' I should figure out how to print this table too:
-thecounts4 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai, a_any_cd4) %>% 
-  filter(hispanic_ethnicity=='No') %>% count()
-plot_no_cd4_nohisp_violin + annotate("text", x = c(0.75, 1.2, 1.8, 2.2)
-                              ,y = 10000, label = as.character(thecounts4$n)
-                              ,size = 5)
-#selecting patients that DO NOT have Clavien-Dindo Grade 4 complications
-#and are hispanic
-thedata5 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by( a_discrete_rai) %>% 
-  filter(hispanic_ethnicity=='Yes')
-ggplot(data = thedata5, aes(x = a_discrete_rai
-                            ,y = income_final, fill = a_any_cd4)) + 
-  geom_violin(coef=100) + 
-  labs(title = "Income Vs Frailty Vs CD4 Complications in UHS Hispanic Colectomy Patients") +
-  scale_fill_discrete(name = "Clavien-Dindo Grade4"
-                      ,breaks = c("FALSE", "TRUE")
-                      ,labels = c("No", "Yes")
-  )-> plot_no_cd4_hisp_violin;
-
-#' I should figure out how to print this table too:
-thecounts5 <- dat1subs[["all_colon_all"]] %>% select(a_discrete_rai,hispanic_ethnicity, income_final, a_any_cd4) %>% group_by(a_discrete_rai, a_any_cd4) %>% 
-  filter(hispanic_ethnicity=='Yes') %>% count()
-plot_no_cd4_hisp_violin + annotate("text", x = c(0.75, 1.2, 1.8, 2.2, 2.8, 3.2)
-                            ,y = 10000, label = as.character(thecounts5$n)
-                            ,size = 5)
+# Need a more descriptive name than theplotlist, making it pl_surv-- pl_ just like
+# the other pl_ objects created in this script indicates that it is plottable,
+# and surv means they are survival plots. Currently our only ones. As this evolves
+# beyond the February 2018 poster, we may later need to have an even more 
+# specific naming scheme
+pl_surv <-list(RAI=autoplot(surv.rai), Rockwood=autoplot(surv.rock));
+# below not worth it: a_rai identical to above, a_rockwood very close
+#pl_surv_roc <-list(RAI=autoplot(update(surv.rai,.~I(a_rai>6)))
+#                   , Rockwood=autoplot(update(surv.rock,.~I(a_rockwood>0.26))));
 
 
-#selecting patients that DO NOT have Clavien-Dindo Grade 4 complications
-#and are hispanic
-d2 <- rbind(dat1subs[["all_colon_all"]], dat1subs[["all_colon_all"]])
-d2$hispanic_ethnicity2 <- c(rep("All", times=nrow(dat1subs[["all_colon_all"]])), dat1subs[["all_colon_all"]]$hispanic_ethnicity)
-#re-leveling ethnicity
-d2$hispanic_ethnicity3 <- factor(d2$hispanic_ethnicity2, levels = c("All", "No", "Yes", "Unknown"))
+# These were not plots_cph_numeric, so renaming it. Actually reusing the pl_surv
+# object because the sapply result contains the same number and identities of
+# objects, with each one a superset of its respective original. If you disagree
+# and want to keep the previous step for debugging or whatever, please give it a 
+# prefix like .debug_ or .temp_ or .junk_ 
+pl_surv <- sapply(names(pl_surv)
+                  ,function(xx) pl_surv[[xx]] + 
+                    theme(legend.position = 'none') + 
+                    ggtitle(paste0(xx,', Split by Median')) +
+                    scale_y_continuous(limits=c(.5,1),labels = scales::percent) +
+                    labs(x='Time in Days', y = 'Survival'),simplify=F);
+multiplot(plotlist=pl_surv,cols=1);
 
-
-thedata6 <- d2 %>% select(hispanic_ethnicity3, income_final, a_any_cd4) %>% 
-  filter(hispanic_ethnicity3 %in% c("All", "No", "Yes")) %>% group_by( hispanic_ethnicity3, a_any_cd4) 
-
-  ggplot(data = thedata6, aes(x = hispanic_ethnicity3
-                            ,y = income_final, fill = a_any_cd4)) + 
-  geom_violin(coef=100) + 
-  labs(title = "Income Vs CD4 Complications in UHS Hispanic Colectomy Patients") +
-  scale_y_continuous(labels = comma) +
-  scale_fill_discrete(name = "Clavien-Dindo Grade4"
-                      ,breaks = c("FALSE", "TRUE")
-                      ,labels = c("No", "Yes")) +
-  scale_x_discrete(name = "Ethnicity"
-                   ,breaks = c("All", "No", "Yes")
-                   ,labels = c("All", "Non-Hispanic", "Hispanic")
-                   ) -> plot_no_rai_cd4_hisp_violin;
-
-#' I should figure out how to print this table too:
-thecounts6 <- thedata6 %>% group_by(hispanic_ethnicity3, a_any_cd4) %>% count()
-plot_no_rai_cd4_hisp_violin + annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2)
-                                   ,y = 5000, label = as.character(thecounts6$n)
-                                   ,size = 5)
-
-
-
-pdf(height = 10, width = 7.5, onefile = TRUE, file = paste0(outputpath,"UHS_ACSNSQIP_CD4comps_violinplots-DSW-", format(Sys.Date(), '%m-%d-%Y'),".pdf"))
-plot_any_cd4_violin + annotate("text", x = c(0.8, 1.2, 1.8, 2.2, 2.8, 3.2)
-                        ,y = 10000, label = as.character(thecounts$n)
-                        ,size = 6)
-plot_no_cd4_violin + annotate("text", x = c(0.75, 1.0, 1.25, 1.8, 2.2, 3.0)
-                       ,y = 10000, label = as.character(thecounts2$n)
-                       ,size = 5)
-plot_cd4_violin +annotate("text", x = c(0.75, 1.0, 1.25, 1.8, 2.2, 3.0)
-                   ,y = 10000, label = as.character(thecounts3$n)
-                   ,size = 5)
-plot_no_cd4_nohisp_violin + annotate("text", x = c(0.75, 1.2, 1.8, 2.2)
-                              ,y = 10000, label = as.character(thecounts4$n)
-                              ,size = 5)
-plot_no_cd4_hisp_violin + annotate("text", x = c(0.75, 1.2, 1.8, 2.2, 2.8, 3.2)
-                            ,y = 10000, label = as.character(thecounts5$n)
-                            ,size = 5)
-plot_no_rai_cd4_hisp_violin + annotate("text", x = c(0.75, 1.2, 1.8, 2.25, 2.8, 3.2)
-                                       ,y = 5000, label = as.character(thecounts6$n)
-                                       ,size = 5)
 
 dev.off()
