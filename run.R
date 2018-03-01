@@ -521,3 +521,5 @@ cox.rai.train <- coxph(Surv(a_t,a_c) ~ a_rai, data = sbs0$train$all_emergency
                  ,subset=a_t>0);
 cox.rock.train <- coxph(Surv(a_t,a_c) ~ a_rockwood, data = sbs0$train$all_emergency
                  ,subset=a_t>0);
+cox.mfi.train <- coxph(Surv(a_t,a_c) ~ a_mfi, data=sbs0$train$all_emergency
+                       ,subset=a_t>0);

@@ -34,6 +34,7 @@ thecolnames1 <- c("RAI-A Score"='rai_range'
                   ,"Rockwood Score"='a_rockwood_range'
                   ,"RAI-A"='a_rai'
                   ,"Rockwood"='a_rockwood'
+                  ,"mFI"='a_mfi'
                   ,"Income"='income_final'
                   ,"Gender"='gender'
                   ,"Hispanic"='hispanic_ethnicity'
@@ -221,26 +222,28 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 fit_srvs <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rai))
                             , data = sbs0$all$all_emergency,subset=a_t>0)
                 ,Rockwood=survfit(Surv(a_t,a_c) ~ I(a_rockwood>median(a_rockwood))
-                            , data = sbs0$all$all_emergency,subset=a_t>0));
+                            , data = sbs0$all$all_emergency,subset=a_t>0)
+                ,mFI=survfit(Surv(a_t,a_c) ~ I(a_rockwood>median(a_rockwood))
+                             , data = sbs0$all$all_emergency,subset=a_t>0));
 # what if we cut them along their optimal thresholds?
-fit_srvs_optcut <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>9.5)
-                                 , data = sbs0$all$all_emergency,subset=a_t>0)
-                 ,Rockwood=survfit(Surv(a_t,a_c) ~ I(a_rockwood>0.264245)
-                                   , data = sbs0$all$all_emergency,subset=a_t>0));
+# fit_srvs_optcut <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>9.5)
+#                                  , data = sbs0$all$all_emergency,subset=a_t>0)
+#                  ,Rockwood=survfit(Surv(a_t,a_c) ~ I(a_rockwood>0.264245)
+#                                    , data = sbs0$all$all_emergency,subset=a_t>0));
 pl_srvs <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30)) + 
                     ggtitle(paste0(bb,' as a predictor of  death/readmission')) +
                     scale_y_continuous(labels=scales::percent) +
                     scale_color_discrete(bb,labels=c('Low','High')) +
                     scale_fill_discrete(bb,labels=c('Low','High')) +
-                    labs(x='Days Post-Surgery',y='No Death or Readmission')
+                    labs(x='Days Post-Surgery',y='No Death nor \nReadmission')
                   ,fit_srvs,names(fit_srvs),SIMPLIFY = F);
-pl_srvs_optcut <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30)) + 
-                    ggtitle(paste0(bb,' as a predictor, OPTCUT')) +
-                    scale_y_continuous(labels=scales::percent) +
-                    scale_color_discrete(bb,labels=c('Low','High')) +
-                    scale_fill_discrete(bb,labels=c('Low','High')) +
-                    labs(x='Days Post-Surgery',y='No Death or Readmission')
-                  ,fit_srvs_optcut,names(fit_srvs),SIMPLIFY = F);
+# pl_srvs_optcut <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30)) + 
+#                     ggtitle(paste0(bb,' as a predictor, OPTCUT')) +
+#                     scale_y_continuous(labels=scales::percent) +
+#                     scale_color_discrete(bb,labels=c('Low','High')) +
+#                     scale_fill_discrete(bb,labels=c('Low','High')) +
+#                     labs(x='Days Post-Surgery',y='No Death or Readmission')
+#                   ,fit_srvs_optcut,names(fit_srvs),SIMPLIFY = F);
 
 multiplot(plotlist=pl_srvs,cols=1);
 #' 
@@ -254,7 +257,9 @@ multiplot(plotlist=pl_srvs,cols=1);
 #' #### Table 2. Results of Cox survival model fits
 #'
 #+ results='asis'
-t_coxresults <- sapply(fit_coxs<-list(`RAI-A`=cox.rai.train,`Rockwood`=cox.rock.train)
+t_coxresults <- sapply(fit_coxs<-list(`RAI-A`=cox.rai.train
+                                      ,`Rockwood`=cox.rock.train
+                                      ,`mFI`=cox.mfi.train)
                        ,function(xx) cbind(tidy(xx),glance(xx)),simplify=F) %>% 
   do.call('rbind',.) %>% `[`(,c('n','nevent','estimate','std.error','statistic'
                                 ,'p.value','r.squared','concordance'
@@ -295,6 +300,13 @@ countfrac(sbs0$all$all_emergency,groupcols = 'rai_range') %>%
 #+ table_rockcounts, results='asis'
 countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);
+
+#' #### Table 3c. Event frequencies broken down by mFI range
+#' 
+#+ table_mficounts, results='asis'
+countfrac(sbs0$all$all_emergency,groupcols = 'a_mfi_range') %>% 
+  mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);
+
 #' 
 #' ## RAI-A and Rockwood have equivalent concordances and AUCs
 #' 
@@ -313,13 +325,15 @@ countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>%
 #' 
 #' #### Figure 2. ROC curves for RAI-A and Rockwood
 #' 
-l_rocs <- with(sbs0$train,lapply(all_emergency[,c('a_rai','a_rockwood')]
+l_rocs <- with(sbs0$train,lapply(all_emergency[,c('a_rai','a_rockwood','a_mfi')]
                                  ,function(xx) roc(response=all_emergency$a_c
                                                    ,predictor=xx)));
 plot(l_rocs$a_rai,col='orange');
 lines(l_rocs$a_rockwood,col='darkgreen');
-legend('topleft',bty ='n',col=c('orange','darkgreen'),lwd=3
-       ,legend=sprintf('%s (AUC=%0.3f)',c('RAI-A','Rockwood'),sapply(l_rocs,auc)));
+lines(l_rocs$a_mfi,col='purple');
+legend('topleft',bty ='n',col=c('orange','darkgreen','purple'),lwd=3
+       ,legend=sprintf('%s (AUC=%0.3f)',c('RAI-A','Rockwood','mFI')
+                       ,sapply(l_rocs,auc)));
 #' 
 #' ## Optimal threshold values for RAI-A and Rockwood
 #' 
@@ -363,7 +377,7 @@ lapply(l_rocs,coords,'b',ret=c('tn','fn','fp','tp')) %>%
 #+ prep_coxauc
 crossval_cox <- lapply(sbs0[c('train','test')],function(xx) {
   with(subset(xx$all_emergency,a_t>0)
-       ,data.frame(resp=Surv(a_t,a_c),a_rai,a_rockwood))});
+       ,data.frame(resp=Surv(a_t,a_c),a_rai,a_rockwood,a_mfi))});
 # now the Cox linear predictors
 for(ii in names(crossval_cox)) for(jj in names(fit_coxs)) 
   crossval_cox[[ii]][[jj]] <- predict(fit_coxs[[jj]],newdata = crossval_cox[[ii]]);
