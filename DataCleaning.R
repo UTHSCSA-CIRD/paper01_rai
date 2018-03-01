@@ -15,7 +15,7 @@ source('global.R');
 # tlmgr install wrapfig
 # tlmgr install tabu
 # 
-#' Report date: `r date()`.
+#' Report date: `r Sys.Date()`.
 #'
 #' Revision: `r gitstamp()`.
 #'
