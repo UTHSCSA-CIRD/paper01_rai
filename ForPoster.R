@@ -15,17 +15,19 @@
 #     reference_docx: styletemplate.docx
 knitr::opts_chunk$set(echo=F,warning = F,cache=F,message=F);
 options(knitr.kable.NA='');
-#+ source_global,results='hide'
-source('global.R');
+options(runr.prodgitstamp=F);
 #' Report date: `r Sys.Date()`.
 #'
 #' #### Audit Info
-#+ projinfo,results='asis',cache=FALSE
-lapply(PI,rbind) %>% lapply(as.character) %>% lapply(`length<-`,2) %>% 
-  bind_cols %>% t %>% kable(format = 'markdown',col.names = c('value','hash'));
 #' 
 #+ cache=TRUE,echo=FALSE,results='hide'
 source('run.R');
+#+ source_global,results='hide'
+source('global.R');
+#+ projinfo,results='asis',cache=FALSE
+lapply(PI,rbind) %>% lapply(as.character) %>% lapply(`length<-`,2) %>% 
+  bind_cols %>% t %>% kable(format = 'markdown',col.names = c('value','hash'));
+
 #+ poster_variables
 thecolnames1 <- c("RAI-A Score"='rai_range'
                   ,"Rockwood Score"='a_rockwood_range'
@@ -60,6 +62,7 @@ thecolnames1 <- c("RAI-A Score"='rai_range'
                   ,"Negative Predictive Value"='npv'
                   ,"Positive Predictive Value"='ppv'
 );
+
 # this is a list of functions from survAUC that return predictive accuracy metrics
 c_auclist<-c('AUC.cd','AUC.hc','AUC.sh','AUC.uno','BeggC','GHCI','Nagelk','OXS','UnoC','XO');
 

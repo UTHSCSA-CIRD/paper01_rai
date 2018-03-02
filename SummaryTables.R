@@ -7,6 +7,8 @@
 #'
 #+ echo=FALSE, message=FALSE
 knitr::opts_chunk$set(echo=F,warning = F,cache=T,message=F);
+options(knitr.kable.NA='');
+options(runr.prodgitstamp=F);
 #+ source_global,cache=FALSE,results='hide'
 source('global.R');
 # Note: if the lanscape classoption errors on your machine, you need an

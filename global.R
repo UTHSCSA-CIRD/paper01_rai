@@ -42,12 +42,12 @@ tryCatch(PI[['incache_run']] <-c(value=normalizePath(incache_run),hash=unname(md
          ,error=function(ee) warning(ee,immediate. = T)
          ,finally=cat('Checking for valid incache_run file...\n'));
 cat('Checking for valid outcache_path...\n');
-if(exists('outcache_path') && file_test('-d',outcache_path)){
+if(exists('outcache_path',1) && file_test('-d',outcache_path)){
   PI[['outcache_path']]<-c(value=normalizePath(outcache_path));
 } else stop("The 'outcache_path' variable either was not set or does not specify a valid directory path. Please set it in your config.R");
 
 options(runr.makeoutcache=if(exists('create_outcache')) create_outcache else F);
-if(exists('update_incache_run')) options(runr.updincacherun=update_incache_run);
+if(exists('update_incache_run',1)) options(runr.updincacherun=update_incache_run);
 
 #' ## Load project-level metadata and functions
 source('./metadata.R'); 
@@ -56,7 +56,7 @@ source('./functions.R');
 #' 
 #' git hash
 PI$revision <- gitstamp(production=F,branch=T);
-tryCatch(PI$revision <- gitstamp(production = T,branch=T)
+tryCatch(PI$revision <- gitstamp(production = getOption('runr.prodgitstamp',T),branch=T)
          ,error=function(ee) warning(ee,immediate. =T)
          ,finally=cat('Checking to see if code is properly checked in...\n'));
 #' 

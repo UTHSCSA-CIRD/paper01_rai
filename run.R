@@ -555,5 +555,5 @@ if(!interactive()||file.exists('cleanrun')) {
   };
   # now delete everything to keep it from mucking up the environment of whatever
   # is calling this script
-  rm(list=ls(all=T));
+  #rm(list=ls(all=T));
 };
