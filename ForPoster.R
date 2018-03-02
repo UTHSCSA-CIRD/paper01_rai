@@ -19,7 +19,7 @@ options(knitr.kable.NA='');
 source('global.R');
 #' Report date: `r Sys.Date()`.
 #'
-#' Revision: `r gitstamp(production=T)`.
+#' Revision: `r gitstamp(production=F)`.
 #'
 #' Data file: `r inputdata`.
 #' 
@@ -223,7 +223,7 @@ fit_srvs <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rai))
                             , data = sbs0$all$all_emergency,subset=a_t>0)
                 ,Rockwood=survfit(Surv(a_t,a_c) ~ I(a_rockwood>median(a_rockwood))
                             , data = sbs0$all$all_emergency,subset=a_t>0)
-                ,mFI=survfit(Surv(a_t,a_c) ~ I(a_rockwood>median(a_rockwood))
+                ,mFI=survfit(Surv(a_t,a_c) ~ I(a_mfi>median(a_mfi))
                              , data = sbs0$all$all_emergency,subset=a_t>0));
 # what if we cut them along their optimal thresholds?
 # fit_srvs_optcut <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>9.5)
