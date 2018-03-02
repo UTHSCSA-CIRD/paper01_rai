@@ -5,10 +5,10 @@
 #' ---
 #'
 #+ echo=FALSE, message=FALSE
-knitr::opts_chunk$set(echo=F,warning = F,cache=T,message=F);
+knitr::opts_chunk$set(echo=F,warning = F,cache=F,message=F);
 #+ cache=FALSE
 options(knitr.kable.NA='');
-options(runr.prodgitstamp=T);
+options(runr.prodgitstamp=F);
 #+ cache=FALSE,results='hide'
 source('global.R');
 #+ echo=TRUE,results='markdown'
