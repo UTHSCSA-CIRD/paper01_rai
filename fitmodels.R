@@ -7,7 +7,7 @@
 #+ echo=FALSE, message=FALSE
 knitr::opts_chunk$set(echo=F,warning = F,cache=T,message=F);
 options(knitr.kable.NA='');
-options(runr.prodgitstamp=F);
+options(runr.prodgitstamp=T);
 #+ cache=FALSE,results='hide'
 source('global.R');
 #+ echo=TRUE,results='markdown'
@@ -56,7 +56,7 @@ ls();
 #+ results='asis'
 installed.packages()[,c('Package','Version')] %>% data.frame %>% 
   subset(Package %in% (search() %>% gsub('^package:','',.))) %>% 
-  kable(format = 'markdown');
+  kable(format = 'markdown',row.names = F);
 #' 
 #' 
 #' 
