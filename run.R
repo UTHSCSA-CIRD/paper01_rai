@@ -543,16 +543,16 @@ cox.rock.train <- coxph(Surv(a_t,a_c) ~ a_rockwood, data = sbs0$train$all_emerge
 previous.PI <- PI;
 rm(PI);
 if(!interactive()||file.exists('cleanrun')) {
-  warning('Creating run.R results cache');
+  warning(sprintf('Creating %s results cache',previous.PI$basefname));
   save.image(file=cfile<-paste0(previous.PI$outcache_path
-                         ,'/'
-                         ,gsub('\\.r$','',previous.PI$basefname,ignore.case = T)
-                         ,format(Sys.time(),'.%Y.%m.%d.%s.rdata')));
+                                ,'/'
+                                ,nametag<-gsub('\\.r$','',previous.PI$basefname,ignore.case = T)
+                                ,format(Sys.time(),'.%Y.%m.%d.%s.rdata')));
   # update the local 'config.R' with the path to this cache file, if the 
   # user has indicated they want this by setting option(runr.updincacherun=T)
-  if(getOption('runr.updincacherun',F)){
-    write(sprintf("incache_run <- '%s'\n",cfile),file='config.R',append=T);
-    };
+  if(getOption(sprintf('runr.updincache%s',nametag),F)){
+    write(sprintf("incache_%s <- '%s'\n",c(nametag,cfile)),file='config.R',append=T);
+  };
   # now delete everything to keep it from mucking up the environment of whatever
   # is calling this script
   rm(list=ls(all=T));
