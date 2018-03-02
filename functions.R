@@ -299,13 +299,14 @@ vartype <- function(dat, ctype) {
 #' TODO: instead of auto-committing, error if uncommited changes, needs to be 
 #' a deliberate process, otherwise we have tons of meaningless auto-commit
 #' messages that will make future maintenance harder
-gitstamp <- function(production=T) {
+gitstamp <- function(production=T,branch=F) {
+  br<- if(branch) system("git rev-parse --abbrev-ref HEAD",intern=T) else NULL;
   if(production){
     if(length(gitdiff<-system("git update-index --refresh && git diff-index HEAD --",intern = T))!=0) stop(sprintf(
       "\ngit message: %s\n\nYou have uncommitted changes. Please do 'git commit' and then try again."
       ,gitdiff));
-    system("git push && git log --pretty=format:'%h' -n 1",intern=T);
-  } else return('TEST_OUTPUT_DO_NOT_USE');
+    c(br,system("git push && git log --pretty=format:'%h' -n 1",intern=T));
+  } else return(c(br,'TEST_OUTPUT_DO_NOT_USE'));
 }
 
 #' This function can be called from `stat_summary()` as the
@@ -482,9 +483,9 @@ raiscore <- function(xx){
     8*(origin_status!='Not transferred (admitted from home)') +
     ifelse(disseminated_cancer=='Yes'
            # scoring for age when there is cancer
-           ,as.numeric(cut(dat1$age_at_time_surg,breaks = c(0,69,74,79,84,89,99,Inf),labels = c(20,19,18,17,15,14,13)))
+           ,as.numeric(cut(age_at_time_surg,breaks = c(0,69,74,79,84,89,99,Inf),labels = c(20,19,18,17,15,14,13)))
            # scoring for age when there is no cancer
-           ,as.numeric(cut(dat1$age_at_time_surg,breaks = c(0,69,74,79,84,89,94,99,Inf),labels = 2:9))
+           ,as.numeric(cut(age_at_time_surg,breaks = c(0,69,74,79,84,89,94,99,Inf),labels = 2:9))
     ))
   }
   
@@ -502,8 +503,8 @@ raiscore.bak <- function(xx){
          ifelse(functnal_heath_status=='Partially Dependent',10,0) +
          ifelse(functnal_heath_status=='Totally Dependent',21,0) +
          ifelse(disseminated_cancer=='Yes'
-                ,as.numeric(cut(dat1$age_at_time_surg,breaks = c(0,69,74,79,84,89,99,Inf),labels = c(20,19,18,17,15,14,13)))
-                ,as.numeric(cut(dat1$age_at_time_surg,breaks = c(0,69,74,79,84,89,94,99,Inf),labels = 2:9))
+                ,as.numeric(cut(age_at_time_surg,breaks = c(0,69,74,79,84,89,99,Inf),labels = c(20,19,18,17,15,14,13)))
+                ,as.numeric(cut(age_at_time_surg,breaks = c(0,69,74,79,84,89,94,99,Inf),labels = 2:9))
                 )
        );
 }
@@ -532,9 +533,13 @@ raiscore.bak <- function(xx){
 v <- function(var,dat
               ,matchcol='dataset_column_names'
               ,retcol=matchcol
-              ,dictionary=dct0) {
+              ,dictionary=dct0
+              ,env=parent.env()) {
   # convenience function: if forgot what column names are available, call with
   # no arguments and they will be listed
+  
+  #dctdbg<-tryCatch(nrow(dictionary));
+  #if(is(dctdbg,'try-error')) browser();
   if(missing(var)) return(names(dictionary));
   # support both standard or non-standard evaluation
   var<-as.character(substitute(var));

@@ -7,10 +7,30 @@
 #' Please read this file through before trying to run it. The comments tell
 #' you what you need to edit in order to proceed.
 #' 
+#' Here is the reasoning behind this new code... run.R is supposed to process
+#' the data for all the other scripts. As this project develops, it will do
+#' more and more things, and thus take longer and longer to run. Thus the need
+#' for the caching feature. On the other hand, we want the information needed
+#' to reproduce the analysis always bound tightly to the final output. So if
+#' the output relies on cached results rather than always sourcing `run.R` that
+#' means the cache needs to contain all the information needed to reproduce it 
+#' exactly. We should never trust cached results unless they start with a 
+#' completely empty .GlobalEnv. So this is what the `rm(list=ls(all=T))` is
+#' for. But if we call `run.R` interactively or call something interactively 
+#' that calls it, and it "cleans up" the environment, that could result in 
+#' really loud screaming of curse words. So, before we empty out `.GlobalEnv`
+#' we check to see if this session is interactive and if it is, we don't do 
+#' it. But if we want to impersonate a non-interactive session for purposes
+#' of debugging or convenience, the non-interactive behavior will also be 
+#' enabled by the existence in the local directory of a file called `'cleanrun'`
+#+ cleanup
+if(!interactive()||file.exists('cleanrun')) rm(list=ls(all=T));
+#'
 #+ source_global
 source('global.R');
-pi$project_seed <- c(value=20180218);
-basefname <- gsub('.r$','',basename(parent.frame(2)$ofile),ignore.case = T);
+PI$project_seed <- c(value=20180218);
+PI$basefname <- c(value=basename(parent.frame(2)$ofile));
+#basefname <- gsub('.r$','',basename(parent.frame(2)$ofile),ignore.case = T);
 
 #' ## Load data if it exists 
 #' 
@@ -18,12 +38,14 @@ basefname <- gsub('.r$','',basename(parent.frame(2)$ofile),ignore.case = T);
 #'if(session %in% list.files()) load(session);
 #' Load your data. Notice that we're using `read_csv()` from the readr library.
 #' It is a little smarter than the built-in `read.csv()`
-cost0 <- read_tsv(pi$inputdata_cost[1],na=c('(null)',''));
-dat0 <- read_tsv(pi$inputdata[1],na=c('(null)',''));
+cost0 <- read_tsv(PI$inputdata_cost[1],na=c('(null)',''));
+dat0 <- read_tsv(PI$inputdata[1],na=c('(null)',''));
 
 #' Read in the data dictionary
-dct0 <- read_csv(pi$dctfile[1],na = '');
-dct1 <- read_csv(pi$cptfile[1],na='');
+dct0 <- read_csv(PI$dctfile[1],na = '');
+formals(v)$dictionary <- dct0;
+
+dct1 <- read_csv(PI$cptfile[1],na='');
 
 colnames(dat0) <- tolower(colnames(dat0));
 colnames(cost0) <- tolower(colnames(cost0));
@@ -89,7 +111,7 @@ dat1[dat0$height_unit=='in','height_unit'] <- c('cm');
 #' 
 #' As long as the seed is the same, all random values will be generated the same
 #' reproducibly.
-set.seed(pi$project_seed);
+set.seed(PI$project_seed);
 #' Randomly assign IDN_MRNs to training, testing, or validation sets
 pat_samples <- split(dat1$idn_mrn,sample(c('train','test','val')
                                          ,size=nrow(dat1),rep=T));
@@ -354,9 +376,8 @@ dat1namelookup <- with(dct0,setNames(dataset_column_names
 #' versions of the same graph, as for item #3 of the 10/13/2017 PKS email.
 
 #identifying the colectomy patients that have multiple visits:
-dup_mrn <- unlist(dat1 %>% filter(cpt_code %in% v(c_all_colon,di=dct1)) %>%
+dup_mrn <- unlist(dat1 %>% filter(cpt_code %in% v(c_all_colon,di=eval(dct1))) %>%
                     filter(duplicated(idn_mrn)==TRUE) %>% select(idn_mrn));
-
 #dropping visits after the index colectomy procedure for colectomy patients:
 drop_case_num <- unlist(sapply(dup_mrn, function(themrn){
   mat0 <- dat1 %>% select(idn_mrn, case_number, hospital_admissn_dt) %>% 
@@ -375,37 +396,37 @@ subs_criteria <- alist(
   ,all_elective=elective_surg=='Yes'
   ,all_urgent=elective_surg=='No' & emergency_case=='No'
   ,all_emergency=emergency_case=='Yes'
-  ,all_colon_all=cpt_code %in% v(c_all_colon,di=dct1) & !(case_number %in% drop_case_num)
+  ,all_colon_all=cpt_code %in% v(c_all_colon,di=eval(dct1)) & !(case_number %in% drop_case_num)
   # coming soon:
   #,all_colon_all_2017 = 
-  ,all_colon_elective=cpt_code %in% v(c_all_colon,di=dct1) & elective_surg=='Yes' & 
+  ,all_colon_elective=cpt_code %in% v(c_all_colon,di=eval(dct1)) & elective_surg=='Yes' & 
     !(case_number %in% drop_case_num)
-  ,all_colon_urgent=cpt_code %in% v(c_all_colon,di=dct1) & elective_surg=='No' & 
+  ,all_colon_urgent=cpt_code %in% v(c_all_colon,di=eval(dct1)) & elective_surg=='No' & 
     emergency_case=='No' &
     !(case_number %in% drop_case_num)
-  ,all_colon_emergency=cpt_code %in% v(c_all_colon,di=dct1) &
+  ,all_colon_emergency=cpt_code %in% v(c_all_colon,di=eval(dct1)) &
     emergency_case=='Yes' & 
     !(case_number %in% drop_case_num)
-  ,open_colon_all=cpt_code %in% v(c_open_colon,di=dct1) &
+  ,open_colon_all=cpt_code %in% v(c_open_colon,di=eval(dct1)) &
     !case_number %in% drop_case_num
-  ,open_colon_elective=cpt_code %in% v(c_open_colon,di=dct1) &
+  ,open_colon_elective=cpt_code %in% v(c_open_colon,di=eval(dct1)) &
     elective_surg=='Yes' &
     !(case_number %in% drop_case_num)
-  ,open_colon_urgent=cpt_code %in% v(c_open_colon,di=dct1) &
+  ,open_colon_urgent=cpt_code %in% v(c_open_colon,di=eval(dct1)) &
     elective_surg=='No' & emergency_case=='No' &
     !(case_number %in% drop_case_num)
-  ,open_colon_emergency=cpt_code %in% v(c_open_colon,di=dct1) &
+  ,open_colon_emergency=cpt_code %in% v(c_open_colon,di=eval(dct1)) &
     emergency_case=='Yes' &
     !(case_number %in% drop_case_num)
-  ,lapa_colon_all=cpt_code %in% v(c_lapa_colon,di=dct1) &
+  ,lapa_colon_all=cpt_code %in% v(c_lapa_colon,di=eval(dct1)) &
     !(case_number %in% drop_case_num)
-  ,lapa_colon_elective=cpt_code %in% v(c_lapa_colon,di=dct1) &
+  ,lapa_colon_elective=cpt_code %in% v(c_lapa_colon,di=eval(dct1)) &
     elective_surg=='Yes' &
     !(case_number %in% drop_case_num)
-  ,lapa_colon_urgent=cpt_code %in% v(c_lapa_colon,di=dct1) &
+  ,lapa_colon_urgent=cpt_code %in% v(c_lapa_colon,di=eval(dct1)) &
     elective_surg=='No' & emergency_case=='No' &
     !(case_number %in% drop_case_num)
-  ,lapa_colon_emergency=cpt_code %in% v(c_lapa_colon,di=dct1) &
+  ,lapa_colon_emergency=cpt_code %in% v(c_lapa_colon,di=eval(dct1)) &
     emergency_case=='Yes' & !(case_number %in% drop_case_num)
   ,ssi_all=a_any_ssi>0
 );
@@ -517,3 +538,22 @@ cox.rai.train <- coxph(Surv(a_t,a_c) ~ a_rai, data = sbs0$train$all_emergency
                  ,subset=a_t>0);
 cox.rock.train <- coxph(Surv(a_t,a_c) ~ a_rockwood, data = sbs0$train$all_emergency
                  ,subset=a_t>0);
+#' 
+#' # Caching results
+previous.PI <- PI;
+rm(PI);
+if(!interactive()||file.exists('cleanrun')) {
+  warning('Creating run.R results cache');
+  save.image(file=cfile<-paste0(previous.PI$outcache_path
+                         ,'/'
+                         ,gsub('\\.r$','',previous.PI$basefname,ignore.case = T)
+                         ,format(Sys.time(),'.%Y.%m.%d.%s.rdata')));
+  # update the local 'config.R' with the path to this cache file, if the 
+  # user has indicated they want this by setting option(runr.updincacherun=T)
+  if(getOption('runr.updincacherun',F)){
+    write(sprintf("incache_run <- '%s'\n",cfile),file='config.R',append=T);
+    };
+  # now delete everything to keep it from mucking up the environment of whatever
+  # is calling this script
+  rm(list=ls(all=T));
+};

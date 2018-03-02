@@ -21,7 +21,7 @@ source('global.R');
 #' 
 #' #### Audit Info
 #+ projinfo,results='asis'
-lapply(pi,rbind) %>% lapply(as.character) %>% lapply(`length<-`,2) %>% 
+lapply(PI,rbind) %>% lapply(as.character) %>% lapply(`length<-`,2) %>% 
   bind_cols %>% t %>% kable(format = 'markdown',col.names = c('value','hash'));
 #'
 #+ source_run,cache=TRUE,results='hide'

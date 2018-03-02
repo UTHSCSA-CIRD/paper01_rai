@@ -31,25 +31,20 @@ enableJIT(3);
 #+ global_val, message=FALSE
 tryCatch(source('./config.R'),error=function(ee) stop(ee)
          ,finally=cat('\nValidating config.R file:\n'));
-pi<-list(); comment(pi) <- "Project Info";
-tryCatch(pi[['inputdata']] <-c(value=normalizePath(inputdata),hash=unname(md5sum(inputdata)))
+PI<-list(); comment(PI) <- "Project Info";
+tryCatch(PI[['inputdata']] <-c(value=normalizePath(inputdata),hash=unname(md5sum(inputdata)))
          ,error=function(ee) stop(ee)
          ,finally=cat('Checking for valid inputdata file...\n'));
-tryCatch(pi[['inputdata_cost']] <-c(value=normalizePath(inputdata_cost),hash=unname(md5sum(inputdata_cost)))
+tryCatch(PI[['inputdata_cost']] <-c(value=normalizePath(inputdata_cost),hash=unname(md5sum(inputdata_cost)))
          ,error=function(ee) stop(ee)
          ,finally=cat('Checking for valid inputdata_cost file...\n'));
-tryCatch(pi[['incache_run']] <-c(value=normalizePath(incache_run),hash=unname(md5sum(incache_run)))
+tryCatch(PI[['incache_run']] <-c(value=normalizePath(incache_run),hash=unname(md5sum(incache_run)))
          ,error=function(ee) warning(ee,immediate. = T)
          ,finally=cat('Checking for valid incache_run file...\n'));
 cat('Checking for valid outcache_path...\n');
 if(exists('outcache_path') && file_test('-d',outcache_path)){
-  pi[['outcache_path']]<-c(value=normalizePath(outcache_path));
+  PI[['outcache_path']]<-c(value=normalizePath(outcache_path));
 } else stop("The 'outcache_path' variable either was not set or does not specify a valid directory path. Please set it in your config.R");
-
-pi$revision <- c(value='gitstamp',hash='TEST_OUTPUT_DO_NOT_USE');
-tryCatch(pi$revision <- c(value='gitsamp',hash=gitstamp())
-         ,error=function(ee) warning(ee,immediate. =T)
-         ,finally=cat('Checking to see if code is properly checked in...\n'));
 
 options(runr.makeoutcache=if(exists('create_outcache')) create_outcache else F);
 if(exists('update_incache_run')) options(runr.updincacherun=update_incache_run);
@@ -59,16 +54,22 @@ source('./metadata.R');
 source('./functions.R');
 #' ## Set generic variables
 #' 
+#' git hash
+PI$revision <- gitstamp(production=F,branch=T);
+tryCatch(PI$revision <- gitstamp(production = T,branch=T)
+         ,error=function(ee) warning(ee,immediate. =T)
+         ,finally=cat('Checking to see if code is properly checked in...\n'));
+#' 
 #' data dictionary:
 dctfile <- 'VariableNamesFromUHSNSQIP.csv';
-tryCatch(pi$dctfile <- c(value=normalizePath(dctfile),hash=unname(md5sum(dctfile)))
+tryCatch(PI$dctfile <- c(value=normalizePath(dctfile),hash=unname(md5sum(dctfile)))
          ,error=function(ee) stop(ee)
          ,finally=cat('Checking for valid dctfile...\n'));
 rm(dctfile);
 
 #' CPT code dictionary
 cptfile <- 'cpt_dictionary.csv';
-tryCatch(pi$cptfile <- c(value=normalizePath(cptfile),hash=unname(md5sum(cptfile)))
+tryCatch(PI$cptfile <- c(value=normalizePath(cptfile),hash=unname(md5sum(cptfile)))
          ,error=function(ee) stop(ee)
          ,finally=cat('Checking for valid cptfile...\n'));
 rm(cptfile);

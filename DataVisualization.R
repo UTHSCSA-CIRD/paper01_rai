@@ -12,13 +12,12 @@ source('global.R');
 #'
 #' Revision: `r gitstamp(production=F)`.
 #' 
-#' #### Audit Info
-#+ projinfo,results='asis'
-lapply(pi,rbind) %>% lapply(as.character) %>% lapply(`length<-`,2) %>% 
-  bind_cols %>% t %>% kable(format = 'markdown',col.names = c('value','hash'));
-#' 
 #+ cache=TRUE,results='hide'
 source('run.R');
+#' #### Audit Info
+#+ projinfo,results='asis'
+lapply(PI,rbind) %>% lapply(as.character) %>% lapply(`length<-`,2) %>% 
+  bind_cols %>% t %>% kable(format = 'markdown',col.names = c('value','hash'));
 
 # Note: above I set the global options so that the code is hidden in this report.
 # Comments beginning with # are code and therefore get hidden (only the output
