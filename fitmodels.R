@@ -6,7 +6,7 @@
 #'
 #+ echo=FALSE, message=FALSE
 knitr::opts_chunk$set(echo=F,warning = F,cache=T,message=F);
-#+ cache=F
+#+ cache=FALSE
 options(knitr.kable.NA='');
 options(runr.prodgitstamp=T);
 #+ cache=FALSE,results='hide'

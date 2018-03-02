@@ -55,10 +55,11 @@ source('./functions.R');
 #' ## Set generic variables
 #' 
 #' git hash
-PI$revision <- gitstamp(production=F,branch=T);
-tryCatch(PI$revision <- gitstamp(production = getOption('runr.prodgitstamp',T),branch=T)
-         ,error=function(ee) stop(ee,immediate. =T)
-         ,finally=cat('Checking to see if code is properly checked in...\n'));
+PI$revision <- gitstamp(getOption('runr.prodgitstamp',T),branch=T);
+#PI$revision <- gitstamp(production=F,branch=T);
+#tryCatch(PI$revision <- gitstamp(production = getOption('runr.prodgitstamp',T),branch=T)
+#         ,error=function(ee) stop(ee,immediate. =T)
+#         ,finally=cat('Checking to see if code is properly checked in...\n'));
 #' 
 #' data dictionary:
 dctfile <- 'VariableNamesFromUHSNSQIP.csv';
