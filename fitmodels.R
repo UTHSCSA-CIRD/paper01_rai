@@ -46,8 +46,26 @@ if(exists('PI')){
   cat('inputdata:',inputdata);
   cat('inputdata_cost:',inputdata_cost);
 }
-#' ### Hi world
+#' Declare the predictors, responses (by type), covariates
+#' and the right-hand sides of additive models and of models
+#' with 2-way interactions
+l_mainpreds <- c('a_rai','a_rockwood');
+ll_resps <- list(
+  counts = c('a_postop','a_cd4')
+  ,t2event = 'a_t'
+  ,cevent = c('a_c_death','a_c_readm','a_c')
+);
+l_covars <- c('income_final','sex','hispanic_ethnicity','age_at_time_surg')
+
+l_forms_add <- sapply(l_mainpreds
+                      ,function(xx) paste0('.~',xx,paste(l_covars,collapse='+'))
+                      ,simplify=F) %>% lapply(as.formula);
+l_forms_2int <- lapply(l_forms_add,update,.~(.)^2);
+l_forms_univar <- sapply(l_mainpreds,function(xx) paste0('.~',xx)) %>% 
+  lapply(as.formula);
 #' 
+#' Then we will create the left-hand sides, which is trickier due to some
+#' responses being Surv(a_t,a_c_FOO)~. and some being FOO~
 #' 
 #' 
 #' 

@@ -152,19 +152,26 @@ dat1$a_transfer <- dat1$origin_status!='Not transferred (admitted from home)';
 dat1$a_readm_30_dy <- dat1$readm_30_dy>0; 
 
 #' Time from surgery to adverse outcome if any
-dat1$a_t <- with(dat1
+#' Censor the variables at 30 days
+dat1$a_t_readm <- with(dat1
                  ,pmin(
-                   dt_death
-                   ,dt_first_readm
+                   dt_first_readm
                    ,dt_first_unpl_ret_or
                    ,dt_second_unp_ret,na.rm = T) %>% 
                    difftime(proc_surg_finish,units='days') %>%
                    as.numeric());
-#' Censor the variables at 30 days
-dat1$a_t[dat1$a_t>30] <- 30;
-dat1$a_t[is.na(dat1$a_t)] <- 30;
-dat1$a_c <- dat1$a_t!=30;
+dat1$a_t_readm[dat1$a_t_readm>30] <- 30;
 
+dat1$a_t_death <- with(dat1,dt_death %>% 
+                         difftime(proc_surg_finish,units='days') %>%
+                         as.numeric());
+dat1$a_t_death[dat1$a_t_death>30] <- 30;
+
+dat1$a_t <- with(dat1,pmin(a_t_readm,a_t_death,na.rm=T));
+dat1$a_t[is.na(dat1$a_t)] <- 30;
+dat1$a_c <- dat1$a_t != 30;
+dat1$a_c_readm <- !with(dat1,is.na(a_t_readm)|a_t_readm==30|a_t_readm>a_t);
+dat1$a_c_death <- !with(dat1,is.na(a_t_death)|a_t_death==30|a_t_death>a_t);
 
 #' Obtain the RAI score
 dat1$a_rai <- raiscore(dat1);
