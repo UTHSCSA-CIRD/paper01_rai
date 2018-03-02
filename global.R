@@ -57,7 +57,7 @@ source('./functions.R');
 #' git hash
 PI$revision <- gitstamp(production=F,branch=T);
 tryCatch(PI$revision <- gitstamp(production = getOption('runr.prodgitstamp',T),branch=T)
-         ,error=function(ee) warning(ee,immediate. =T)
+         ,error=function(ee) stop(ee,immediate. =T)
          ,finally=cat('Checking to see if code is properly checked in...\n'));
 #' 
 #' data dictionary:

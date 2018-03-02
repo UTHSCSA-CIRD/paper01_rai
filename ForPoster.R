@@ -15,7 +15,7 @@
 #     reference_docx: styletemplate.docx
 knitr::opts_chunk$set(echo=F,warning = F,cache=F,message=F);
 options(knitr.kable.NA='');
-options(runr.prodgitstamp=F);
+options(runr.prodgitstamp=T);
 #' Report date: `r Sys.Date()`.
 #'
 #' #### Audit Info
