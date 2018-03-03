@@ -359,6 +359,7 @@ truthy.factor <- function(xx,...) truthy.default(as.character(xx),...);
 truthy.numeric <- function(xx,...) xx>0;
 truthy.default <- function(xx,truewords=c('TRUE','true','Yes','T','Y','yes','y')
                            ,...) xx %in% truewords;
+truthy.data.frame <- function(xx,...) as.data.frame(lapply(xx,truthy,...));
 
 countfrac <- function(xx,outcomes
                       # set to TOTAL in order to do _only_ the total
