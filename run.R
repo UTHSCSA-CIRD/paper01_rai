@@ -38,6 +38,7 @@ names(dat1)<-gsub('deid_case','case_number',names(dat1));
 #' Create synonyms for 'TRUE' for components of the Rockwood index
 #' l_ is a variable storing labels for factors
 l_truthy_default <- eval(formals(truthy.default)$truewords);
+l_postop_true <- c('Yes','Positive',l_truthy_default);
 l_rockwood_true <- c("Insulin", "Non-Insulin"
                      , "At Rest", "Moderate Exertion"
                      , "Partially Dependent","Totally Dependent"
@@ -128,8 +129,11 @@ dat1[,c_canbepatos] <- dat1[,c_canbepatos] - dat1[,c_patos];
 c_postop_yesno <- setdiff(v(c_postop),v(c_count));
 c_postop_count <- intersect(v(c_postop),v(c_count));
 dat1$a_postop <- rowSums(dat1[,c_postop_count]) +
-  apply(dat1[,c_postop_yesno],1,function(xx) sum(na.omit(xx %in% c('Yes','Positive'))));
-
+  rowSums(truthy(dat1[,c_postop_yesno],truewords=l_postop_true));
+  #apply(dat1[,intersect(v(c_postop_nodeath),c_postop_yesno)],1,function(xx) sum(na.omit(xx %in% c('Yes','Positive'))));
+dat1$a_postop_nodeath <- rowSums(dat1[,c_postop_count]) + 
+  rowSums(truthy(dat1[,intersect(v(c_postop_nodeath),c_postop_yesno)]
+                 ,truewords=l_postop_true));
 #' -Hack the values of these variables to be binary for now.-
 #dat1$sepsis_sirs_sepsis_sepshk_48h <- dat1$sepsis_sirs_sepsis_sepshk_48h != 'None';
 #dat1$first_unp_ret_or <- dat1$first_unp_ret_or == 'Yes';
