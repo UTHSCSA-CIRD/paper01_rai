@@ -299,13 +299,19 @@ vartype <- function(dat, ctype) {
 #' TODO: instead of auto-committing, error if uncommited changes, needs to be 
 #' a deliberate process, otherwise we have tons of meaningless auto-commit
 #' messages that will make future maintenance harder
-gitstamp <- function(production=T) {
+#' Return a commit hash (for inclusion in reports for example) after first making
+#' sure all changes are committed and pushed
+#' TODO: instead of auto-committing, error if uncommited changes, needs to be 
+#' a deliberate process, otherwise we have tons of meaningless auto-commit
+#' messages that will make future maintenance harder
+gitstamp <- function(production=T,branch=F) {
+  br<- if(branch) system("git rev-parse --abbrev-ref HEAD",intern=T) else NULL;
   if(production){
     if(length(gitdiff<-system("git update-index --refresh && git diff-index HEAD --",intern = T))!=0) stop(sprintf(
       "\ngit message: %s\n\nYou have uncommitted changes. Please do 'git commit' and then try again."
       ,gitdiff));
-    system("git push && git log --pretty=format:'%h' -n 1",intern=T);
-  } else return('TEST_OUTPUT_DO_NOT_USE');
+    c(br,system("git push && git log --pretty=format:'%h' -n 1",intern=T));
+  } else return(c(br,'TEST_OUTPUT_DO_NOT_USE'));
 }
 
 #' This function can be called from `stat_summary()` as the

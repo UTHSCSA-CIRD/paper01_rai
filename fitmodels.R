@@ -13,7 +13,7 @@ prod<-F;
 #' 
 #+ cache=FALSE,results='hide'
 # first, try to load the 'incache_run' data
-if(exists('PI') && !is.null(PI$incache_run[1]) && 
+if(exists('PI',1) && !is.null(PI$incache_run[1]) && 
    !is.na(PI$incache_run[1]) && file.exists(PI$incache_run[1])){
   load(PI$incache_run[1]);
   PI$previous <- previous.PI;
@@ -21,12 +21,13 @@ if(exists('PI') && !is.null(PI$incache_run[1]) &&
 } else {
   # otherwise try sourcing it the old way
   source('run.R');
+  source('global.R');
   msg_cache <- '';
 }
 #' #### Audit Trail
 #+ projinfo,results='asis'
 cat(msg_cache,'\n');
-if(exists('PI')){
+if(exists('PI',1)){
   PI$basefname <- basename(as.character(parent.frame(2)$ofile));
   currentpi <- PI;
   temp_seeds <- c();
@@ -50,10 +51,10 @@ if(exists('PI')){
 #' and the right-hand sides of additive models and of models
 #' with 2-way interactions
 l_mainpreds <- c('a_rai','a_rockwood');
-ll_resps <- list(
-  counts = c('a_postop','a_cd4')
-  ,t2event = 'a_t'
-  ,cevent = c('a_c_death','a_c_readm','a_c')
+l_models <- list(
+  death=coxph(Surv(a_t_death,a_c_death)~1,data=sbs0$train$all_emergency)
+  ,readm=coxph(Surv(a_t,a_c_readm)~1,data=sbs0$train$all_emergency)
+  ,postop=glm(a_postop_nodeath~1,family = 'poisson',data=sbs0$train$all_emergency)
 );
 l_covars <- c('income_final','sex','hispanic_ethnicity','age_at_time_surg')
 
@@ -63,7 +64,29 @@ l_forms_add <- sapply(l_mainpreds
 l_forms_2int <- lapply(l_forms_add,update,.~(.)^2);
 l_forms_univar <- sapply(l_mainpreds,function(xx) paste0('.~',xx)) %>% 
   lapply(as.formula);
-#' 
+l_models_univar <- list();
+for(ii in names(l_forms_univar)) l_models_univar<- c(l_models_univar
+                                                      ,lapply(l_models
+                                                              ,update
+                                                              ,l_forms_univar[[ii]]) %>%
+                                                       setNames(paste(ii,names(.),sep='.')));
+l_models_univar_alltrain <- lapply(l_models_univar,update,data=sbs0$train$full);
+t_models_univar <- lapply(l_models_univar,tidy,conf.int=.95) %>% do.call(rbind,.);
+t_models_univar_alltrain <- lapply(l_models_univar_alltrain,tidy,conf.int=.95) %>% do.call(rbind,.);
+#' ### Summary of coefficient fits for alll outcomes, and frailty-only predictors
+#+ modelfits, results='asis'
+kable(t_models_univar,format = 'markdown');
+t_models_univar[,c('estimate','conf.low','conf.high')] %>% exp %>% 
+  mutate(Estimate=estimate,CI=sprintf('(%1.2f - %1.2f)',conf.low,conf.high)) %>% 
+  select('Estimate','CI') %>% cbind(Term=t_models_univar$term,.) %>% 
+  kable(format='markdown',digits=2);
+#' ### Now, not just the emergency but all...
+#+ modelfits_alltrain, results='asis'
+kable(t_models_univar_alltrain,format = 'markdown');
+t_models_univar_alltrain[,c('estimate','conf.low','conf.high')] %>% exp %>% 
+  mutate(Estimate=estimate,CI=sprintf('(%1.2f - %1.2f)',conf.low,conf.high)) %>% 
+  select('Estimate','CI') %>% cbind(Term=t_models_univar$term,.) %>% 
+  kable(format='markdown',digits=2);
 #' Then we will create the left-hand sides, which is trickier due to some
 #' responses being Surv(a_t,a_c_FOO)~. and some being FOO~
 #' 
@@ -71,8 +94,8 @@ l_forms_univar <- sapply(l_mainpreds,function(xx) paste0('.~',xx)) %>%
 #' 
 #' 
 #' 
-previous.PI <- PI;
-rm(PI);
+#previous.PI <- PI;
+#rm(PI);
 # The below gives errors, needs to be dealt with later
 #if(!is.na(previous.PI$basefname) && 
 #   (!interactive()||file.exists('cleanrun'))) {

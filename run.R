@@ -129,6 +129,8 @@ c_postop_yesno <- setdiff(v(c_postop),v(c_count));
 c_postop_count <- intersect(v(c_postop),v(c_count));
 dat1$a_postop <- rowSums(dat1[,c_postop_count]) +
   apply(dat1[,c_postop_yesno],1,function(xx) sum(na.omit(xx %in% c('Yes','Positive'))));
+dat1$a_postop_nodeath <- rowSums(dat1[,intersect(v(c_postop_nodeath),c_postop_count)]) +
+  apply(dat1[,intersect(v(c_postop_nodeath),c_postop_yesno)],1,function(xx) sum(na.omit(xx %in% c('Yes','Positive'))));
 
 #' -Hack the values of these variables to be binary for now.-
 #dat1$sepsis_sirs_sepsis_sepshk_48h <- dat1$sepsis_sirs_sepsis_sepshk_48h != 'None';
@@ -166,12 +168,13 @@ dat1$a_t_death <- with(dat1,dt_death %>%
                          difftime(proc_surg_finish,units='days') %>%
                          as.numeric());
 dat1$a_t_death[dat1$a_t_death>30] <- 30;
-
 dat1$a_t <- with(dat1,pmin(a_t_readm,a_t_death,na.rm=T));
+dat1$a_t_death[is.na(dat1$a_t_death)] <- 30;
 dat1$a_t[is.na(dat1$a_t)] <- 30;
 dat1$a_c <- dat1$a_t != 30;
+dat1$a_c_death <- dat1$a_t_death != 30;
 dat1$a_c_readm <- !with(dat1,is.na(a_t_readm)|a_t_readm==30|a_t_readm>a_t);
-dat1$a_c_death <- !with(dat1,is.na(a_t_death)|a_t_death==30|a_t_death>a_t);
+#dat1$a_c_death <- !with(dat1,is.na(a_t_death)|a_t_death==30|a_t_death>a_t);
 
 #' Obtain the RAI score
 dat1$a_rai <- raiscore(dat1);
