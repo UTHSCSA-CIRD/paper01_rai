@@ -9,7 +9,7 @@ cpt_code,CPT Code,,,,,,,,,,,,,,,FALSE,FALSE
 cpt_descriptn,CPT Description,,,,,,,,,,,,,,,FALSE,FALSE
 in_out_patient_status,In/Out-Patient Status,,,,,,,,,,,,,,T,FALSE,FALSE
 elective_surg,Elective Surgery,,,,,,,,,,,T,,,T,FALSE,FALSE
-origin_status,Origin Status,,,,,,,,,,T,,,,T,TRUE,FALSE
+origin_status,Origin Status,,,,,,,,,,T,,,,T,FALSE,FALSE
 hospital_admissn_dt,Hospital Admission Date,,,,,,,,,T,,,,,,FALSE,FALSE
 operatn_dt,Operation Date,,,,,,,,,T,,,,,,FALSE,FALSE
 principal_anesthesia_technique,Principal Anesthesia Technique,,,,,,,,,,,,,,T,FALSE,FALSE
