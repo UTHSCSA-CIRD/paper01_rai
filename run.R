@@ -7,108 +7,98 @@
 #' Please read this file through before trying to run it. The comments tell
 #' you what you need to edit in order to proceed.
 #' 
-#' ## Load libraries
-#+ warning=FALSE, message=FALSE
-rq_libs <- c('compiler'                                   # just-in-time compilation
-             ,'MatchIt','DHARMa'                          # propensity scores and glm residuals
-             ,'pscl'                                      # zero-inflated poisson, sigh
-             ,'survival','MASS','Hmisc','zoo','coin'      # various analysis methods
-             ,'readr','dplyr','stringr','magrittr'        # data manipulation & piping
-             ,'ggplot2','ggfortify','grid','GGally'       # plotting
-             ,'stargazer','broom', 'tableone','janitor'); # table formatting
-rq_installed <- sapply(rq_libs,require,character.only=T);
-rq_need <- names(rq_installed[!rq_installed]);
-if(length(rq_need)>0) install.packages(rq_need,repos='https://cran.rstudio.com/',dependencies = T);
-sapply(rq_need,require,character.only=T);
-#' Turn JIT to max: pre-compile all closures, `for`, `while`, and `repeat` loops
-enableJIT(3);
-#' ## Load local config file
-#' 
-#' Please edit the file referenced below, it has instructions in the 
-#' comments.
-source('./config.R');
-#' Please edit the file referenced below, it has instructions in the
-#' comments
-source('./metadata.R');
-#' This file has some possible useful functions. You might not need to edit
-#' it but should read it.
-source('./functions.R');
-
-
-#'
-#' ## Set generic variables
-#' 
-#' data dictionary:
-dctfile = 'VariableNamesFromUHSNSQIP.csv';
-#' saved session data (not used right now)
-session <- 'session.rdata';
+source('global.R');
+project_seed <- 20180218;
 
 #' ## Load data if it exists 
 #' 
 #' (useful later, right now don't bother saving sessions)
-if(session %in% list.files()) load(session);
+#'if(session %in% list.files()) load(session);
 #' Load your data. Notice that we're using `read_csv()` from the readr library.
 #' It is a little smarter than the built-in `read.csv()`
+cost0 <- read_tsv(inputdata_cost,na=c('(null)',''));
 dat0 <- read_tsv(inputdata,na=c('(null)',''));
+
 #' Read in the data dictionary
 dct0 <- read_csv(dctfile,na = '');
+dct1 <- read_csv(cptfile,na='');
 colnames(dat0) <- tolower(colnames(dat0));
-#' ## Create the groups of exact column names for this dataset
-#' 
-#' Any vector in `metadata.R` that is composed of regexps should get
-#' resolved here to a vector of literal names using this expression as
-#' an example:
-#' 
-#carepatos <- grepor(dat0,garepatos);
-#cnopatos <- sub('_patos','',carepatos);
-#' We have a new way to get column names whenever we need them:
-#' `v(c_cd4)` . To see what other groups of column names are currently available
-#' do `names(dct0)[-(1:2)]`
+colnames(cost0) <- tolower(colnames(cost0));
 
-#' If you need to modify lists of column names using `gsub()` or if you
-#' need to dynamically generate lists of column names using something
-#' other than `grepor()` put the code for doing so here. Might want to
-#' find columns with all/almost-all missing values, or ones with a value that
-#' is always the same for all rows.
-
-
-
-#' ## Convert columns
-#' 
+ 
 #' Create copy of original dataset
+cost1 <- cost0;
 dat1 <- dat0;
-#' Convert appropriate columns to factor
-# Example only, doesn't run, you need to actually populate `cfactr` with
-# names of columns for it to work
-#dat1[,cfactr] <- sapply(dat1[,cfactr],factor,simplify = F);
+dropcol_dat <- c('idn_mrn', 'lmrn_visit', 'case_number');
+dat1 <- dat0 %>% select(-one_of(dropcol_dat));
+names(dat1)<-gsub('deid_patient','idn_mrn',names(dat1));
+names(dat1)<-gsub('deid_visit','lmrn_visit',names(dat1));
+names(dat1)<-gsub('deid_case','case_number',names(dat1));
 
-#' Normalize weight units
-#' 
-#' Normalize the weight units
+#' Create synonyms for 'TRUE' for components of the Rockwood index
+#' l_ is a variable storing labels for factors
+l_truthy_default <- eval(formals(truthy.default)$truewords);
+l_rockwood_true <- c("Insulin", "Non-Insulin"
+                     , "At Rest", "Moderate Exertion"
+                     , "Partially Dependent","Totally Dependent"
+                     ,"From acute care hospital inpatient"
+                     , "Nursing home - Chronic care - Intermediate care"
+                     ,"Outside emergency department"
+                     , "Transfer from other"
+                     , l_truthy_default);
+l_missing <- c(NA,'Unknown','unknown','UNKNOWN');
+#+ inl_test_001
+if(length(inl_test_000.0<-intersect(v(c_refval,dat1),v(c_rock_tf,dat1)))>0){
+  stop(sprintf('Problem with %s. the following variables are listed as both discrete and numeric components of Rockwood index:
+               %s'),dctfile,paste0(inl_test_000.0,collapse=','));
+}
+
+dropcol_cost <- c('idn_mrn', 'case_number');
+cost1 <- cost0 %>% select(-one_of(dropcol_cost));
+names(cost1)<-gsub('deid_patient','idn_mrn',names(cost1));
+names(cost1)<-gsub('deid_case','case_number',names(cost1));
+
+ 
+#' This is another departure from my not making code changes-- I think this is 
+#' the only obstacle to using the version of the cost data you gave me, and this
+#' code will be completely silent if your copy doesn't have spaces in the names
+names(cost1)<-gsub('[()]','',names(cost1));
+names(cost1) <- chartr(' ','_',names(cost1));
+
+
+#' Fixing the date columns in the 'cost' dataset:
+cost1$admission_date <- as.Date(cost1$admission_date, format = '%m/%d/%y')
+cost1$discharge_date <- as.Date(cost1$discharge_date, format = '%m/%d/%Y')
+
+#' Filtering out hopefully the indext cases. This needs work but this is a 
+#' a quick dirty way to get the index cases:
+cost2 <- cost1 %>% filter(admitdatediff < 20 & admitdatediff > -20)
+
+
+#' Standardizing the weight units to kilograms
 dat1[dat0$weight_unit=='lbs','weight'] <- dat1[dat0$weight_unit=='lbs','weight']*0.453592;
-#' Similarly for height...
+dat1[dat0$weight_unit=='lbs','weight_unit'] <- c('kg');
+#' Standardizing height units to centimeters
+dat1[dat0$height_unit=='in','height'] <- dat1[dat0$height_unit=='in','height']*2.54;
+dat1[dat0$height_unit=='in','height_unit'] <- c('cm');
 
-#' -Do likewise for dates, factors, maybe logicals, maybe numerics-
-#' Turns out `read_delim()` is good at recognizing dates and numerics 
-#' on its own.
+#' Creating training/testing/validation samples
+#' 
+#' As long as the seed is the same, all random values will be generated the same
+#' reproducibly.
+set.seed(project_seed);
+#' Randomly assign IDN_MRNs to training, testing, or validation sets
+pat_samples <- split(dat1$idn_mrn,sample(c('train','test','val')
+                                         ,size=nrow(dat1),rep=T));
 
+#' Make sex/gender a factor
+#' 
+#' TODO: do this dynamically via new c_ group for all columns that are safe to
+#' directly convert to factors
+dat1$gender <- factor(dat1$gender);
 
-#' For each column in `chavepatos` create a column that is true only 
-#' if that column is true and the corresponding column in `carepatos`
-#' is false. Hint: use `mapply()` or `sapply()` for this and replace
-#' the original `chavepatos` columns with these
-
-
-#' getting rid of the 2's in the column:
-# firstidx <- which(dat1[,cnopatos[1]] > 1);
-# secondidx <- which(dat1[,cnopatos[7]] > 1);
-# dat1[firstidx,cnopatos[1]]  <- 1;
-# dat1[secondidx,cnopatos[7]]  <- 1;
-#' The below was wrong! Thes columns are counts, so can occur more than once.
-#dat1[,cnopatos] <- sapply(dat1[,cnopatos],function(xx) xx>0,simplify=F);
-#'
 #' ## Column names of primary relevance
-modelvars <- c(v(c_rai),v(c_postop),'income_final','hispanic_ethnicity');
+c_modelvars <- c(v(c_rai),v(c_postop),'income_final','hispanic_ethnicity');
 
 #' Backup up the modified cnopatos column
 #' ...because it's easier if patos-subtracted columns are modified in place
@@ -159,7 +149,7 @@ dat1$a_any_cd4 <- factor(dat1$a_cd4>0);
 dat1$a_any_postop <- factor(dat1$a_postop>0);
 
 dat1$a_transfer <- dat1$origin_status!='Not transferred (admitted from home)';
-
+dat1$a_readm_30_dy <- dat1$readm_30_dy>0; 
 
 #' Time from surgery to adverse outcome if any
 dat1$a_t <- with(dat1
@@ -174,24 +164,140 @@ dat1$a_t <- with(dat1
 dat1$a_t[dat1$a_t>30] <- 30;
 dat1$a_t[is.na(dat1$a_t)] <- 30;
 dat1$a_c <- dat1$a_t!=30;
+
+
 #' Obtain the RAI score
 dat1$a_rai <- raiscore(dat1);
+dat1$rai_range <- cut(dat1$a_rai, breaks=c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55));
 dat1$a_discrete_rai <- cut(dat1$a_rai
                            ,c(0,15,21,Inf)
                            ,right = F
                            ,labels = c('Non Frail','Pre Frail','Frail'));
+dat1$a_rai_hisp <- with(dat1,interaction(a_discrete_rai,hispanic_ethnicity));
 
-#' ## The Rockwood Scale
+temp_truewords <- formals(truthy.default)$truewords;
+
+#' ## The Rockwood Index!!!
 #' 
-#' ...sounds crazy but it actually works. According to Mitnitski, Mogilner and 
-#' Rockwood The Scientific World 2001, you just add together a large number of 
-#' binary deficits and divide by the number of non-missing data elements for that
-#' patient and that's your score! Here I calculate it on every Yes/No preop risk
-#' except those whose time window is less than a week, plus creatinine > 30.
-#' 
-#' Lo and behold we get a distribution that looks a lot like what Mitnitski et al
-#' published, and a strong correlation with number of postop complications.
-dat1$a_rockwood <- with(dat1,(
+#' ### Counting just the abnormal labs first
+#+ task_rock_num0
+# The first step in the pipeline, outer(...), simply creates a matrix of column
+# names, with the column names of lower bounds in the first row (named 'lo') and
+# those of the upper bounds in the second row (named 'hi'). The male values are
+# in the first column ('Male') and the female values in the second ('Female')
+.junk_rock_numerator0 <- outer(c(lo='lref_',hi='uref_'),c(Male='m',Female='f'),paste0) %>% 
+  # this is piped to apply(). The 1:2 value of MARGIN argument of the apply() 
+  # function means that the function will be applied to each combination of 
+  # row and column rather than just rows (1) or just columns (2). The output of
+  # this is a THREE dimensional matrix where the first dimension is the column
+  # specified by v(c_refval, ...), the second dimension is whether it's the 
+  # 'lo' or the 'hi' bound, and the third dimension is whether the reference 
+  # value is for a male or a female (but this can generalize to any number of
+  # patient subgroups which is why I did it this wierd-seeming way). Have a look
+  # at what v(c_refval,dat1,retcol='lref_m')) does for example, and try the other
+  # three values as well. c_refval is the newly created column in the data dictionary
+  # dct0 that identifies which variables have upper and lower reference values 
+  # and therefore can be treated as labs. Reference values are sex-specific (even
+  # if that means they repeat in cases where they are the same for both sexes).
+  # That is why we have a 2x2 grid in the previous step.
+  apply(1:2,function(xx) v(c_refval,dat1,retcol=xx)) %>% 
+  # This step of the pipeline turns a 3-dimensional matrix into a list containing
+  # two data.frames-- one for males and one for females. Rather than trying to
+  # understand this abstractly, again, try executing the pipeline just up to this
+  # step and then capturing the output to a temporary variable, and examining that
+  # variable.
+  apply(3,data.frame) %>% 
+  # It doesn't matter which order the data.frames appear, as long as it is
+  # deterministic so that we can make sure that the right reference values are
+  # matched in the next steps, so we explicitly put the subset function into
+  # the pipeline for the sole purpose of specifying the order, whatever the
+  # original one might have been
+  `[`(levels(dat1$gender)) %>% 
+  # mapply() is like lapply() or sapply() except the first argument is the function
+  # and the subsequent arguments are list-like objects on which the function 
+  # operates. The function should take as many arguments are there are list-like
+  # objects passed to mapply(), and it will run on all the first elements as
+  # its arguments, then all the second elements, and so on, until it's processed
+  # all the elements of the objects passed to it. For more info, I recommend
+  # ?mapply
+  # I will document this one argument at a time
+  # The function will take the FIRST top-level argument (which as we will see 
+  # is a data.frame)...
+  mapply(function(aa,bb) apply(bb
+                               # ...passes each row to another anonymous function
+                               # as the argument zz.
+                               ,1,function(zz) 
+                                 # that function compares the row to the 'lo'
+                                 # column and the 'hi' column of the FIRST 
+                                 # top-level argument and returns TRUE for
+                                 # elements of zz that are outside their 
+                                 # respective lo and hi bounds, and FALSE 
+                                 # if they are within bounds (i.e. normal)
+                                 aa$lo > zz | aa$hi < zz)
+         # the FIRST top-level argument is what comes out of the pipeline that
+         # is prior to this step (represented by a '.' because it's not the 
+         # first argument to mapply). As a reminder, it is a list of data.frames
+         # in our case one for males and one for females, and each data.frame
+         # has a 'lo' and a 'hi' column. Each of them in turn becomes the 'aa'
+         # variable to the function that is the first top-level argument.
+         ,.
+         # The third top-level argument, which will supply the corresponding 'bb'
+         # arguments to that function is our main dataset, but it needs to be
+         # split by sex, just like our reference values were split by sex in the
+         # above pipeline. But this is a simpler process and we do it in one
+         # step using the split() command. Notice that we are only keeping the 
+         # columns that have reference values according to our data dictionary 
+         # and exist in dat1.
+         ,split(dat1[,v(c_refval,dat1)]
+                # The second argument to split() is a variable that we split by
+                # in this case gender. Just as before, we end up with a list of
+                # two data.frames-- one the records for male patients, one with
+                # the records for female patients. As above, we specify the 
+                # order explicitly
+                ,dat1$gender)[levels(dat1$gender)]) %>% 
+  # What comes out of the mapply() step of the pipeline is another list with two
+  # matrices, one for Males and one for Females. Each matrix has as many columns
+  # as there are records for that group and as many rows as there are variables
+  # currently included in c_refval. This is because a quirk of apply() wherein
+  # it transposes its output. That's not a big deal, though, we aren't keeping 
+  # these matrices around for very long-- in the next step, we do colSums, which
+  # is exactly what it sounds like-- for every column (i.e. for every NSQIP case) 
+  # we sum up all the normal values, omitting the missing ones by using the
+  # na.rm=T argument to colSums. Recall that in apply-type functions you can 
+  # add additional arbitrary arguments that get passed to the function that is
+  # being applied. Recall also that when you to arithmetic on TRUE/FALSE values
+  # they get coerced to 1s and 0s, so a column sum is the same a a count of TRUE
+  lapply(colSums,na.rm=T) %>% 
+  # The output of the pipeline so far is a list of two integer vectors, one for 
+  # males, one for females. Each has the same length as there are male/female 
+  # records. The values represent the number of aberrant labs for that NSQIP 
+  # case. But now we need to get the data back into its original order so we can
+  # insert it back into dat1 as a new column. R has a brilliantly simple way of
+  # doing this: unsplit, which reverses the split we did on dat1! It will put 
+  # these scalar values back in the same order as the rows in the data frame
+  # from which they were calculated.
+  unsplit(dat1$gender);
+
+#' ### Rockwood: counts for pre-op conditions (i.e. TRUE/FALSE)
+#+ task_rock_num1
+.junk_rock_numerator1 <- apply(dat1[,v(c_rock_tf)],1
+                               ,function(xx) sum(truthy(xx,truewords=l_rockwood_true),na.rm = T));
+#' ### Rockwood: number of non-missing values for each case (denominator)
+#+ task_rock_denom
+# include both the discrete columns from numerator0 and the numeric columns 
+# from numerator1
+.junk_rock_denominator <- apply(dat1[,c(v(c_refval),v(c_rock_tf))] 
+                                # for each row...
+                                ,1
+                                # sum/count all the elements that don't have a 
+                                # value synonymous with missing (that's why we 
+                                # created 'l_missing') earlier
+                                ,function(xx) sum(!xx %in% l_missing));
+dat1$a_rockwood <- (.junk_rock_numerator1+.junk_rock_numerator0)/.junk_rock_denominator;
+dat1$a_rockwood_range <- cut(dat1$a_rockwood, .09*(0:7),include.lowest = T);
+
+#+ task_rock_old
+dat1$a_rockwood_old <- with(dat1,(
   as.numeric(bmi>=25)+
     as.numeric(origin_status!='Not transferred (admitted from home)')+
     as.numeric(diabetes_mellitus!='No')+
@@ -217,9 +323,9 @@ dat1$a_rockwood <- with(dat1,(
     as.numeric(is.na(serum_creatinine))
 ));
 
-tabsievars <- c(v('c_tabsie')
-                ,'a_postop','a_any_postop','a_cd4','a_any_cd4'
-                ,'a_rai','a_discrete_rai','a_rockwood');
+c_tabsievars <- c(v('c_tabsie')
+                  ,'a_postop','a_any_postop','a_cd4','a_any_cd4'
+                  ,'a_rai','a_discrete_rai','a_rockwood');
 #' ## Transform Rows
 #'
 #' ### Sort the rows by patient ID and then by date of surgery, ascending
@@ -228,278 +334,183 @@ dat1 <- dat1[order(dat1$proc_surg_start),];
 #' 
 #' ### Drop patients without an income
 #dat1 <- dat1[!is.na(dat1$income_final),];
+#' 
+#' ### Adding a column that aggregates all SSI cases together:
+dat1$a_any_ssi <- rowSums(dat1[,c("postop_si_ssi", "postop_deep_incisnal_ssi")],na.rm=T) > 0;
+
+#' Creating an object to use as the lookup argument for `mapnames()``
+dat1namelookup <- with(dct0,setNames(dataset_column_names
+                                     ,ifelse(is.na(NSQIP_NAMES)
+                                             ,dataset_column_names
+                                             ,NSQIP_NAMES)));
+#'
+#'
+#' ### Make several subsets of dat1 all at once
+#' 
+#' for later use to make multiple versions of the same table and multiple
+#' versions of the same graph, as for item #3 of the 10/13/2017 PKS email.
+
+#identifying the colectomy patients that have multiple visits:
+dup_mrn <- unlist(dat1 %>% filter(cpt_code %in% v(c_all_colon,di=dct1)) %>%
+                    filter(duplicated(idn_mrn)==TRUE) %>% select(idn_mrn));
+
+#dropping visits after the index colectomy procedure for colectomy patients:
+drop_case_num <- unlist(sapply(dup_mrn, function(themrn){
+  mat0 <- dat1 %>% select(idn_mrn, case_number, hospital_admissn_dt) %>% 
+    filter(idn_mrn %in% themrn) %>% arrange(desc(hospital_admissn_dt));
+  drop_this <- mat0$case_number[-1]
+}));
 
 #' ### Create a version of the dataset that only has each patient's 1st encounter
 #' 
 #' (you need to have specified the name of the ID column in `metadata.R`)
 dat2 <- group_by(dat1,idn_mrn) %>% summarise_all(first);
 
+subs_criteria <- alist(
+  y2016=hospital_admissn_dt<'2017-01-01' & hospital_admissn_dt>'2015-12-31'
+  ,full=T
+  ,all_elective=elective_surg=='Yes'
+  ,all_urgent=elective_surg=='No' & emergency_case=='No'
+  ,all_emergency=emergency_case=='Yes'
+  ,all_colon_all=cpt_code %in% v(c_all_colon,di=dct1) & !(case_number %in% drop_case_num)
+  # coming soon:
+  #,all_colon_all_2017 = 
+  ,all_colon_elective=cpt_code %in% v(c_all_colon,di=dct1) & elective_surg=='Yes' & 
+    !(case_number %in% drop_case_num)
+  ,all_colon_urgent=cpt_code %in% v(c_all_colon,di=dct1) & elective_surg=='No' & 
+    emergency_case=='No' &
+    !(case_number %in% drop_case_num)
+  ,all_colon_emergency=cpt_code %in% v(c_all_colon,di=dct1) &
+    emergency_case=='Yes' & 
+    !(case_number %in% drop_case_num)
+  ,open_colon_all=cpt_code %in% v(c_open_colon,di=dct1) &
+    !case_number %in% drop_case_num
+  ,open_colon_elective=cpt_code %in% v(c_open_colon,di=dct1) &
+    elective_surg=='Yes' &
+    !(case_number %in% drop_case_num)
+  ,open_colon_urgent=cpt_code %in% v(c_open_colon,di=dct1) &
+    elective_surg=='No' & emergency_case=='No' &
+    !(case_number %in% drop_case_num)
+  ,open_colon_emergency=cpt_code %in% v(c_open_colon,di=dct1) &
+    emergency_case=='Yes' &
+    !(case_number %in% drop_case_num)
+  ,lapa_colon_all=cpt_code %in% v(c_lapa_colon,di=dct1) &
+    !(case_number %in% drop_case_num)
+  ,lapa_colon_elective=cpt_code %in% v(c_lapa_colon,di=dct1) &
+    elective_surg=='Yes' &
+    !(case_number %in% drop_case_num)
+  ,lapa_colon_urgent=cpt_code %in% v(c_lapa_colon,di=dct1) &
+    elective_surg=='No' & emergency_case=='No' &
+    !(case_number %in% drop_case_num)
+  ,lapa_colon_emergency=cpt_code %in% v(c_lapa_colon,di=dct1) &
+    emergency_case=='Yes' & !(case_number %in% drop_case_num)
+  ,ssi_all=a_any_ssi>0
+);
+
+sbs0 <- sapply(list(all=dat1,index=dat2),function(xx) do.call(ssply,c(list(dat=xx),subs_criteria[-1])),simplify=F);
+sbs0$all2016 <- lapply(sbs0$all,subset,subset=eval(subs_criteria[['y2016']]));
+comment(sbs0$all2016$all_colon_all) <- c(comment(sbs0$all2016),'These are only the index colon patients for 2016');
+dat1subs <- sbs0$all; comment(dat1subs) <- c(comment(dat1subs),'This is deprecated, used sbs0$all instead');
+#' Subsetting by the earlier randomly assigned train and test groups
+sbs0$train <- lapply(sbs0$all,subset,idn_mrn%in%pat_samples$train);
+sbs0$test <- lapply(sbs0$all,subset,idn_mrn%in%pat_samples$test);
+
+#' Isolating the 2016 UHS colectomy data elements:
+#col2016 <- sbs0$index[["all_colon_all"]] %>% 
+#  filter(hospital_admissn_dt < '2017-01-01' & hospital_admissn_dt > '2015-12-31')
+
+#' Merging the datasets:
+# the first step in pipeline selects the index surgeries from cost1
+subset(cost1,admission_date-1<=operatn_dt&discharge_date+1>=operatn_dt) %>%
+  # now merge with all colectomy patients by MRN in order to avoid relying on admitdatediff
+  # as a literal merge criterion (because it could permit mismatches as we saw)
+  merge(sbs0$all$all_colon_all,.,by=c('idn_mrn','operatn_dt'),all.x=T,all.y=F,suffixes=c('','.junk')) %>%
+  # now we have all colectomies one-to-one matched with cost data where available, and just need
+  # to get rid of the out-of-range dates. This step has to come last because in future
+  # datasets the admit/discharge window can span multiple time periods, and the time 
+  # period of interest may vary while the fundamental structure of the merge remains the
+  # same
+  subset(eval(subs_criteria$y2016)) -> costdata;
+#' We now have `r dim(subset(costdata,is.na(admitdatediff)))` patients missing cost 
+#' data. This is one more missing than was previously calculated, because that one
+#' has an `operatn_dt` that does not fall between the `admission_date` and `discharge_date`.
+#' This is the only costdata patient for which this is the case, and the `proc_surg_start`
+#' and `proc_surg_finish` fields argee with the `operatn_dt`. Though the patient is
+#' eligible, and there is costdata for A visit by that patient, the costdata is not
+#' for the index visit.
+#' Below follows testing code for establishing that the above pipeling produces a 
+#' unique set of index patients meeting the criteria, with a single patient missing 
+#' from the earlier version of costdata because they do not have an index surgery
+#' 
+#' 
+#costdata <-  merge(sbs0$all2016$all_colon_all, cost2, by = 'idn_mrn', all.x = TRUE);
+#na_in_costdata<-subset(costdata,is.na(admission_date))$idn_mrn;
+#' Useful columns
+#ccs<-c('admitdatediff','admission_date','discharge_date','proc_surg_start','case_number','idn_mrn','hospital_admissn_dt')
+#' Can we rely on the NSQIP variables operatn_dt and proc_surg_start, proc_surg_finish being in agreement
+#' with each other, since only the former is in the costdata?
+.debug_operatn_dt_mm0 <- subset(dat1,as.Date(proc_surg_start)!=as.Date(operatn_dt))[,c('idn_mrn','proc_surg_start','proc_surg_finish','operatn_dt')] %>% data.frame;
+#' There are `r nrow(.debug_operatn_dt_mm)` rows in NSQIP that disagree:
+.debug_operatn_dt_mm0[,c('idn_mrn','proc_surg_start','proc_surg_finish','operatn_dt')];
+.debug_operatn_dt_mm1 <- subset(.debug_operatn_dt_mm0,as.Date(proc_surg_start)-as.Date(operatn_dt)>2);
+#' `r nrow(.debug_operatn_dt_mm1)` of them by more than one day, none of which were in 2016
+.debug_operatn_dt_mm1[,c('idn_mrn','proc_surg_start','proc_surg_finish','operatn_dt')];
+#' merging all colonectomies (not limited by time) with all available cost data
+#' to hopefully resolve a few more missing variables
+#costdata0 <- merge(sbs0$all$all_colon_all,cost1,by='idn_mrn',all.x=TRUE,all.y=F,suffixes = c('','.junk'));
+#' Dropping all records where the proc_surg_start does not fall between admission_date and discharge_date
+#' First create the temporary filtering variables
+#costdata1 <- mutate(costdata0,a_srg=as.Date(proc_surg_start),a_adm=admission_date-1,a_dis=discharge_date+1);
+#' Then subset on them, keeping also the ones that are not in the costdata via is.na(...)
+#costdata2 <- subset(costdata1,is.na(admitdatediff)|(a_srg>=a_adm&a_srg<=a_dis));
+#costdata3 <- subset(costdata2
+#                    ,(pmin(a_adm,as.Date(hospital_admissn_dt),na.rm=T)<'2017-01-01' &
+#                      pmax(a_adm,as.Date(hospital_admissn_dt),na.rm=T)>'2015-12-31'));
+#costdata3a <- subset(costdata2,as.Date(hospital_admissn_dt)<'2017-01-01' & 
+#                       as.Date(hospital_admissn_dt)>'2015-12-31');
+#costdata3b <- subset(costdata2,pmax(hospital_admissn_dt,hospital_admissn_dt.junk,na.rm = T)<'2017-01-01' & 
+#                       pmin(hospital_admissn_dt,hospital_admissn_dt.junk,na.rm = T)>'2015-12-31');
+#' Do the `operatn_dt` fields match up?
+#dim(subset(costdata3,as.Date(proc_surg_start)==as.Date(operatn_dt)));
+#dim(costdata3); dim(costdata3a); dim(costdata3b);
+#' Yes
+#' We have one patient in the original costdata that is not making it into the 
+#' new version
+#missing_from_costdata3<-setdiff(costdata$idn_mrn,costdata3$idn_mrn);
+#missing_from_costdata3a<-setdiff(costdata$idn_mrn,costdata3a$idn_mrn);
+# View(subset(dat1,idn_mrn==missing_from_costdata3)[,intersect(names(dat1),ccs)]);
+# View(subset(cost1,idn_mrn==missing_from_costdata3)[,intersect(names(cost1),ccs)]);
+#' Their admit/discharge dates are the only ones in cost1 that fail to span the surgery
+#' date by more than one day
+#' 
+#' We have duplicates in costdata3:
+# length(unique(costdata3$idn_mrn)); # 169
+#costdata3dups <- table(costdata3$idn_mrn);
+#costdata3dups <- names(costdata3dups[costdata3dups>1]);
+#costdata3adups <- table(costdata3a$idn_mrn);
+#costdata3adups <- names(costdata3adups[costdata3adups>1]);
+#length(unique(costdata3b$idn_mrn)); #169
+#setdiff(costdata3b$idn_mrn,costdata3$idn_mrn); # 0
+#setdiff(costdata3$idn_mrn,costdata3b$idn_mrn); # 0
+#' Conclusion: the costdata3b algorithm pulls non-duplicated patients
+
 #' Filter down to only NHW and hispanic
 dat3<-subset(dat2,hispanic_ethnicity!='Unknown'&(hispanic_ethnicity=='Yes'|race=='White'));
 dat3$hispanic_ethnicity<-factor(dat3$hispanic_ethnicity);
-#' creating a counts table of missingness for each variable:
-#' TODO: Fix these, to include the actual RAI components
-# misstable <- transform(dat3, missing_income=is.na(income_final)) %>%
-#   CreateTableOne(data=., vars= c(therai,c_cd4_count), strata='missing_income') %>%
-#   print;
-# misstable[,'p'] %>%  gsub("<","", x=.) %>% trimws() %>%
-#   as.numeric() %>% p.adjust() %>% cbind(misstable,padj=.) %>%
-#   data.frame %>% select(-test) -> misstable;
-# 
-# misstable2 <- CreateTableOne(data=., vars= c(therai,c_cd4_count), strata='gender');
-# newmisstable2 <- print(misstable2);
-# newmisstable2[,'p'] %>%  gsub("<","", x=.) %>% trimws() %>%
-#   as.numeric() %>% p.adjust() %>% cbind(newmisstable2,padj=.) %>%
-#   data.frame %>% select(-test) -> newmisstable2;
-#' writing output to a 'Results' folder:
-# variables <- rownames(newmisstable)
-# newmisstable <- cbind(variables, newmisstable)
-# write.table(x=newmisstable, file=paste(outputpath, 'IncomeMissingTable.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
-
-modvarstrata <-sapply(modelvars,function(ii) {
-  try(
-    eval(
-      parse(text=sprintf("stratatable(dat3,modelvars,str=is.na(%s)|%s=='Unknown')",ii,ii))))
-  });
-modvarstrata <- modvarstrata[sapply(modvarstrata,class)=='matrix'];
-
-#' Let's treat the variables with more than 6 distinct values as continuous and
-#' the rest we tabulate whether or not they are factors. For this, 
-#' `modelvars_iscont`, a named vector of T/F values, is created. We really ought
-#' to just create a c_discrete column in dct0, but it might be out of date with 
-#' the latest version so we'll clean it up later and use this vector for now.
-modelvars_iscont<-sapply(dat3[,modelvars],function(xx) length(unique(xx))>6);
-#' Now we just first do the continuous ones with summary and then the discrete
-#' ones with table, and we `c()` them all together because when you do that to
-#' lists, you get a list as the result.
-modelvarsumtab <- c(sapply(dat3[,names(modelvars_iscont[modelvars_iscont])]
-                         ,function(xx) cbind(summary(xx))),
-                  sapply(dat3[,names(modelvars_iscont[!modelvars_iscont])]
-                         ,function(xx) cbind(table(xx,useNA='always'))));
-
-#modvarsumtab <- sapply(modelvars, function(ii){table(dat3[,ii],useNA = 'always')});
-#newmodvarstrata <- print(modvarstrata);
-#newmodvarsumtab <- print(modvarsumtab);
-
-modvarstratafile <- paste0(outputpath,'StrataComplicationsMissingTables'
-                           ,gsub(" ","_",paste0(Sys.time(),'CDT.csv')));
-modvartabfile <- paste0(outputpath,'SumComplicationsMissingTables'
-                        ,gsub(" ","_",paste0(Sys.time(),'CDT.csv')));
-sapply(names(modvarstrata), function(x) try({
-  # this one just skips a few lines to make the output easier to read
-  write("\n\n",file=modvarstratafile,append=T);
-  # this one writes the name of the table
-  write(x,file=modvarstratafile,append=T);
-  # this one writes the header manually because write.table is so dumb
-  write(",Present,Missing,p-adj",file=modvarstratafile,append=T);
-  # writing the actual table
-  write.table( modvarstrata[[x]], file=modvarstratafile, na="", col.names=FALSE, row.names=TRUE
-               , append= TRUE, sep=',' )
-  }));
-sapply(names(modelvarsumtab),function(xx){
-  # Same as above
-  cat("\n\n",xx,"\n",file=modvartabfile,append=T);
-  write.table(modelvarsumtab[[xx]],file=modvartabfile,na="",col.names=F,row.names = T,append=T,sep=',');
-});
-#write.csv2(x=newmodvarstrata, file=paste(outputpath, 'StrataComplicationsMissingTables.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
-#write.csv2(x=newmodvarsumtab, file=paste(outputpath, 'SumComplicationsMissingTables.csv', sep=''), na="", col.names=TRUE, row.names=FALSE, sep=',');
-
-#' ### Summary counts
-# subset(dat3,race=='White'|hispanic_ethnicity=='Yes') %>% 
-#   mutate(hisp=hispanic_ethnicity=='Yes') %>% 
-#   group_by(gender,hisp) %>% 
-#   summarise(
-#     age=paste0(round(mean(age_at_time_surg,na.rm=T),1),' (',round(sd(age_at_time_surg,na.rm=T),1),')')
-#     ,no_complications=sum((a_cd4+a_postop)==0)
-#     ,income_nocomp=paste0(round(median(income_final[!(a_cd4|a_postop)],na.rm=T)/1000,1),' (',paste0(round(quantile(income_final[!(a_cd4|a_postop)],c(.25,.75),na.rm=T)/1000,1),collapse=','),')')
-#     ,income_comp=paste0(round(median(income_final[a_cd4|a_postop],na.rm=T)/1000,1),' (',paste0(round(quantile(income_final[a_cd4|a_postop],c(.25,.75),na.rm=T)/1000,1),collapse=','),')')
-#     ,n_cd4=sum(a_cd4>0)
-#     , n_postop=sum(a_postop>0)) %>% 
-#   mutate(hisp=ifelse(hisp,'Yes','No')) %>% 
-#   setNames(c('Sex','Hispanic','Age (SD)','No Comp (N)','Income No Comp (IQR)','Income Comp (IQR)','CvDn4 (N)','Postop (N)')) ->   summary_counts;
-# 
-# write_tsv(summary_counts,'summary_counts.tsv');
-
-
 #'  creating tables similar to the tables that Dan MacCarthy creates for the VASQIP data:
-dat3$rai_range <- cut(dat3$a_rai, breaks=c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55));
-
-dat3 %>% group_by(rai_range) %>% 
-summarize(`RAI Range` = n(), `Non-Elective Surgery` = sum(elective_surg=='No')
-          ,`Non-Elective Surgery Fraction` = mean(elective_surg=='No')
-          ,`Emergency Case N` = sum(emergency_case=='Yes')
-          ,`Emergency Case Fraction` = mean(emergency_case=='Yes')
-          ,`Died 30days N` = sum(postop_death_30_dy_proc =='Yes') 
-          ,`Died 30days Fraction` = mean(postop_death_30_dy_proc =='Yes')
-          ,`Complications 30days N` = sum(a_any_postop=='TRUE')
-          ,`Complications 30days Fraction` = mean(a_any_postop=='TRUE')
-          ,`Clavien-Dindo Grade4 30days N` = sum(a_any_cd4=='TRUE')
-          ,`Clavien-Dindo Grade4 30days Fraction` = mean(a_any_cd4=='TRUE')
-          ) %>% 
-  mutate(`Cumulative Count`=cumsum(`RAI Range`)) %>% View();
-          
 
 
-# reminder: you can sum over T/F values (and average over them too)
-# 
-# if it's not T/F, this might not always be reliable... foo == bar
-# ...if NAs exist... so for a strictly T/F output use isTRUE(foo == bar)
-# 
-# Second sheet, as you said, is a job for table(...)
-# 
-# Ditto third sheet.
-# 
-# Done!
-# 
-# (don't forget to commit your changes)
-# 
-
-#' ## Exploration
-#' 
-#' Try making pivot tables...
-#group_by(dat3,FOO) %>% summarize(AllComp_Fraction=mean(a_allcomp>0)
-#                                 ,CD4Comp_Fraction=mean(a_cd4comp>0));
-#' ...by replacing FOO with NON-quoted column names representing sex, ethnicity
-#' and binned income. Not a vector, just an arbitrarily long set of 
-#' non-quoted names separated by commas. This can go in your abstract!
-#' 
-#' Try plotting a hist on each numeric value...
-#layout(matrix(1:25,nrow=5));
-#.junk<-sapply(union(cnum,cintgr),function(ii) hist(dat3[[ii]],main=ii));
-#' You will probably need to adjust the nrow/ncol for the `layout()`
-#' command, and probably plot some of them individually so you 
-#' can adjust the `xlim`, `breaks`, etc. The goal is to look for
-#' skewed or otherwise wierd distributions.
-
-#' Try using `ggduo()` to plot all predictors vs all 
-#' responses.
-resps <- c('a_postop','a_cd4');
+#' Both of our main non time-to-event responses
+c_resps <- c('a_postop','a_cd4');
 
 #' ### Create your random sample
-source('random_seed.R');
-pat_samp <- sample(dat3$idn_mrn,1000,rep=F);
-dat4 <- subset(dat3,idn_mrn %in% pat_samp);
+#source('random_seed.R');
+#pat_samp_dat3 <- sample(dat3$idn_mrn,1000,rep=F);
+#' These are the samples for survival analysis
+#dat4 <- subset(dat3,idn_mrn %in% pat_samp_dat3);
 
-#' Create a tabsie object for visualization
-#' How well does Rockwood correlate with RAI-A?
-smoothScatter(dat4$a_rockwood
-              ,dat4$a_rai
-              ,bandwidth = c(.03,.5)
-              ,nrpoints = 0);
-#' ### Plot of percent having any complication versus ethnicity and RAI bin
-# if you are grouping by something else, edit the next line
-group_by(dat4,hispanic_ethnicity,a_discrete_rai) %>% 
-  # the mean of a T/F variable is the percent TRUE
-  summarise(a_any_postop=mean(a_any_postop=='TRUE')) %>% 
-  # if you are grouping by something else, update to match the group_by
-  ggplot(aes(x=a_discrete_rai,y=a_any_postop,fill=hispanic_ethnicity)) + 
-  geom_bar(stat='identity',position='dodge') -> plot_anypostop;
-
-# create tabsie dataset for visualization
-# mktabsie(dat4
-#          ,c(Full=T,OnlyPostop=bquote(a_postop!=0),OnlyNoPostop=bquote(a_postop==0))
-#          ,pw=shinypw
-#          ,serverTitle = 'RAI Pilot Project'
-#          ,serverStatement = bquote(h4("Now we can each see the data. Please note, only pairwise comparisons are available with this tool."))
-#          ,vars=tabsievars);
-
-tidy(lmrr<-lm(a_rockwood~a_rai,dat4));
-glance(lmrr);
-cxbase<-coxph(Surv(a_t,a_c)~1,dat4);
-#' How predictive is RAI of deaths and readmissions?
-tidy(cxrai <- update(cxbase,.~a_rai));
-glance(cxrai);
-survfit(Surv.a_t..a_c.~.fitted>median(.fitted),data=augment(cxrai)) %>% 
-  autoplot(ylim=c(.75,1)) +
-  labs(x='Time in Days', y = 'Event-Free') +
-  scale_fill_discrete('RAI-A   ',labels=c('Low','High')) +
-  scale_color_discrete('RAI-A   ',labels=c('Low','High')) +
-  ggtitle('RAI-A as Predictor of 30 Mortality or Readmission');
-#' How predictive is Rockwood of deaths and readmissions?
-tidy(cxrck <- update(cxbase,.~a_rockwood));
-glance(cxrck);
-survfit(Surv.a_t..a_c.~.fitted>median(.fitted),data=augment(cxrck)) %>% 
-  autoplot(ylim=c(.75,1)) +
-  labs(x='Time in Days', y = 'Event-Free') +
-  scale_fill_discrete('Rockwood',labels=c('Low','High')) +
-  scale_color_discrete('Rockwood',labels=c('Low','High')) +
-  ggtitle('Rockwood Index as Predictor of 30 Mortality or Readmission');
-#ggduo(dat4,union(cnum,cintgr),resps);
-#ggduo(dat4,union(ctf,cfactr),resps);
-
-#plotting graphs:
-cnum <- vartype(dat4, 'numeric'); #<= I created this function in 'functions.R' file
-cintgr <- vartype(dat4, 'integer');
-ctf <- vartype(dat4, 'logical');
-cfactr <- vartype(dat4, 'factor');
-ggduo(dat4,union(cnum[1:2],cintgr[1:2]),resps);
-ggduo(dat4,union(ctf,cfactr),resps);
-
-#the following plots are interesting:
-ggduo(dat4, columnsX='income_final', columnsY=c('a_postop','a_cd4'), resps);
-ggduo(dat4, columnsX='age_at_time_surg', columnsY=c('a_postop','a_cd4'), resps);
-ggduo(dat4, columnsY='age_at_time_surg', columnsX=c('hispanic_ethnicity'), resps);
-ggduo(dat4, columnsY='income_final', columnsX=c('hispanic_ethnicity'), resps);
-ggduo(dat4, columnsY='hispanic_ethnicity', columnsX=c('a_postop','a_cd4'), resps);
-
-
-#' The goal is to find the most obvious relationships beteen
-#' predictors and variables.
-
-#' NOW you have probed your data in a sufficiently deep and 
-#' methodical way that you can start making decisions about how
-#' to analyze it. For example...
-glmpostop <- glm(a_postop~1,dat4,family='poisson');
-glmpostopaic <- stepAIC(update(glmpostop,subset=!is.na(income_final))
-                        ,scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+age_at_time_surg+income_final)^3)
-                        ,direction='both');
-summary(glmpostopaic);
-glmcd4 <- glm(a_cd4~1,dat4,family='poisson');
-glmcd4aic <- stepAIC(update(glmcd4,subset=!is.na(income_final)),scope=list(lower=.~1,upper=.~(a_rai+hispanic_ethnicity+age_at_time_surg+income_final)^3),direction='both');
-summary(glmcd4aic);
-#' BUt this is kind of a waste of time because RAI-A was never properly weighted.
-#' Let's fix that...
-glmp_cd4<-glm(a_cd4~gender+x_loss_bw_6_months_prior_surg+dyspnea+currently_dialysis+chr_30_dy_prior_surg+functnal_heath_status+disseminated_cancer*age_at_time_surg+serum_creatinine+a_transfer
-              ,dat4,subset=!is.na(serum_creatinine)&dyspnea!='At Rest'&functnal_heath_status!='Unknown',family='poisson');
-#' Can we improve on RAI by adding the above fitted model?
-anova(update(glmp_cd4,.~a_rai),update(glmp_cd4,.~.+a_rai),test='LRT');
-#' Yes
-#' 
-#' How about in reverse? Can we improve on the model by adding RAI?
-anova(glmp_cd4,update(glmp_cd4,.~.+a_rai),test='LRT');
-#' Yes also
-#' 
-#' Now let's do stepwise regression to see what really needs to be in the model
-glmp_cd4_aic <- stepAIC(glmp_cd4,scope=list(lower=~1,upper=~(.)^2),direction='both');
-#' Now can this be improved with original RAI?
-#' Can we improve on RAI by adding the above fitted model?
-anova(update(glmp_cd4_aic,.~a_rai),update(glmp_cd4_aic,.~.+a_rai),test='LRT');
-#' And does RAI improve it?
-anova(glmp_cd4_aic,update(glmp_cd4_aic,.~.+a_rai),test='LRT');
-#' A little
-#' 
-
-#' ## (yet another) summary demographic table for NSQIP
-#' 
-#' (with patients aged 60-89)
-#' 
-subset(dat2,between((Sys.time() - dt_birth)/365.25,60,89)) %>% 
-  mutate(income=income_final/1000
-         ,age=(Sys.time()-dt_birth)/365.25
-         ,ohw=(ifelse(hispanic_ethnicity=='Yes'
-                      ,'Hispanic'
-                      ,ifelse(race=='White'
-                              ,'White'
-                              ,'Other')))) %>% 
-  group_by(ohw,gender) %>% 
-  summarise(N=n()
-            ,mage=sprintf('%0.1f (%0.1f, %0.1f)'
-                          ,median(age,na.rm=T)
-                          ,quantile(age,.25,na.rm=T)
-                          ,quantile(age,.75,na.rm=T))
-            ,inc=sprintf('%0.0f (%0.0f, %0.0f)'
-                         ,median(income,na.rm=T)
-                         ,quantile(income,.25,na.rm=T)
-                         ,quantile(income,.75,na.rm=T))) %>%
-  View;
-
+#' # Survival Analysis
+cox.rai.train <- coxph(Surv(a_t,a_c) ~ a_rai, data = sbs0$train$all_emergency
+                 ,subset=a_t>0);
+cox.rock.train <- coxph(Surv(a_t,a_c) ~ a_rockwood, data = sbs0$train$all_emergency
+                 ,subset=a_t>0);
