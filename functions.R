@@ -1,3 +1,16 @@
+instrequire <- function(pkglist
+                        ,repos=getOption('repos','https://cran.rstudio.com/')){
+  pkgs_installed <- sapply(pkglist,require,character.only=T);
+  if(length(pkgs_needed <- names(pkgs_installed[!pkgs_installed]))>0){
+    install.packages(pkgs_needed,repos=repos,dependencies = T);
+    pkgs_final <- sapply(pkgs_needed,require,character.only=T);
+    if(!all(pkgs_final)){
+      stop(c('the following required packages could not be installed:\n'
+             ,paste0(names(pkgs_final[!pkgs_final]),collapse = ', ')));
+    }
+  };
+}
+
 survAUC<-function(Surv.rsp,Surv.rsp.new,lp,lpnew,times,time,lp0=0
                   ,nonstdSurv=c('OXS','Nagelk','XO')
                   ,...,FUNS){
