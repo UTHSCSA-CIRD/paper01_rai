@@ -316,11 +316,19 @@ gitstamp <- function(production=getOption('gitstamp.production',T),branch=F
                      ,whichfile='') {
   br<- if(branch) system("git rev-parse --abbrev-ref HEAD",intern=T) else NULL;
   if(production){
-    if(length(gitdiff<-system("git update-index --refresh && git diff-index HEAD --",intern = T))!=0) stop(sprintf(
+    if(length(gitdiff<-system("git update-index --refresh && git diff-index HEAD --",intern = T))!=0){
+      stop(sprintf(
       "\ngit message: %s\n\nYou have uncommitted changes. Please do 'git commit' and then try again."
-      ,gitdiff));
-    c(br,system(sprintf("git push && git log --pretty=format:'%%h' -n 1 -- %s"
-                        ,whichfile),intern=T));
+      ,gitdiff));};
+    hash<-system(sprintf("git push && git log --pretty=format:'%%h' -n 1 -- %s"
+                         ,whichfile),intern=T);
+    if(length(hash)==0) stop('
+The specified file is not part of a git repository. You need to do (for example):
+
+git add NAMEOFTHISSCRIPT.R && git commit -a -m "New script"
+
+...and then try again.');
+    return(br,hash);
   } else return(c(br,'TEST_OUTPUT_DO_NOT_USE'));
 }
 
