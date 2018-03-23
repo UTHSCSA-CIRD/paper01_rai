@@ -427,5 +427,5 @@ kable(racesexu)
 racesext <- dat1 %>% 
   filter(duplicated(idn_mrn)!=TRUE) %>% 
   select(race) %>% 
-  table(useNA="always") %>% addmargins()
-kable(racesext)
+  table(useNA="always") %>% addmargins();
+kable(cbind(racesext));
