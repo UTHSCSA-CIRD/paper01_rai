@@ -28,12 +28,17 @@ colnames(cost0) <- tolower(colnames(cost0));
  
 #' Create copy of original dataset
 cost1 <- cost0;
-dat1 <- dat0;
 dropcol_dat <- c('idn_mrn', 'lmrn_visit', 'case_number');
-dat1 <- dat0 %>% select(-one_of(dropcol_dat));
-names(dat1)<-gsub('deid_patient','idn_mrn',names(dat1));
-names(dat1)<-gsub('deid_visit','lmrn_visit',names(dat1));
-names(dat1)<-gsub('deid_case','case_number',names(dat1));
+#dat1b <- dat0 %>% select(-one_of(dropcol_dat));
+#names(dat1b)<-gsub('deid_patient','idn_mrn',names(dat1b));
+#names(dat1b)<-gsub('deid_visit','lmrn_visit',names(dat1b));
+#names(dat1b)<-gsub('deid_case','case_number',names(dat1b));
+# 
+#' All the above commented out code is replaced by this one statement:
+dat1 <- dat0[,setdiff(names(dat0),dropcol_dat)] %>%
+  mapnames(lookup=c(idn_mrn='deid_patient',lmrn_visit='deid_visit'
+                    ,case_number='deid_case'));
+# all.equal(dat1b,dat1); # TRUE
 
 #' Create synonyms for 'TRUE' for components of the Rockwood index
 #' l_ is a variable storing labels for factors
