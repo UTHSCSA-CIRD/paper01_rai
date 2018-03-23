@@ -328,7 +328,7 @@ The specified file is not part of a git repository. You need to do (for example)
 git add NAMEOFTHISSCRIPT.R && git commit -a -m "New script"
 
 ...and then try again.');
-    return(br,hash);
+    return(c(br,hash));
   } else return(c(br,'TEST_OUTPUT_DO_NOT_USE'));
 }
 
