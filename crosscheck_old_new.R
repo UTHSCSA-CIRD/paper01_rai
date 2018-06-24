@@ -37,12 +37,21 @@ oldenv <- new.env(); load(inputenv_old,envir = oldenv);
 newenv <- new.env(); load(inputenv_new,envir = newenv);
 
 #' ### Does every top-leveltable have the same row counts?
-test_rowcounts <- cbind(
-  old=sapply(oldenv,nrow) %>% Filter(Negate(is.null),.) %>% cbind(),
-  new=sapply(newenv,nrow) %>% Filter(Negate(is.null),.) %>% cbind()
-);
+test_rowcounts <- sapply(oldenv,nrow) %>% Filter(Negate(is.null),.) %>% names %>% 
+  union(sapply(newenv,nrow) %>% Filter(Negate(is.null),.) %>% names) %>% 
+  sapply(function(xx) c(nrow(oldenv[[xx]]),nrow(newenv[[xx]]))) %>% t %>% 
+  data.frame %>% setNames(c('old','new'));
 test_rowcounts;
 
 #' ### What columns are different in the old and new data?
 setdiff(names(oldenv$dat0),names(newenv$dat0));
 setdiff(names(newenv$dat0),names(oldenv$dat0));
+test_samenames <- intersect(names(oldenv$dat1),names(newenv$dat1));
+
+#' ### For the column names that are the same, which ones have different values?
+#' 
+#' ...for the `dat1` s of the old and new versions
+test_coldiffs <- mapply(all.equal
+                        ,with(oldenv,dat1[order(dat1$idn_mrn),test_samenames])
+                        ,with(newenv,dat1[order(dat1$idn_mrn),test_samenames]));
+cbind(test_coldiffs[test_coldiffs!='TRUE']);
