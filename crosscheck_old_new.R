@@ -21,14 +21,14 @@ instrequire('pander');
 #' the current `inputdata` environment created using the current `run.R` file.
 #+ cache=TRUE
 if(!(exists('inputenv_new')&&file.exists(inputenv_new))){
-    # warn
+    warning('inputenv_new variable either not defined or file does not exist, creating new one.');
     if(!file.exists(session)){
       system(sprintf('R -e "source(\'run.R\'); save.image(file=\'%s\')"',session));
     }
   inputenv_new <- session;
 }
 if(!(exists('inputenv_old')&&file.exists(inputenv_old))){
-  # warn
+  warning('inputenv_old variable either not defined or file does not exist, copying new one to old.');
   inputenv_old <- inputenv_new;
 }
 #' Old environment: `r inputenv_old`
@@ -57,7 +57,7 @@ dat1new <- with(newenv,dat1[order(dat1$case_number),]);
 #' Set the income_final column of the new dat1 to what it was in the old
 dat1new$income_final <- dat1new$income_2013; 
 #' Update `test_samenames`
-test_samenames <- c('income_2013',test_samenames);
+test_samenames <- c('income_final',test_samenames);
 #' Same thing with 2016 colectomy
 col2016old <- with(oldenv$sbs0$all2016,all_colon_all[order(all_colon_all$case_number),]);
 col2016new <- with(newenv$sbs0$all2016,all_colon_all[order(all_colon_all$case_number),]);
@@ -94,8 +94,7 @@ with(dat1new,table(`No Address`=no_address,`2016`=is.na(income_2016))) %>%
   addmargins();
 with(dat1new,table(`No Address`=no_address,`2013`=is.na(income_2013))) %>% 
   addmargins();
-#' This is not due to more missing addresses-- most of the missing 2016 incomes
-#' are not missing addresses.
+#' This is not due to more missing addresses
 nrow(subset(dat1new,no_address!=1&no_idmatch==1));
 #' There are none missing due to missing ID that are not also missing due to 
 #' missing address. So, the missing incomes are ones for which addresses are 
