@@ -119,5 +119,7 @@ subset(col2016new,is.na(income_2016)&!is.na(income_2013))[,1:11];
 #' Again, these are not due to missing address.
 #' 
 #' Conclusion: there are 33 patients for whom we lack addresses.
+#' 
 #' TODO: Confirm that all the manual patches have been applied database-end
+#' 
 #' TODO: Find their MRNs and get their addresses from sunrise.client or patient_dimension
