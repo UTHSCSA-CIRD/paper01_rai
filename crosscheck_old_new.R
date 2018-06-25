@@ -52,6 +52,9 @@ test_samenames <- intersect(names(oldenv$dat1),names(newenv$dat1));
 #' 
 #' ...for the `dat1` s of the old and new versions
 test_coldiffs <- mapply(all.equal
-                        ,with(oldenv,dat1[order(dat1$idn_mrn),test_samenames])
-                        ,with(newenv,dat1[order(dat1$idn_mrn),test_samenames]));
+                        ,with(oldenv,dat1[order(dat1$case_number),test_samenames])
+                        ,with(newenv,dat1[order(dat1$case_number),test_samenames]));
 cbind(test_coldiffs[test_coldiffs!='TRUE']);
+#' The postop_icd9_code column is different solely because of trailing 0s
+
+#' Create a datold and datnew for dat1, ordered by case_number
