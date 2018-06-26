@@ -38,6 +38,12 @@ dropcol_dat <- c('idn_mrn', 'lmrn_visit', 'case_number');
 dat1 <- dat0[,setdiff(names(dat0),dropcol_dat)] %>%
   mapnames(lookup=c(idn_mrn='deid_patient',lmrn_visit='deid_visit'
                     ,case_number='deid_case'));
+#' Small hack to make it backwards compatible with the version where we only had
+#' one income column. Do not use `income_final` for any new code, use `income_2013`
+#' or `income_2016`
+if(!'income_final' %in% names(dat1) && 'income_2013' %in% names(dat1)){
+  dat1$income_final <- dat1$income_2013
+}
 # all.equal(dat1b,dat1); # TRUE
 
 #' Create synonyms for 'TRUE' for components of the Rockwood index
