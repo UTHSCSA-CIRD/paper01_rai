@@ -49,7 +49,7 @@ source('run.R');
 # Creating open colon summary tables:
 # 
 # **AFB:** Oops-- my bad, I should have named it `a_rai_range` in `run.R`
-lapply(dat1subs, function(xx) group_by(xx,rai_range) %>% 
+lapply(c(dat1subs,sbs0$all2016), function(xx) group_by(xx,rai_range) %>% 
   summarise(rai_n = n()	    
             ,cumul_count = cumsum(n())
             ,died_n = sum(postop_death_30_dy_proc =='Yes') 
@@ -58,6 +58,8 @@ lapply(dat1subs, function(xx) group_by(xx,rai_range) %>%
             ,comp_frac = mean(a_any_postop=='TRUE')
             ,cd4_n = sum(a_any_cd4=='TRUE')
             ,cd4_frac = mean(a_any_cd4=='TRUE')
+            ,income_2013 = mean(income_2013,na.rm=T)
+            ,income_2016 = mean(income_2016,na.rm=T)
             ,readmsn_n = sum(a_readm_30_dy=='TRUE')
             ,readmsn_frac = mean(a_readm_30_dy=='TRUE')
             ) %>% 
@@ -89,6 +91,8 @@ thecolnames0 <- c("RAI-A Range"='rai_range'
                  ,"Complications 30days Fraction"="comp_frac"
                  ,"Clavien-Dindo Grade4 30days N"="cd4_n"
                  ,"Clavien-Dindo Grade4 30days Fraction"="cd4_frac"
+                 ,"Income '13" = "income_2013"
+                 ,"Income '16" = "income_2016"
                  ,"30day Readmission N"="readmsn_n"
                  ,"30day Readmission Fraction"="readmsn_frac"
 );

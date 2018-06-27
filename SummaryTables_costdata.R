@@ -24,6 +24,12 @@ table_01 <- costdata %>% group_by(rai_range) %>%
             ,cd4_frac = mean(a_any_cd4=='TRUE')
             ,readmsn_n = sum(a_readm_30_dy=='TRUE')
             ,readmsn_frac = mean(a_readm_30_dy=='TRUE')
+            ,avg_var_cost = mean(tot_vbl_direct_cost,na.rm = T)
+            ,avg_dir_fx_cost = mean(tot_fx_dir_cost,na.rm=T)
+            ,avg_ind_fx_cost = mean(tot_fx_indir_cost,na.rm=T)
+            ,length_stay = mean(los,na.rm=T)
+            ,income_2013 = mean(income_2013,na.rm=T)
+            ,income_2016 = mean(income_2016,na.rm=T)
   ) %>% 
   mutate(cumul_count=rev(cumsum(rev(rai_n)))) %>% 
   arrange(desc(rai_range)) 
