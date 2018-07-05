@@ -23,7 +23,7 @@ instrequire('pander');
 if(!(exists('inputenv_new')&&file.exists(inputenv_new))){
     warning('inputenv_new variable either not defined or file does not exist, creating new one.');
     if(!file.exists(session)){
-      system(sprintf('R -e "source(\'run.R\'); save.image(file=\'%s\')"',session));
+      system(sprintf('R -e "source(\'SummaryTables.R\'); save.image(file=\'%s\')"',session));
     }
   inputenv_new <- session;
 }
@@ -40,7 +40,7 @@ newenv <- new.env(); load(inputenv_new,envir = newenv);
 #' ### Does every top-leveltable have the same row counts?
 test_rowcounts <- sapply(oldenv,nrow) %>% Filter(Negate(is.null),.) %>% names %>% 
   union(sapply(newenv,nrow) %>% Filter(Negate(is.null),.) %>% names) %>% 
-  sapply(function(xx) c(nrow(oldenv[[xx]]),nrow(newenv[[xx]]))) %>% t %>% 
+  sapply(function(xx) c(c(nrow(oldenv[[xx]]),0)[1],c(nrow(newenv[[xx]]),0)[1])) %>% t %>% 
   data.frame %>% setNames(c('old','new'));
 test_rowcounts;
 
