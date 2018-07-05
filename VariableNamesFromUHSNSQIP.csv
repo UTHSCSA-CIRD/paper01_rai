@@ -1,140 +1,140 @@
-dataset_column_names,NSQIP_NAMES,lref_m,lref_f,uref_m,uref_f,c_cd4,c_postop,c_canbepatos,c_patos,c_date,c_rai,c_noyes,c_count,c_num,c_tabsie,c_rock_tf,c_refval
-idn_mrn,,,,,,,,,,,,,,,,FALSE,FALSE
-income_final,,,,,,,,,,,,,,,T,FALSE,FALSE
-age_at_time_surg,Age at Time of Surgery,,,,,,,,,,T,,,T,T,FALSE,FALSE
-gender,Gender,,,,,,,,,,T,,,,T,FALSE,FALSE
-race,Race,,,,,,,,,,,,,,T,FALSE,FALSE
-hispanic_ethnicity,Hispanic Ethnicity,,,,,,,,,,,T,,,T,FALSE,FALSE
-cpt_code,CPT Code,,,,,,,,,,,,,,,FALSE,FALSE
-cpt_descriptn,CPT Description,,,,,,,,,,,,,,,FALSE,FALSE
-in_out_patient_status,In/Out-Patient Status,,,,,,,,,,,,,,T,FALSE,FALSE
-elective_surg,Elective Surgery,,,,,,,,,,,T,,,T,FALSE,FALSE
-origin_status,Origin Status,,,,,,,,,,T,,,,T,FALSE,FALSE
-hospital_admissn_dt,Hospital Admission Date,,,,,,,,,T,,,,,,FALSE,FALSE
-operatn_dt,Operation Date,,,,,,,,,T,,,,,,FALSE,FALSE
-principal_anesthesia_technique,Principal Anesthesia Technique,,,,,,,,,,,,,,T,FALSE,FALSE
-height,Height,,,,,,,,,,,,,T,,FALSE,FALSE
-height_unit,Height Unit,,,,,,,,,,,,,,,FALSE,FALSE
-height_unknown,Height Unknown,,,,,,,,,,,,,,,FALSE,FALSE
-weight,Weight,,,,,,,,,,,,,T,,FALSE,FALSE
-weight_unit,Weight Unit,,,,,,,,,,,,,,,FALSE,FALSE
-weight_unknown,Weight Unknown,,,,,,,,,,,,,,,FALSE,FALSE
-bmi,BMI,18.5,18.5,25,25,,,,,,,,,T,T,FALSE,TRUE
-diabetes_mellitus,Diabetes Mellitus,,,,,,,,,,,,,,T,TRUE,FALSE
-current_smoker_within_1_year,Current Smoker within 1 year,,,,,,,,,,,T,,,,TRUE,FALSE
-dyspnea,Dyspnea,,,,,,,,,,T,,,,,TRUE,FALSE
-functnal_heath_status,Functional Heath Status,,,,,,,,,,T,,,,,TRUE,FALSE
-vent_dependent,Ventilator Dependent,,,,,,,,,,,T,,,,TRUE,FALSE
-history_severe_copd,History of Severe COPD,,,,,,,,,,,T,,,,TRUE,FALSE
-ascites_30_dy_prior_surg,Ascites w/in 30 days prior to surgery,,,,,,,,,,,T,,,,TRUE,FALSE
-chr_30_dy_prior_surg,Congestive Heart Failure w/in 30 days prior to surgery,,,,,,,,,,T,T,,,,TRUE,FALSE
-hypertensn_req_medicatn,Hypertension requiring medication,,,,,,,,,,,T,,,,TRUE,FALSE
-acute_renal_failure,Acute Renal Failure,,,,,,,,,,,T,,,,TRUE,FALSE
-currently_dialysis,Currently requiring or on dialysis,,,,,,,,,,T,T,,,,TRUE,FALSE
-disseminated_cancer,Disseminated Cancer,,,,,,,,,,T,T,,,,TRUE,FALSE
-open_wound,Open Wound with or without infection,,,,,,,,,,,T,,,,TRUE,FALSE
-steroid_immunosupp,Steroid/Immunosuppressant use for chronic condition,,,,,,,,,,,T,,,,TRUE,FALSE
-x_loss_bw_6_months_prior_surg,>10% loss of body weight in the 6 months prior to surgery,,,,,,,,,,T,T,,,,TRUE,FALSE
-bleeding_disorder,Bleeding Disorder,,,,,,,,,,,T,,,,TRUE,FALSE
-preop_tnsf_rbc_72h_prior_surg,Preop Transfusions (RBC w/in 72 hrs prior to surgery start time),,,,,,,,,,,T,,,,FALSE,FALSE
-sepsis_sirs_sepsis_sepshk_48h,Sepsis (SIRS/Sepsis/Septic shock) (48h),,,,,,,,,,,,,,,FALSE,FALSE
-all_pre_op_labs_unknown,All Pre-op Labs Unknown,,,,,,,,,,,T,,,,FALSE,FALSE
-serum_sodium,Serum Sodium,132,132,146,146,,,,,,,,,T,,FALSE,TRUE
-serum_sodium_dt,Serum Sodium Date,,,,,,,,,T,,,,,,FALSE,FALSE
-bun,BUN,9,9,23,23,,,,,,,,,T,,FALSE,TRUE
-bun_dt,BUN Date,,,,,,,,,T,,,,,,FALSE,FALSE
-serum_creatinine,Serum Creatinine,0.7,0.5,1.3,1.1,,,,,,T,,,T,,FALSE,TRUE
-serum_creatinine_dt,Serum Creatinine Date,,,,,,,,,T,,,,,,FALSE,FALSE
-albumin,Albumin,3.2,3.2,4.8,4.8,,,,,,,,,T,,FALSE,TRUE
-albumin_dt,Albumin Date,,,,,,,,,T,,,,,,FALSE,FALSE
-total_bilirubin,Total Bilirubin,,,,,,,,,,,,,T,,FALSE,FALSE
-total_bilirubin_dt,Total Bilirubin Date,,,,,,,,,T,,,,,,FALSE,FALSE
-ast_sgot,AST/SGOT,,,,,,,,,,,,,T,,FALSE,FALSE
-ast_sgot_dt,AST/SGOT Date,,,,,,,,,T,,,,,,FALSE,FALSE
-alkaline_phosphatase,Alkaline Phosphatase,,,,,,,,,,,,,T,,FALSE,FALSE
-alkaline_phosphatase_dt,Alkaline Phosphatase Date,,,,,,,,,T,,,,,,FALSE,FALSE
-wbc,WBC,5.2,5.2,12.4,12.4,,,,,,,,,T,,FALSE,TRUE
-wbc_dt,WBC Date,,,,,,,,,T,,,,,,FALSE,FALSE
-hematocrit,Hematocrit,40,37,54,47,,,,,,,,,T,,FALSE,TRUE
-hematocrit_dt,Hematocrit Date,,,,,,,,,T,,,,,,FALSE,FALSE
-platelet_count,Platelet Count,130,130,400,400,,,,,,,,,T,,FALSE,TRUE
-platelet_count_dt,Platelet Count Date,,,,,,,,,T,,,,,,FALSE,FALSE
-inr,INR,0.9,0.9,1.2,1.2,,,,,,,,,T,,FALSE,TRUE
-inr_dt,INR Date,,,,,,,,,T,,,,,,FALSE,FALSE
-ptt,PTT,23.3,23.3,31.9,31.9,,,,,,,,,T,,FALSE,TRUE
-ptt_dt,PTT Date,,,,,,,,,T,,,,,,FALSE,FALSE
-emergency_case,Emergency Case,,,,,,,,,,,T,,,T,FALSE,FALSE
-wound_class,Wound Classification,,,,,,,,,,,,,,T,FALSE,FALSE
-surg_wound_s_closure,Surgical Wound(s) Closure,,,,,,,,,,,,,,,FALSE,FALSE
-asa_class,ASA Classification,,,,,,,,,,,,,,T,FALSE,FALSE
-proc_surg_start,Procedure/Surgery Start,,,,,,,,,,,,,,,FALSE,FALSE
-proc_surg_finish,Procedure/Surgery Finish,,,,,,,,,,,,,,,FALSE,FALSE
-duratn_surg_proc_minutes,Duration of Surgical Procedure (in minutes),,,,,,,,,,,,,T,T,FALSE,FALSE
-other_proc,# of Other Procedures,,,,,,,,,,,,T,,,FALSE,FALSE
-other_proc_cpt,Other Procedures CPT,,,,,,,,,,,,,,,FALSE,FALSE
-concurrent_proc,# of Concurrent Procedures,,,,,,,,,,,,T,,,FALSE,FALSE
-concurrent_proc_cpt,Concurrent Procedures CPT,,,,,,,,,,,,,,,FALSE,FALSE
-postop_si_ssi,# of Postop Superficial Incisional SSI,,,,,F,F,T,,,,,T,,,FALSE,FALSE
-postop_si_ssi_patos,# of Postop Superficial Incisional SSI PATOS,,,,,F,F,,T,,,,T,,,FALSE,FALSE
-postop_deep_incisnal_ssi,# of Postop Deep Incisional SSI,,,,,F,T,T,,,,,T,,,FALSE,FALSE
-postop_deep_incisnal_ssi_patos,# of Postop Deep Incisional SSI PATOS,,,,,F,F,,T,,,,T,,,FALSE,FALSE
-postop_organ_space_ssi,# of Postop Organ/Space SSI,,,,,F,T,T,,,,,T,,,FALSE,FALSE
-postop_organ_space_ssi_patos,# of Postop Organ/Space SSI PATOS,,,,,F,F,,T,,,,T,,,FALSE,FALSE
-postop_wound_disruptn,# of Postop Wound Disruption,,,,,F,T,,,,,,T,,,FALSE,FALSE
-postop_pneumonia,# of Postop Pneumonia,,,,,F,T,T,,,,,T,,,FALSE,FALSE
-postop_pneumonia_patos,# of Postop Pneumonia PATOS,,,,,F,F,,T,,,,T,,,FALSE,FALSE
-postop_unpl_intubatn,# of Postop Unplanned Intubation,,,,,T,T,,,,,,T,,,FALSE,FALSE
-postop_pulmonary_embolism,# of Postop Pulmonary Embolism,,,,,T,T,,,,,,T,,,FALSE,FALSE
-postop_vent_48_hr,# of Postop On Ventilator > 48 hours,,,,,T,T,T,,,,,T,,,FALSE,FALSE
-postop_vent_48_hr_patos,# of Postop On Ventilator > 48 hours PATOS,,,,,F,F,,T,,,,T,,,FALSE,FALSE
-postop_prog_renal_ins,# of Postop Progressive Renal Insufficiency,,,,,T,T,,,,,,T,,,FALSE,FALSE
-postop_acute_renal_failure,# of Postop Acute Renal Failure,,,,,T,T,,,,,,T,,,FALSE,FALSE
-postop_uti,# of Postop UTI,,,,,F,F,T,,,,,T,,,FALSE,FALSE
-postop_uti_patos,# of Postop UTI PATOS,,,,,F,F,,T,,,,T,,,FALSE,FALSE
-postop_cva,# of Postop CVA,,,,,T,T,,,,,,T,,,FALSE,FALSE
-postop_cardiac_arrest_req_cpr,# of Postop Cardiac Arrest Requiring CPR,,,,,T,T,,,,,,T,,,FALSE,FALSE
-postop_mi,# of Postop Myocardial Infarction,,,,,T,T,,,,,,T,,,FALSE,FALSE
-postop_transf_intraop_72h_surg,# of Postop Transfusion Intraop/ Postop (72h of surgery start time),,,,,F,T,,,,,,T,,,FALSE,FALSE
-total_blood_transfused_units,Total Blood Transfused (in units),,,,,F,T,,,,,,,,,FALSE,FALSE
-dvt,# of Postop Vein Thrombosis Requiring Therapy,,,,,F,T,,,,,,T,,,FALSE,FALSE
-postop_c_diff,# of Postop C. diff,,,,,F,T,,,,,,T,,,FALSE,FALSE
-type_c_diff_test_performed,Type of C. diff test performed,,,,,,,,,,,,,,,FALSE,FALSE
-result_c_diff_test,Result of C. diff test,,,,,F,T,,,,,,,,,FALSE,FALSE
-treatment_cdiff,Was patient given treatment for C. diff?,,,,,,,,,,,T,,,,FALSE,FALSE
-c_diff_loose_stool,Did patient with C. diff have diarrhea/loose stools?,,,,,F,T,,,,,T,,,,FALSE,FALSE
-postop_sepsis,# of Postop Sepsis,,,,,F,T,T,,,,,T,,,FALSE,FALSE
-postop_sepsis_patos,# of Postop Sepsis PATOS,,,,,F,F,,T,,,,T,,,FALSE,FALSE
-postop_sepshk,# of Postop Septic Shock,,,,,T,T,T,,,,,T,,,FALSE,FALSE
-postop_sepshk_patos,# of Postop Septic Shock PATOS,,,,,F,F,,T,,,,T,,,FALSE,FALSE
-acute_hospital_discharge_dt,Acute Hospital Discharge Date,,,,,,,,,T,,,,,,FALSE,FALSE
-hospital_length_stay,Hospital Length of Stay,,,,,,,,,,,,,,T,FALSE,FALSE
-hospital_discharge_destinatn,Hospital Discharge Destination,,,,,,,,,,,,,,,FALSE,FALSE
-postop_icd9_code,Postoperative ICD9 Code,,,,,,,,,,,,,,,FALSE,FALSE
-postop_icd9_descriptn,Postoperative ICD9 Description,,,,,,,,,,,,,,,FALSE,FALSE
-postop_icd10_code,Postoperative ICD10 Code,,,,,,,,,,,,,,,FALSE,FALSE
-postop_icd10_descriptn,Postoperative ICD10 Description,,,,,,,,,,,,,,,FALSE,FALSE
-still_hospital_30_dy,Still in Hospital >30 Days,,,,,F,T,,,,,T,,,,FALSE,FALSE
-postop_death_30_dy_proc,Postop Death w/in 30 days of Procedure,,,,,F,T,,,,,T,,,,FALSE,FALSE
-postop_death_gt_30_dy_proc,Postoperative Death > 30 days of Procedure,,,,,F,T,,,,,T,,,,FALSE,FALSE
-dt_death,Date of Death,,,,,,,,,T,,,,,,FALSE,FALSE
-dt_death_unknown,Date of Death Unknown,,,,,,,,,,,T,,,,FALSE,FALSE
-end_life_withdrawal_care,End of Life/Withdrawal of Care,,,,,,,,,,,T,,,,FALSE,FALSE
-readm_30_dy,# of Readmissions w/in 30 days,,,,,F,T,,,,,,T,,T,FALSE,FALSE
-dt_first_readm,,,,,,,,,,,,,,,,FALSE,FALSE
-unpl_readm,# of Unplanned Readmissions,,,,,T,T,,,,,,T,,T,FALSE,FALSE
-readm_likely_rel_pr_proc,# of Readmissions likely related to principal procedure,,,,,F,T,,,,,,T,,T,FALSE,FALSE
-readm_likely_unrel_pr_proc,# of Readmissions likely unrelated to principal procedure,,,,,F,T,,,,,,T,,,FALSE,FALSE
-first_unp_ret_or,First Unplanned return to OR,,,,,T,T,,,,,T,,,,FALSE,FALSE
-dt_first_unpl_ret_or,Date  of First Unplanned Return to OR,,,,,,,,,T,,,,,,FALSE,FALSE
-first_unpl_ret_proc,# of First Unplanned Return Procedures,,,,,,,,,,,,T,,,FALSE,FALSE
-first_unpl_ret_cpt,First Unplanned Return CPT,,,,,,,,,,,,,,,FALSE,FALSE
-first_unpl_ret_rel_pr_proc,First Unplanned Return Related to Principal Procedure,,,,,,,,,,,T,,,,FALSE,FALSE
-second_unp_ret_or,Second unplanned return to OR,,,,,T,T,,,,,T,,,,FALSE,FALSE
-dt_second_unp_ret,Date of Second unplanned return,,,,,,,,,T,,,,,,FALSE,FALSE
-second_unpl_ret_proc,# of Second Unplanned Return Procedures,,,,,,,,,,,,T,,,FALSE,FALSE
-second_unpl_ret_cpt,Second Unplanned Return CPT,,,,,,,,,,,,,,,FALSE,FALSE
-second_unpl_ret_rel_pr_proc,Second Unplanned Return Related to Principal Procedure,,,,,,,,,,,T,,,,FALSE,FALSE
-more_than_2_unp_ret_or,More than 2 unplanned returns to OR,,,,,T,T,,,,,T,,,,FALSE,FALSE
-x30_dy_f_u_complete,30 Day F/U Complete,,,,,,,,,,,T,,,,FALSE,FALSE
-fu_dy,Follow-up Days,,,,,,,,,,,,,,,FALSE,FALSE
-robotic_assisted,Robotic Assisted?,,,,,,,,,,,T,,,,FALSE,FALSE
+dataset_column_names,NSQIP_NAMES,Comments,Type,lref_m,lref_f,uref_m,uref_f,c_cd4,c_postop,c_canbepatos,c_patos,c_date,c_rai,c_noyes,c_count,c_num,c_tabsie,c_rock_tf,c_refval
+idn_mrn,,,,,,,,,,,,,,,,,,FALSE,FALSE
+income_final,,,,,,,,,,,,,,,,,T,FALSE,FALSE
+age_at_time_surg,Age at Time of Surgery,,,,,,,,,,,,T,,,T,T,FALSE,FALSE
+gender,Gender,,,,,,,,,,,,T,,,,T,FALSE,FALSE
+race,Race,,,,,,,,,,,,,,,,T,FALSE,FALSE
+hispanic_ethnicity,Hispanic Ethnicity,,,,,,,,,,,,,T,,,T,FALSE,FALSE
+cpt_code,CPT Code,,,,,,,,,,,,,,,,,FALSE,FALSE
+cpt_descriptn,CPT Description,,,,,,,,,,,,,,,,,FALSE,FALSE
+in_out_patient_status,In/Out-Patient Status,,,,,,,,,,,,,,,,T,FALSE,FALSE
+elective_surg,Elective Surgery,,,,,,,,,,,,,T,,,T,FALSE,FALSE
+origin_status,Origin Status,,,,,,,,,,,,T,,,,T,FALSE,FALSE
+hospital_admissn_dt,Hospital Admission Date,,,,,,,,,,,T,,,,,,FALSE,FALSE
+operatn_dt,Operation Date,,,,,,,,,,,T,,,,,,FALSE,FALSE
+principal_anesthesia_technique,Principal Anesthesia Technique,,,,,,,,,,,,,,,,T,FALSE,FALSE
+height,Height,,,,,,,,,,,,,,,T,,FALSE,FALSE
+height_unit,Height Unit,,,,,,,,,,,,,,,,,FALSE,FALSE
+height_unknown,Height Unknown,,,,,,,,,,,,,,,,,FALSE,FALSE
+weight,Weight,,,,,,,,,,,,,,,T,,FALSE,FALSE
+weight_unit,Weight Unit,,,,,,,,,,,,,,,,,FALSE,FALSE
+weight_unknown,Weight Unknown,,,,,,,,,,,,,,,,,FALSE,FALSE
+bmi,BMI,,,18.5,18.5,25,25,,,,,,,,,T,T,FALSE,TRUE
+diabetes_mellitus,Diabetes Mellitus,,,,,,,,,,,,,,,,T,TRUE,FALSE
+current_smoker_within_1_year,Current Smoker within 1 year,,,,,,,,,,,,,T,,,,TRUE,FALSE
+dyspnea,Dyspnea,,,,,,,,,,,,T,,,,,TRUE,FALSE
+functnal_heath_status,Functional Heath Status,,,,,,,,,,,,T,,,,,TRUE,FALSE
+vent_dependent,Ventilator Dependent,,,,,,,,,,,,,T,,,,TRUE,FALSE
+history_severe_copd,History of Severe COPD,,,,,,,,,,,,,T,,,,TRUE,FALSE
+ascites_30_dy_prior_surg,Ascites w/in 30 days prior to surgery,,,,,,,,,,,,,T,,,,TRUE,FALSE
+chr_30_dy_prior_surg,Congestive Heart Failure w/in 30 days prior to surgery,,,,,,,,,,,,T,T,,,,TRUE,FALSE
+hypertensn_req_medicatn,Hypertension requiring medication,,,,,,,,,,,,,T,,,,TRUE,FALSE
+acute_renal_failure,Acute Renal Failure,,,,,,,,,,,,,T,,,,TRUE,FALSE
+currently_dialysis,Currently requiring or on dialysis,,,,,,,,,,,,T,T,,,,TRUE,FALSE
+disseminated_cancer,Disseminated Cancer,,,,,,,,,,,,T,T,,,,TRUE,FALSE
+open_wound,Open Wound with or without infection,,,,,,,,,,,,,T,,,,TRUE,FALSE
+steroid_immunosupp,Steroid/Immunosuppressant use for chronic condition,,,,,,,,,,,,,T,,,,TRUE,FALSE
+x_loss_bw_6_months_prior_surg,>10% loss of body weight in the 6 months prior to surgery,,,,,,,,,,,,T,T,,,,TRUE,FALSE
+bleeding_disorder,Bleeding Disorder,,,,,,,,,,,,,T,,,,TRUE,FALSE
+preop_tnsf_rbc_72h_prior_surg,Preop Transfusions (RBC w/in 72 hrs prior to surgery start time),,,,,,,,,,,,,T,,,,FALSE,FALSE
+sepsis_sirs_sepsis_sepshk_48h,Sepsis (SIRS/Sepsis/Septic shock) (48h),,,,,,,,,,,,,,,,,FALSE,FALSE
+all_pre_op_labs_unknown,All Pre-op Labs Unknown,,,,,,,,,,,,,T,,,,FALSE,FALSE
+serum_sodium,Serum Sodium,,,132,132,146,146,,,,,,,,,T,,FALSE,TRUE
+serum_sodium_dt,Serum Sodium Date,,,,,,,,,,,T,,,,,,FALSE,FALSE
+bun,BUN,,,9,9,23,23,,,,,,,,,T,,FALSE,TRUE
+bun_dt,BUN Date,,,,,,,,,,,T,,,,,,FALSE,FALSE
+serum_creatinine,Serum Creatinine,,,0.7,0.5,1.3,1.1,,,,,,T,,,T,,FALSE,TRUE
+serum_creatinine_dt,Serum Creatinine Date,,,,,,,,,,,T,,,,,,FALSE,FALSE
+albumin,Albumin,,,3.2,3.2,4.8,4.8,,,,,,,,,T,,FALSE,TRUE
+albumin_dt,Albumin Date,,,,,,,,,,,T,,,,,,FALSE,FALSE
+total_bilirubin,Total Bilirubin,,,,,,,,,,,,,,,T,,FALSE,FALSE
+total_bilirubin_dt,Total Bilirubin Date,,,,,,,,,,,T,,,,,,FALSE,FALSE
+ast_sgot,AST/SGOT,,,,,,,,,,,,,,,T,,FALSE,FALSE
+ast_sgot_dt,AST/SGOT Date,,,,,,,,,,,T,,,,,,FALSE,FALSE
+alkaline_phosphatase,Alkaline Phosphatase,,,,,,,,,,,,,,,T,,FALSE,FALSE
+alkaline_phosphatase_dt,Alkaline Phosphatase Date,,,,,,,,,,,T,,,,,,FALSE,FALSE
+wbc,WBC,,,5.2,5.2,12.4,12.4,,,,,,,,,T,,FALSE,TRUE
+wbc_dt,WBC Date,,,,,,,,,,,T,,,,,,FALSE,FALSE
+hematocrit,Hematocrit,,,40,37,54,47,,,,,,,,,T,,FALSE,TRUE
+hematocrit_dt,Hematocrit Date,,,,,,,,,,,T,,,,,,FALSE,FALSE
+platelet_count,Platelet Count,,,130,130,400,400,,,,,,,,,T,,FALSE,TRUE
+platelet_count_dt,Platelet Count Date,,,,,,,,,,,T,,,,,,FALSE,FALSE
+inr,INR,,,0.9,0.9,1.2,1.2,,,,,,,,,T,,FALSE,TRUE
+inr_dt,INR Date,,,,,,,,,,,T,,,,,,FALSE,FALSE
+ptt,PTT,,,23.3,23.3,31.9,31.9,,,,,,,,,T,,FALSE,TRUE
+ptt_dt,PTT Date,,,,,,,,,,,T,,,,,,FALSE,FALSE
+emergency_case,Emergency Case,,,,,,,,,,,,,T,,,T,FALSE,FALSE
+wound_class,Wound Classification,,,,,,,,,,,,,,,,T,FALSE,FALSE
+surg_wound_s_closure,Surgical Wound(s) Closure,,,,,,,,,,,,,,,,,FALSE,FALSE
+asa_class,ASA Classification,,,,,,,,,,,,,,,,T,FALSE,FALSE
+proc_surg_start,Procedure/Surgery Start,,,,,,,,,,,,,,,,,FALSE,FALSE
+proc_surg_finish,Procedure/Surgery Finish,,,,,,,,,,,,,,,,,FALSE,FALSE
+duratn_surg_proc_minutes,Duration of Surgical Procedure (in minutes),,,,,,,,,,,,,,,T,T,FALSE,FALSE
+other_proc,# of Other Procedures,,,,,,,,,,,,,,T,,,FALSE,FALSE
+other_proc_cpt,Other Procedures CPT,,,,,,,,,,,,,,,,,FALSE,FALSE
+concurrent_proc,# of Concurrent Procedures,,,,,,,,,,,,,,T,,,FALSE,FALSE
+concurrent_proc_cpt,Concurrent Procedures CPT,,,,,,,,,,,,,,,,,FALSE,FALSE
+postop_si_ssi,# of Postop Superficial Incisional SSI,,,,,,,F,F,T,,,,,T,,,FALSE,FALSE
+postop_si_ssi_patos,# of Postop Superficial Incisional SSI PATOS,,,,,,,F,F,,T,,,,T,,,FALSE,FALSE
+postop_deep_incisnal_ssi,# of Postop Deep Incisional SSI,,,,,,,F,T,T,,,,,T,,,FALSE,FALSE
+postop_deep_incisnal_ssi_patos,# of Postop Deep Incisional SSI PATOS,,,,,,,F,F,,T,,,,T,,,FALSE,FALSE
+postop_organ_space_ssi,# of Postop Organ/Space SSI,,,,,,,F,T,T,,,,,T,,,FALSE,FALSE
+postop_organ_space_ssi_patos,# of Postop Organ/Space SSI PATOS,,,,,,,F,F,,T,,,,T,,,FALSE,FALSE
+postop_wound_disruptn,# of Postop Wound Disruption,,,,,,,F,T,,,,,,T,,,FALSE,FALSE
+postop_pneumonia,# of Postop Pneumonia,,,,,,,F,T,T,,,,,T,,,FALSE,FALSE
+postop_pneumonia_patos,# of Postop Pneumonia PATOS,,,,,,,F,F,,T,,,,T,,,FALSE,FALSE
+postop_unpl_intubatn,# of Postop Unplanned Intubation,,,,,,,T,T,,,,,,T,,,FALSE,FALSE
+postop_pulmonary_embolism,# of Postop Pulmonary Embolism,,,,,,,T,T,,,,,,T,,,FALSE,FALSE
+postop_vent_48_hr,# of Postop On Ventilator > 48 hours,,,,,,,T,T,T,,,,,T,,,FALSE,FALSE
+postop_vent_48_hr_patos,# of Postop On Ventilator > 48 hours PATOS,,,,,,,F,F,,T,,,,T,,,FALSE,FALSE
+postop_prog_renal_ins,# of Postop Progressive Renal Insufficiency,,,,,,,T,T,,,,,,T,,,FALSE,FALSE
+postop_acute_renal_failure,# of Postop Acute Renal Failure,,,,,,,T,T,,,,,,T,,,FALSE,FALSE
+postop_uti,# of Postop UTI,,,,,,,F,F,T,,,,,T,,,FALSE,FALSE
+postop_uti_patos,# of Postop UTI PATOS,,,,,,,F,F,,T,,,,T,,,FALSE,FALSE
+postop_cva,# of Postop CVA,,,,,,,T,T,,,,,,T,,,FALSE,FALSE
+postop_cardiac_arrest_req_cpr,# of Postop Cardiac Arrest Requiring CPR,,,,,,,T,T,,,,,,T,,,FALSE,FALSE
+postop_mi,# of Postop Myocardial Infarction,,,,,,,T,T,,,,,,T,,,FALSE,FALSE
+postop_transf_intraop_72h_surg,# of Postop Transfusion Intraop/ Postop (72h of surgery start time),,,,,,,F,T,,,,,,T,,,FALSE,FALSE
+total_blood_transfused_units,Total Blood Transfused (in units),,,,,,,F,T,,,,,,,,,FALSE,FALSE
+dvt,# of Postop Vein Thrombosis Requiring Therapy,,,,,,,F,T,,,,,,T,,,FALSE,FALSE
+postop_c_diff,# of Postop C. diff,,,,,,,F,T,,,,,,T,,,FALSE,FALSE
+type_c_diff_test_performed,Type of C. diff test performed,,,,,,,,,,,,,,,,,FALSE,FALSE
+result_c_diff_test,Result of C. diff test,,,,,,,F,T,,,,,,,,,FALSE,FALSE
+treatment_cdiff,Was patient given treatment for C. diff?,,,,,,,,,,,,,T,,,,FALSE,FALSE
+c_diff_loose_stool,Did patient with C. diff have diarrhea/loose stools?,,,,,,,F,T,,,,,T,,,,FALSE,FALSE
+postop_sepsis,# of Postop Sepsis,,,,,,,F,T,T,,,,,T,,,FALSE,FALSE
+postop_sepsis_patos,# of Postop Sepsis PATOS,,,,,,,F,F,,T,,,,T,,,FALSE,FALSE
+postop_sepshk,# of Postop Septic Shock,,,,,,,T,T,T,,,,,T,,,FALSE,FALSE
+postop_sepshk_patos,# of Postop Septic Shock PATOS,,,,,,,F,F,,T,,,,T,,,FALSE,FALSE
+acute_hospital_discharge_dt,Acute Hospital Discharge Date,,,,,,,,,,,T,,,,,,FALSE,FALSE
+hospital_length_stay,Hospital Length of Stay,,,,,,,,,,,,,,,,T,FALSE,FALSE
+hospital_discharge_destinatn,Hospital Discharge Destination,,,,,,,,,,,,,,,,,FALSE,FALSE
+postop_icd9_code,Postoperative ICD9 Code,,,,,,,,,,,,,,,,,FALSE,FALSE
+postop_icd9_descriptn,Postoperative ICD9 Description,,,,,,,,,,,,,,,,,FALSE,FALSE
+postop_icd10_code,Postoperative ICD10 Code,,,,,,,,,,,,,,,,,FALSE,FALSE
+postop_icd10_descriptn,Postoperative ICD10 Description,,,,,,,,,,,,,,,,,FALSE,FALSE
+still_hospital_30_dy,Still in Hospital >30 Days,,,,,,,F,T,,,,,T,,,,FALSE,FALSE
+postop_death_30_dy_proc,Postop Death w/in 30 days of Procedure,,,,,,,F,T,,,,,T,,,,FALSE,FALSE
+postop_death_gt_30_dy_proc,Postoperative Death > 30 days of Procedure,,,,,,,F,T,,,,,T,,,,FALSE,FALSE
+dt_death,Date of Death,,,,,,,,,,,T,,,,,,FALSE,FALSE
+dt_death_unknown,Date of Death Unknown,,,,,,,,,,,,,T,,,,FALSE,FALSE
+end_life_withdrawal_care,End of Life/Withdrawal of Care,,,,,,,,,,,,,T,,,,FALSE,FALSE
+readm_30_dy,# of Readmissions w/in 30 days,,,,,,,F,T,,,,,,T,,T,FALSE,FALSE
+dt_first_readm,,,,,,,,,,,,,,,,,,FALSE,FALSE
+unpl_readm,# of Unplanned Readmissions,,,,,,,T,T,,,,,,T,,T,FALSE,FALSE
+readm_likely_rel_pr_proc,# of Readmissions likely related to principal procedure,,,,,,,F,T,,,,,,T,,T,FALSE,FALSE
+readm_likely_unrel_pr_proc,# of Readmissions likely unrelated to principal procedure,,,,,,,F,T,,,,,,T,,,FALSE,FALSE
+first_unp_ret_or,First Unplanned return to OR,,,,,,,T,T,,,,,T,,,,FALSE,FALSE
+dt_first_unpl_ret_or,Date  of First Unplanned Return to OR,,,,,,,,,,,T,,,,,,FALSE,FALSE
+first_unpl_ret_proc,# of First Unplanned Return Procedures,,,,,,,,,,,,,,T,,,FALSE,FALSE
+first_unpl_ret_cpt,First Unplanned Return CPT,,,,,,,,,,,,,,,,,FALSE,FALSE
+first_unpl_ret_rel_pr_proc,First Unplanned Return Related to Principal Procedure,,,,,,,,,,,,,T,,,,FALSE,FALSE
+second_unp_ret_or,Second unplanned return to OR,,,,,,,T,T,,,,,T,,,,FALSE,FALSE
+dt_second_unp_ret,Date of Second unplanned return,,,,,,,,,,,T,,,,,,FALSE,FALSE
+second_unpl_ret_proc,# of Second Unplanned Return Procedures,,,,,,,,,,,,,,T,,,FALSE,FALSE
+second_unpl_ret_cpt,Second Unplanned Return CPT,,,,,,,,,,,,,,,,,FALSE,FALSE
+second_unpl_ret_rel_pr_proc,Second Unplanned Return Related to Principal Procedure,,,,,,,,,,,,,T,,,,FALSE,FALSE
+more_than_2_unp_ret_or,More than 2 unplanned returns to OR,,,,,,,T,T,,,,,T,,,,FALSE,FALSE
+x30_dy_f_u_complete,30 Day F/U Complete,,,,,,,,,,,,,T,,,,FALSE,FALSE
+fu_dy,Follow-up Days,,,,,,,,,,,,,,,,,FALSE,FALSE
+robotic_assisted,Robotic Assisted?,,,,,,,,,,,,,T,,,,FALSE,FALSE
