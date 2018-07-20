@@ -24,8 +24,6 @@ enableJIT(3);
 #' ## Load local config file
 #' 
 source('./config.R');
-source('./metadata.R'); 
-
 
 
 #' ## Set generic variables
