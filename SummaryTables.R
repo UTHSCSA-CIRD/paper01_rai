@@ -9,7 +9,7 @@
 knitr::opts_chunk$set(echo=F,warning = F,cache=T,message=F);
 #+ cache=FALSE
 source('global.R');
-# Note: if the lanscape classoption errors on your machine, you need an
+# Note: if the landscape classoption errors on your machine, you need an
 # additional LaTeX package, which you can install as follows, from bash:
 # tlmgr install multirow
 # tlmgr install wrapfig

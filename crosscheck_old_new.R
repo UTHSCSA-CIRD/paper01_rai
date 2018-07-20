@@ -23,7 +23,7 @@ instrequire('pander');
 if(!(exists('inputenv_new')&&file.exists(inputenv_new))){
     warning('inputenv_new variable either not defined or file does not exist, creating new one.');
     if(!file.exists(session)){
-      system(sprintf('R -e "source(\'run.R\'); save.image(file=\'%s\')"',session));
+      system(sprintf('R -e "source(\'SummaryTables.R\'); save.image(file=\'%s\')"',session));
     }
   inputenv_new <- session;
 }
@@ -40,30 +40,42 @@ newenv <- new.env(); load(inputenv_new,envir = newenv);
 #' ### Does every top-leveltable have the same row counts?
 test_rowcounts <- sapply(oldenv,nrow) %>% Filter(Negate(is.null),.) %>% names %>% 
   union(sapply(newenv,nrow) %>% Filter(Negate(is.null),.) %>% names) %>% 
-  sapply(function(xx) c(nrow(oldenv[[xx]]),nrow(newenv[[xx]]))) %>% t %>% 
+  sapply(function(xx) c(c(nrow(oldenv[[xx]]),0)[1],c(nrow(newenv[[xx]]),0)[1])) %>% t %>% 
   data.frame %>% setNames(c('old','new'));
 test_rowcounts;
 
 #' ### What columns are different in the old and new data?
-setdiff(names(oldenv$dat0),names(newenv$dat0));
-setdiff(names(newenv$dat0),names(oldenv$dat0));
-test_samenames <- intersect(names(oldenv$dat1),names(newenv$dat1));
-
-#' ### For the column names that are the same, which ones have different values?
-#' 
+oldnames <- names(oldenv$dat0); newnames <- names(newenv$dat0);
+setdiff(oldnames,newnames);
+setdiff(newnames,oldnames);
 #' Create a datold and datnew for dat1, ordered by case_number
 dat1old <- with(oldenv,dat1[order(dat1$case_number),]);
 dat1new <- with(newenv,dat1[order(dat1$case_number),]);
-#' Set the income_final column of the new dat1 to what it was in the old
-dat1new$income_final <- dat1new$income_2013; 
-#' Update `test_samenames`
-test_samenames <- c('income_final',test_samenames);
-#' Same thing with 2016 colectomy
 col2016old <- with(oldenv$sbs0$all2016,all_colon_all[order(all_colon_all$case_number),]);
 col2016new <- with(newenv$sbs0$all2016,all_colon_all[order(all_colon_all$case_number),]);
-#' Set the income_final column of the new dat1 to what it was in the old
-col2016new$income_final <- col2016new$income_2013; 
+#' Backward compatibility hack for files created when we only had one income, which
+#' was the `income_final` column. Going forward, please do not write any new code
+#' that calls `income_final`, use `income_2013` or `income_2016` instead
+if('income_final' %in% union(oldnames,newnames)){
+  if('income_final' %in% oldnames && !'income_2013' %in% oldnames){
+    dat1old$income_2013 <- dat1old$income_final;
+    col2016old$income_2013 <- col2016old$income_final;
+  } else if(!'income_final' %in% oldnames && 'income_2013' %in% oldnames){
+    dat1old$income_final <- dat1old$income_2013;
+    col2016old$income_final <- col2016old$income_2013;
+  }
+  if('income_final' %in% newnames && !'income_2013' %in% newnames){
+    dat1new$income_2013 <- dat1new$income_final;
+    col2016new$income_2013 <- col2016new$income_final;
+  } else if(!'income_final' %in% newnames && 'income_2013' %in% newnames){
+    dat1new$income_final <- dat1new$income_2013;
+    col2016new$income_final <- col2016new$income_2013;
+  }
+}
+test_samenames <- intersect(names(dat1new),names(dat1old));
 
+#' ### For the column names that are the same, which ones have different values?
+#' 
 #' Compare all the shared columns between the old and new
 test_coldiffs <- mapply(all.equal
                         ,dat1old[,test_samenames]
