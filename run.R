@@ -24,20 +24,20 @@ dct0 <- read_csv(dctfile,na = '');
 dct1 <- read_csv(cptfile,na='');
 colnames(dat0) <- tolower(colnames(dat0));
 colnames(cost0) <- tolower(colnames(cost0));
-
+#' If you want to use some other set of columns as indices that is
+#' specific to the version of the data you are using, declare
+#' a different `alist` in your config.R, but it's better to not
+#' mess with this.
+if(!exists('l_indices')) l_indices <- alist(
+  patient_number=deid_patient,visit_number=deid_visit,case_number=deid_case
+);
  
 #' Create copy of original dataset
-cost1 <- cost0;
-dropcol_dat <- c('idn_mrn', 'lmrn_visit', 'case_number');
-#dat1b <- dat0 %>% select(-one_of(dropcol_dat));
-#names(dat1b)<-gsub('deid_patient','idn_mrn',names(dat1b));
-#names(dat1b)<-gsub('deid_visit','lmrn_visit',names(dat1b));
-#names(dat1b)<-gsub('deid_case','case_number',names(dat1b));
-# 
-#' All the above commented out code is replaced by this one statement:
-dat1 <- dat0[,setdiff(names(dat0),dropcol_dat)] %>%
-  mapnames(lookup=c(idn_mrn='deid_patient',lmrn_visit='deid_visit'
-                    ,case_number='deid_case'));
+#dropcol_dat <- c('idn_mrn', 'lmrn_visit', 'case_number');
+#dat1 <- dat0[,setdiff(names(dat0),dropcol_dat)] %>%
+#  list() %>% c(l_indices) %>% do.call(mutate,.);
+# No longer dropping identifiers, researcher might need them
+dat1 <- do.call(mutate,c(list(dat0),l_indices));
 # all.equal(dat1b,dat1); # TRUE
 
 #' Create synonyms for 'TRUE' for components of the Rockwood index
@@ -58,12 +58,12 @@ if(length(inl_test_000.0<-intersect(v(c_refval,dat1),v(c_rock_tf,dat1)))>0){
                %s'),dctfile,paste0(inl_test_000.0,collapse=','));
 }
 
-dropcol_cost <- c('idn_mrn', 'case_number');
-cost1 <- cost0 %>% select(-one_of(dropcol_cost));
-names(cost1)<-gsub('deid_patient','idn_mrn',names(cost1));
-names(cost1)<-gsub('deid_case','case_number',names(cost1));
+# dropcol_cost <- c('idn_mrn', 'case_number');
+#cost1 <- cost0 %>% select(-one_of(dropcol_cost));
+#names(cost1)<-gsub('deid_patient','idn_mrn',names(cost1));
+#names(cost1)<-gsub('deid_case','case_number',names(cost1));
+cost1 <- do.call(mutate,c(list(cost0),l_indices[l_indices %in% names(cost0)]));
 
- 
 #' This is another departure from my not making code changes-- I think this is 
 #' the only obstacle to using the version of the cost data you gave me, and this
 #' code will be completely silent if your copy doesn't have spaces in the names
@@ -93,7 +93,7 @@ dat1[dat0$height_unit=='in','height_unit'] <- c('cm');
 #' reproducibly.
 set.seed(project_seed);
 #' Randomly assign IDN_MRNs to training, testing, or validation sets
-pat_samples <- split(dat1$idn_mrn,sample(c('train','test','val')
+pat_samples <- split(dat1$patient_number,sample(c('train','test','val')
                                          ,size=nrow(dat1),rep=T));
 
 #' Make sex/gender a factor
@@ -357,19 +357,18 @@ dat1namelookup <- with(dct0,setNames(dataset_column_names
 
 #identifying the colectomy patients that have multiple visits:
 dup_mrn <- unlist(dat1 %>% filter(cpt_code %in% v(c_all_colon,di=dct1)) %>%
-                    filter(duplicated(idn_mrn)==TRUE) %>% select(idn_mrn));
+                    filter(duplicated(patient_number)==TRUE) %>% select(patient_number));
 
 #dropping visits after the index colectomy procedure for colectomy patients:
 drop_case_num <- unlist(sapply(dup_mrn, function(themrn){
-  mat0 <- dat1 %>% select(idn_mrn, case_number, hospital_admissn_dt) %>% 
-    filter(idn_mrn %in% themrn) %>% arrange(desc(hospital_admissn_dt));
+  mat0 <- dat1 %>% select(patient_number, case_number, hospital_admissn_dt) %>% 
+    filter(patient_number %in% themrn) %>% arrange(desc(hospital_admissn_dt));
   drop_this <- mat0$case_number[-1]
 }));
 
 #' ### Create a version of the dataset that only has each patient's 1st encounter
 #' 
-#' (you need to have specified the name of the ID column in `metadata.R`)
-dat2 <- group_by(dat1,idn_mrn) %>% summarise_all(first);
+dat2 <- group_by(dat1,patient_number) %>% summarise_all(first);
 
 subs_criteria <- alist(
   y2016=hospital_admissn_dt<'2017-01-01' & hospital_admissn_dt>'2015-12-31'
@@ -417,8 +416,8 @@ sbs0$all2016 <- lapply(sbs0$all,subset,subset=eval(subs_criteria[['y2016']]));
 comment(sbs0$all2016$all_colon_all) <- c(comment(sbs0$all2016),'These are only the index colon patients for 2016');
 dat1subs <- sbs0$all; comment(dat1subs) <- c(comment(dat1subs),'This is deprecated, used sbs0$all instead');
 #' Subsetting by the earlier randomly assigned train and test groups
-sbs0$train <- lapply(sbs0$all,subset,idn_mrn%in%pat_samples$train);
-sbs0$test <- lapply(sbs0$all,subset,idn_mrn%in%pat_samples$test);
+sbs0$train <- lapply(sbs0$all,subset,patient_number%in%pat_samples$train);
+sbs0$test <- lapply(sbs0$all,subset,patient_number%in%pat_samples$test);
 
 #' Isolating the 2016 UHS colectomy data elements:
 #col2016 <- sbs0$index[["all_colon_all"]] %>% 
@@ -429,7 +428,7 @@ sbs0$test <- lapply(sbs0$all,subset,idn_mrn%in%pat_samples$test);
 subset(cost1,admission_date-1<=operatn_dt&discharge_date+1>=operatn_dt) %>%
   # now merge with all colectomy patients by MRN in order to avoid relying on admitdatediff
   # as a literal merge criterion (because it could permit mismatches as we saw)
-  merge(sbs0$all$all_colon_all,.,by=c('idn_mrn','operatn_dt'),all.x=T,all.y=F,suffixes=c('','.junk')) %>%
+  merge(sbs0$all$all_colon_all,.,by=c('patient_number','operatn_dt'),all.x=T,all.y=F,suffixes=c('','.junk')) %>%
   # now we have all colectomies one-to-one matched with cost data where available, and just need
   # to get rid of the out-of-range dates. This step has to come last because in future
   # datasets the admit/discharge window can span multiple time periods, and the time 
@@ -454,12 +453,12 @@ subset(cost1,admission_date-1<=operatn_dt&discharge_date+1>=operatn_dt) %>%
 #ccs<-c('admitdatediff','admission_date','discharge_date','proc_surg_start','case_number','idn_mrn','hospital_admissn_dt')
 #' Can we rely on the NSQIP variables operatn_dt and proc_surg_start, proc_surg_finish being in agreement
 #' with each other, since only the former is in the costdata?
-.debug_operatn_dt_mm0 <- subset(dat1,as.Date(proc_surg_start)!=as.Date(operatn_dt))[,c('idn_mrn','proc_surg_start','proc_surg_finish','operatn_dt')] %>% data.frame;
+.debug_operatn_dt_mm0 <- subset(dat1,as.Date(proc_surg_start)!=as.Date(operatn_dt))[,c('patient_number','proc_surg_start','proc_surg_finish','operatn_dt')] %>% data.frame;
 #' There are `r nrow(.debug_operatn_dt_mm)` rows in NSQIP that disagree:
-.debug_operatn_dt_mm0[,c('idn_mrn','proc_surg_start','proc_surg_finish','operatn_dt')];
+.debug_operatn_dt_mm0[,c('patient_number','proc_surg_start','proc_surg_finish','operatn_dt')];
 .debug_operatn_dt_mm1 <- subset(.debug_operatn_dt_mm0,as.Date(proc_surg_start)-as.Date(operatn_dt)>2);
 #' `r nrow(.debug_operatn_dt_mm1)` of them by more than one day, none of which were in 2016
-.debug_operatn_dt_mm1[,c('idn_mrn','proc_surg_start','proc_surg_finish','operatn_dt')];
+.debug_operatn_dt_mm1[,c('patient_number','proc_surg_start','proc_surg_finish','operatn_dt')];
 #' merging all colonectomies (not limited by time) with all available cost data
 #' to hopefully resolve a few more missing variables
 #costdata0 <- merge(sbs0$all$all_colon_all,cost1,by='idn_mrn',all.x=TRUE,all.y=F,suffixes = c('','.junk'));

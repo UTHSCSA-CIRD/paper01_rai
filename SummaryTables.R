@@ -334,14 +334,14 @@ kable(table_06)
 ####################### CIA Grant Tables #######################
 #'functional status table (unique patients = 5914)
 fxnstatus <- dat1 %>% 
-  filter(duplicated(idn_mrn)!=TRUE) %>% 
+  filter(duplicated(patient_number)!=TRUE) %>% 
   select(functnal_heath_status, rai_range) %>% 
   table() %>% addmargins()
 kable(fxnstatus)
 
 #' origin status table (unique patients = 5914)
 origstatus <- dat1 %>% 
-  filter(duplicated(idn_mrn)!=TRUE) %>% 
+  filter(duplicated(patient_number)!=TRUE) %>% 
   select(origin_status, rai_range) %>% 
   table() %>% addmargins()
 kable(origstatus)
@@ -349,7 +349,7 @@ kable(origstatus)
 #' race, ethnicity, and sex table (unique patients = 5914)
 #' overall table:
 racesexall <- dat1 %>% 
-  filter(duplicated(idn_mrn)!=TRUE) %>% 
+  filter(duplicated(patient_number)!=TRUE) %>% 
   select(race, hispanic_ethnicity, hospital_admissn_dt) %>% 
   mutate(theyear = year(hospital_admissn_dt)) %>% 
   select(race, hispanic_ethnicity, theyear) %>%
@@ -389,7 +389,7 @@ kable(racesexhisptot)
 
 #' sex totals:
 racesex <- dat1 %>% 
-  filter(duplicated(idn_mrn)!=TRUE) %>% 
+  filter(duplicated(patient_number)!=TRUE) %>% 
   select(gender, hospital_admissn_dt) %>% 
   mutate(theyear = year(hospital_admissn_dt)) %>% 
   group_by(gender) %>% 
@@ -404,28 +404,28 @@ kable(racesex)
 #' sex totals by etnicity
 #' non-hispanic:
 racesexnh <- dat1 %>% 
-  filter(duplicated(idn_mrn)!=TRUE, hispanic_ethnicity=="No") %>% 
+  filter(duplicated(patient_number)!=TRUE, hispanic_ethnicity=="No") %>% 
   select(race, gender) %>% 
   table(useNA="always") %>% addmargins()
 kable(racesexnh)
 
 #' hispanic:
 racesexh <- dat1 %>% 
-  filter(duplicated(idn_mrn)!=TRUE, hispanic_ethnicity=="Yes") %>% 
+  filter(duplicated(patient_number)!=TRUE, hispanic_ethnicity=="Yes") %>% 
   select(race, gender) %>% 
   table(useNA="always") %>% addmargins()
 kable(racesexh)
 
 #' unknown:
 racesexu <- dat1 %>% 
-  filter(duplicated(idn_mrn)!=TRUE, hispanic_ethnicity=="Unknown") %>% 
+  filter(duplicated(patient_number)!=TRUE, hispanic_ethnicity=="Unknown") %>% 
   select(race, gender) %>% 
   table(useNA="always") %>% addmargins()
 kable(racesexu)
 
 #' total:
 racesext <- dat1 %>% 
-  filter(duplicated(idn_mrn)!=TRUE) %>% 
+  filter(duplicated(patient_number)!=TRUE) %>% 
   select(race) %>% 
   table(useNA="always") %>% addmargins();
 kable(cbind(racesext));
