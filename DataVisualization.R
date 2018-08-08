@@ -39,9 +39,9 @@ source('run.R');
 # in ALL UHS colectomy patients:
 #+ cache=FALSE
 plt_frl_inc_cd4 <- autoboxplot(sbs0$all$all_colon_all
-                               ,xx='a_discrete_rai',yy='income_final'
+                               ,xx='a_discrete_rai',yy='income_2016'
                                ,zz='a_any_cd4'
-                               ,subset=!is.na(income_final)
+                               ,subset=!is.na(income_2016)
                                ,fill.name=wrap_format(14)("Clavien-Dindo\n Grade 4")
                                ,fill.labels = c('Yes', 'No')
                                ,xx.name='Frailty Group',yy.name='Household Income',title='');
@@ -52,14 +52,14 @@ grid.arrange(plt_frl_inc_cd4
 # Income VS Hispanic Ethnicity VS Clavien-Dindo Grade 4 complications
 # in ALL UHS colectomy patients:
 plt_eth_inc_cd4 <- autoboxplot(sbs0$all$all_colon_all
-                               ,xx='hispanic_ethnicity',yy='income_final'
+                               ,xx='hispanic_ethnicity',yy='income_2016'
                                ,zz='a_any_cd4'
-                               ,subset=hispanic_ethnicity!='Unknown'&!is.na(income_final)
+                               ,subset=hispanic_ethnicity!='Unknown'&!is.na(income_2016)
                                ,fill.name=wrap_format(14)("Clavien-Dindo\n Grade 4")
                                ,fill.labels = c('Yes', 'No')
                                ,xx.name='Hispanic Ethnicity',yy.name=NA,title='');
 
-plt_all_inc_cd4 <- update(plt_eth_inc_cd4, xx=T, subset=!is.na(income_final), fill.name=NA, xx.name='All', yy.name='Household Income');
+plt_all_inc_cd4 <- update(plt_eth_inc_cd4, xx=T, subset=!is.na(income_2016), fill.name=NA, xx.name='All', yy.name='Household Income');
 
 grid.arrange(plt_all_inc_cd4,plt_eth_inc_cd4
              ,top=wrap_format(30)("Income Vs CD4 Complications in all UHS Colectomy Patients")
@@ -68,9 +68,9 @@ grid.arrange(plt_all_inc_cd4,plt_eth_inc_cd4
 # 
 # Income VS Frailty VS Hispanic Ethnicty with NO CD4 Complications
 plt_frl_inc_eth_noc4 <- autoboxplot(sbs0$all$all_colon_all
-                               ,xx='a_discrete_rai',yy='income_final'
+                               ,xx='a_discrete_rai',yy='income_2016'
                                ,zz='hispanic_ethnicity'
-                               ,subset=a_any_cd4==FALSE&!is.na(income_final)
+                               ,subset=a_any_cd4==FALSE&!is.na(income_2016)
                                ,fill.name='Hispanic Ethnicity'
                                ,fill.labels = c('Hispanic', 'Non-Hispanic', 'Unknown')
                                ,xx.name='Frailty Group',yy.name='Household Income',title='');
@@ -82,7 +82,7 @@ grid.arrange(plt_frl_inc_eth_noc4
 #' 
 #' 
 # Income VS Frailty VS Hispanic Ethnicty WITH CD4 Complications
-plt_frl_inc_eth_c4 <- update(plt_frl_inc_eth_noc4, subset=a_any_cd4==TRUE&!is.na(income_final));
+plt_frl_inc_eth_c4 <- update(plt_frl_inc_eth_noc4, subset=a_any_cd4==TRUE&!is.na(income_2016));
 
 grid.arrange(plt_frl_inc_eth_c4
              ,top=wrap_format(60)("Income Vs Frailty VS Hispanic Ethnicity in all UHS Colectomy Patients WITH CD4 Complications")
@@ -92,20 +92,20 @@ grid.arrange(plt_frl_inc_eth_c4
 # Income VS Hispanic Ethnicity VS SSI (surgical site infection)
 #+ cache=FALSE
 plt_ssi_inc_eth <- autoboxplot(sbs0$all$full
-                               ,xx='hispanic_ethnicity',yy='income_final'
+                               ,xx='hispanic_ethnicity',yy='income_2016'
                                ,zz='a_any_ssi'
-                               ,subset=hispanic_ethnicity!='Unknown'&!is.na(income_final)
+                               ,subset=hispanic_ethnicity!='Unknown'&!is.na(income_2016)
                                ,fill.name=wrap_format(14)("SSI")
                                ,fill.labels=c("No", "Yes")
                                ,xx.name='Hispanic',yy.name=NA,title='');
 
-plt_ssi_inc_eth2 <- update(plt_ssi_inc_eth, xx=T, subset=!is.na(income_final), fill.name=NA, xx.name='All', yy.name='Household Income');
+plt_ssi_inc_eth2 <- update(plt_ssi_inc_eth, xx=T, subset=!is.na(income_2016), fill.name=NA, xx.name='All', yy.name='Household Income');
 
 grid.arrange(plt_ssi_inc_eth2,plt_ssi_inc_eth
              ,top=wrap_format(30)("Income Vs SSI VS Hispanic Ethnicty\n in all UHS Patients")
              ,nrow=1,widths=1:2);
 # The following code checks the counts in the graph:
-sbs0$all$full %>% filter(!is.na(income_final)) %>% select(hispanic_ethnicity, a_any_ssi) %>% group_by(hispanic_ethnicity, a_any_ssi) %>% count() %>% View()
+sbs0$all$full %>% filter(!is.na(income_2016)) %>% select(hispanic_ethnicity, a_any_ssi) %>% group_by(hispanic_ethnicity, a_any_ssi) %>% count() %>% View()
 # the numbers do check out. Unfortunately, there is nothing interesting
 # going on here.
 # 

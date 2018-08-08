@@ -103,7 +103,7 @@ pat_samples <- split(dat1$patient_number,sample(c('train','test','val')
 dat1$gender <- factor(dat1$gender);
 
 #' ## Column names of primary relevance
-c_modelvars <- c(v(c_rai),v(c_postop),'income_final','hispanic_ethnicity');
+c_modelvars <- c(v(c_rai),v(c_postop),'income_2016','hispanic_ethnicity');
 
 #' Backup up the modified cnopatos column
 #' ...because it's easier if patos-subtracted columns are modified in place
