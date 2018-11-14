@@ -24,10 +24,6 @@ options(runr.prodgitstamp=T);
 source('run.R');
 #+ source_global,results='hide'
 source('global.R');
-#+ projinfo,results='asis',cache=FALSE
-lapply(PI,rbind) %>% lapply(as.character) %>% lapply(`length<-`,2) %>% 
-  bind_cols %>% t %>% kable(format = 'markdown',col.names = c('value','hash'));
-
 #+ poster_variables
 thecolnames1 <- c("RAI-A Score"='rai_range'
                   ,"Rockwood Score"='a_rockwood_range'
@@ -441,4 +437,10 @@ kable(t_auccox,format='markdown',digits=3);
 #' # Acknowledgments
 #' 
 #' # References
+#' 
+#' # Audit Info
+#+ projinfo,results='asis',cache=FALSE
+lapply(PI,rbind) %>% lapply(as.character) %>% lapply(`length<-`,2) %>% 
+  bind_cols %>% t %>% kable(format = 'markdown',col.names = c('value','hash'));
 
+c()
