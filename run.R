@@ -185,10 +185,19 @@ dat1$a_t <- with(dat1
                    ,dt_second_unp_ret,na.rm = T) %>% 
                    difftime(proc_surg_finish,units='days') %>%
                    as.numeric());
+# time to readmission only
+dat1$a_trdm <- with(dat1,pmin(
+  dt_death,dt_first_readm,dt_first_unpl_ret_or
+  ,dt_second_unp_ret,na.rm = T) %>% 
+    difftime(proc_surg_finish,units='days') %>%
+    as.numeric());
 #' Censor the variables at 30 days
 dat1$a_t[dat1$a_t>30] <- 30;
 dat1$a_t[is.na(dat1$a_t)] <- 30;
 dat1$a_c <- dat1$a_t!=30;
+dat1$a_crdm <- with(dat1,!(is.na(a_trdm)|
+                             a_trdm>30 | a_trdm>a_t));
+dat1$a_trdm <- with(dat1,pmin(a_trdm,a_t,30,na.rm=T));
 
 
 #' Obtain the RAI score
