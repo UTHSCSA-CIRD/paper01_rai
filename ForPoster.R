@@ -214,9 +214,9 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 #' 
 #' #### Figure 1. Predicting post-surgical outcomes (all cause mortality and readmission)
 #+ plot_survfits
-fit_srvs <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>median(a_rai))
+fit_srvs <- list(`RAI-A`=survfit(Surv(a_trdm,a_c) ~ I(a_rai>median(a_rai))
                             , data = sbs0$all$all_emergency,subset=a_t>0)
-                ,Rockwood=survfit(Surv(a_t,a_c) ~ I(a_rockwood>median(a_rockwood))
+                ,Rockwood=survfit(Surv(a_trdm,a_c) ~ I(a_rockwood>median(a_rockwood))
                             , data = sbs0$all$all_emergency,subset=a_t>0));
 # what if we cut them along their optimal thresholds?
 fit_srvs_optcut <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>9.5)
@@ -378,6 +378,11 @@ t_auccox <- sapply(auc_coxs,sapply,function(xx)
 #' #### Table 6. RAI-A and Rockwood compared on their ability to predict death or readmission in the out-of-sample validation set using a panel of predictive accuracy metrics.
 #+ tab_coxauc, results='asis'
 kable(t_auccox,format='markdown',digits=3);
+#' #### Table 7. Harrel's C for RAI-A and RI
+#+ tab_harrelc, results='asis'
+with(sbs0$train$all_emergency
+     ,cbind(`RAI-A`=rcorr.cens(a_rai,Surv(a_trdm,a_crdm))
+            ,RI=rcorr.cens(a_rockwood,Surv(a_trdm,a_crdm)))) %>% pander;
 
 #' 
 # Survival analysis models, such as Cox, incorporate information not only about
