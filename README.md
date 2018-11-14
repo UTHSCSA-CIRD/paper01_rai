@@ -11,7 +11,7 @@ In the Espinoza series of branches, the thing to run is ForPoster.R, which shoul
     
 For the AMIA series of branches, the following command will build the poster as an OpenOffice odt file with only a little format tweaking needed afterward:
 
-    R -e "library(rmarkdown); render('ForPoster.R',output_file='AMIA_Frailty_tmplt.odt',output_format=odt_document(reference_odt='template08.odt',template='./pdefault.opendocument',keep_md=T,pandoc_args=c('--filter','pandoc-crossref')));"
+    R -e "library(rmarkdown); render('ForPoster.R',output_file='AMIA_Frailty.odt',output_format=odt_document(reference_odt='poster_42x60_style.odt',template='./pdefault.opendocument',keep_md=T,pandoc_args=c('--filter','pandoc-crossref')));"
 
 After that there is one manual step, unfortunately, where you have to select each table and set the size of its columns to "Optimal". ~~On the other hand this isn't required for generating content for the poster-- there we just copy-paste the text and some figures from Word, but the tables come from PDF anyway. The way to get PDF tables to behave is to open them from LibreOffice Draw, drag to select entire columns at a time, and use arrow keys to move them closer together as a unit. Draw opens PDFs as if they are vector images in which almost every item is ungrouped.~~
 
