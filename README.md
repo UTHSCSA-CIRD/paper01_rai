@@ -8,8 +8,12 @@ If you are preparing a plot, edit `DataVisualization.R` and if you are preparing
 In the Espinoza series of branches, the thing to run is ForPoster.R, which should be run as an R-Notebook from within RStudio. If the Word output format is chosen when doing this, there is an additional step to turn it into a presentable final format rather than the default Pandoc styles:
 
     pandoc -s -S ForPoster.docx --reference-docx ./styletemplate.docx -o Formatted_ForPoster.docx
+    
+For the AMIA series of branches, the following command will build the poster as an OpenOffice odt file with only a little format tweaking needed afterward:
 
-After that there is one manual step, unfortunately, where you have to select each table and set the size of its columns to "Optimal". On the other hand this isn't required for generating content for the poster-- there we just copy-paste the text and some figures from Word, but the tables come from PDF anyway. The way to get PDF tables to behave is to open them from LibreOffice Draw, drag to select entire columns at a time, and use arrow keys to move them closer together as a unit. Draw opens PDFs as if they are vector images in which almost every item is ungrouped.
+    R -e "library(rmarkdown); render('ForPoster.R',output_file='AMIA_Frailty_tmplt.odt',output_format=odt_document(reference_odt='template08.odt',template='./pdefault.opendocument',keep_md=T,pandoc_args=c('--filter','pandoc-crossref')));"
+
+After that there is one manual step, unfortunately, where you have to select each table and set the size of its columns to "Optimal". ~~On the other hand this isn't required for generating content for the poster-- there we just copy-paste the text and some figures from Word, but the tables come from PDF anyway. The way to get PDF tables to behave is to open them from LibreOffice Draw, drag to select entire columns at a time, and use arrow keys to move them closer together as a unit. Draw opens PDFs as if they are vector images in which almost every item is ungrouped.~~
 
 ## What file does what.
 
@@ -20,6 +24,7 @@ After that there is one manual step, unfortunately, where you have to select eac
 * `example.config.R`: Local settings, e.g. paths to raw data files.
 * `DataVisualization.R`: 
 * `SummaryTables.R`: 
+* `ForPoster.R`: Draft of the AMIA 2019 poster if we end up submitting it.
 * Non-code
     * `cpt_dictionary.csv`: A table matching CPT codes with any information we need to have associated with them. Currently these are:
         * `dataset_column_names` : a misnomer, put in for compatibility with our function `v()`. What it actually contains is the actual CPT code. When there's time we'll update `v()` to expect a different index column name. 
