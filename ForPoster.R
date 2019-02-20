@@ -15,10 +15,10 @@
 #     reference_docx: styletemplate.docx
 knitr::opts_chunk$set(echo=F,warning = F,cache=F,message=F);
 options(knitr.kable.NA='');
-options(runr.prodgitstamp=T);
-#' Report date: `r Sys.Date()`.
+options(runr.prodgitstamp=F);
+# Report date: `r Sys.Date()`.
 #'
-#' #### Audit Info
+# #### Audit Info
 #' 
 #+ cache=TRUE,echo=FALSE,results='hide'
 source('run.R');
@@ -65,7 +65,15 @@ c_auclist<-c('AUC.cd','AUC.hc','AUC.sh','AUC.uno','BeggC','GHCI','Nagelk','OXS',
 # We set the default value of the outcomes argument for the purposes of this 
 # script so we don't have to keep repeating it.
 formals(countfrac)$outcomes <- c('postop_death_30_dy_proc','a_readm_30_dy');
-# # Abstract
+#'
+#'
+#+ spacerplot, fig.width=2, fig.height=6
+par(bg='#FFFFFF00'); 
+plot(0,type='n',ylab='',xlab='',axes=F);
+#'
+#' # Abstract
+#' 
+#' Lorem Ipsum
 #' 
 #' # Introduction
 #' 
@@ -213,7 +221,7 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 #' ## RAI-A and Rockwood both are reasonable predictors of 30-day mortality and readmission
 #' 
 #' #### Figure 1. Predicting post-surgical outcomes (all cause mortality and readmission)
-#+ plot_survfits
+#+ plot_survfits, fig.width=10, fig.height=8
 fit_srvs <- list(`RAI-A`=survfit(Surv(a_trdm,a_c) ~ I(a_rai>median(a_rai))
                             , data = sbs0$all$all_emergency,subset=a_t>0)
                 ,Rockwood=survfit(Surv(a_trdm,a_c) ~ I(a_rockwood>median(a_rockwood))
@@ -273,7 +281,7 @@ mapnames(t_coxresults,thecolnames1) %>% t %>% kable(format = 'markdown',digits=4
 # score. These scores have different scales but a comparison can be made by
 # dividing them by their standard errors ('Effect/SE', also known as the Wald
 # statistic).and these standardized values are close to each other. 
-#' The respective  
+#' 
 #' Akaike Information Criteria and Bayes Information Criteria are also close to
 #' each other..
 #' 
@@ -313,6 +321,7 @@ countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>%
 #' 
 #' #### Figure 2. ROC curves for RAI-A and Rockwood
 #' 
+#+ plot_roc, fig.width=10, fig.height=8
 l_rocs <- with(sbs0$train,lapply(all_emergency[,c('a_rai','a_rockwood')]
                                  ,function(xx) roc(response=all_emergency$a_c
                                                    ,predictor=xx)));
