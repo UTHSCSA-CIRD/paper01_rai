@@ -336,7 +336,7 @@ legend('topleft',bty ='n',col=c('orange','darkgreen'),lwd=3
 #' 
 #' For a fair comparison between the two frailty scores, we used Youden's
 #' Index [@YoudenIndexratingdiagnostic1950] to determine the
-#' threshold values that maximized sensitivity and specificity.. The thresholds,
+#' threshold values that maximized sensitivity and specificity. The thresholds,
 #' sensitivities and specificities are shown in Table 4. Rockwood has a small
 #' advantage in sensitivity and RAI-A in specificity.
 #' 
