@@ -1,6 +1,6 @@
 #' ---
-#' title: "Side by Side Comparison of Rockwood Index and Risk Analysis Index as Predictors of Surgical Complications at a Texas Safety Net Hospital Serving a Large Hispanic Population"
-#' author: "Alex F. Bokov, PhD, MS, Desiree S. Wilson, PhD, Sara E. Espinoza, MD, Paula K. Shireman, MD"
+#' title: "Side by Side Comparison of Rockwood Index and Risk Analysis Index as Predictors of Surgical Readmissions at a Texas Safety Net Hospital Serving a Large Hispanic Population"
+#' author: "Alex F. Bokov *, PhD, MS, Desiree S. Wilson, PhD, Sara E. Espinoza, MD, Paula K. Shireman, MD"
 #' date: "02/23/2018"
 #' bibliography: Frailty.bib
 #' csl: ieee.csl
@@ -72,8 +72,7 @@ par(bg='#FFFFFF00');
 plot(0,type='n',ylab='',xlab='',axes=F);
 #'
 #' # Abstract
-#' 
-#' Lorem Ipsum
+#' Frailty, the loss of ability to maintain homeostasis under everyday stressors, is associated with increased risk of post-operative complications. Screening for frailty could lead to better outcomes in vulnerable populations. Here we compare two frailty metrics : the Rockwood Index (RI) and the Administrative Risk Analysis Index (RAI-A). Both are calculated using registry data but RI is feasible to calculate directly from the electronic health record (EHR).
 #' 
 #' # Introduction
 #' 
@@ -81,13 +80,13 @@ plot(0,type='n',ylab='',xlab='',axes=F);
 # * ...but it cannot be used on live data because it's hard-coded to NSQIP 
 # * The availability of NSQIP variables can differ between sites with different 
 #   levels of participation and some variables may be discontinued. 
-# * Rockwood Index can be calculated on anything, tolerates missing data, and 
+# * RI can be calculated on anything, tolerates missing data, and 
 #   therefore it can be calculated not only on manually curated registry data 
 #   but on any other sources of laboratory values and diagnoses including 
-#   billing records and EMR systems
-# * Rockwood has been thoroughly vetted by geriatricians and its statistical 
+#   billing records and EHR systems
+# * RI has been thoroughly vetted by geriatricians and its statistical 
 #   assumptions have been explicitly tested. 
-# * Rockwood could be used for automated risk-calculation to support surgical 
+# * RI could be used for automated risk-calculation to support surgical 
 #   decisions it it could be shown that it is as good as or better than RAI-A 
 #   for predicting surgical outcomes.
 # 
@@ -110,26 +109,38 @@ plot(0,type='n',ylab='',xlab='',axes=F);
 #' with a focus on physical function assessment and 2) the deficit accumulation 
 #' model developed by Rockwood [@MitnitskiAccumulationDeficitsProxy2001] which 
 #' can use retrospective data including electronic health records (EHR). Our 
-#' study compares the Rockwood Index with the Risk Analysis Index (RAI). The 
-#' RAI-A (administrative RAI) can be ascertained retrospectively while the RAI-C
+#' study compares the the Risk Analysis Index (RAI) which is a functional score
+#' with the Rockwood Index (RI) which represents deficit accumulation. 
+#' 
+#' The RAI-A (administrative RAI) 
+#' [@MelinPreoperativefrailtyRisk2015;@HallDevelopmentInitialValidation2017] 
+#' can be calculated retrospectively while the RAI-C
 #' (clinical RAI) can be collected prospectively in clinics with brief 
 #' questionnaires that are minimally disruptive to patient flow 
 #' [@HallDevelopmentInitialValidation2017].
 #' 
-#' RAI-A uses 11 variables extracted from the administrative data, such as 
-#' medical co-morbidities, cognitive decline and activities of daily living 
-#' (ADLs) (D. E. Hall et al. 2017). If one variable is missing, however, the 
-#' RAI-A could lead to an underestimate of a patient’s frailty. On the other 
-#' hand the Rockwood Index does not depend on one specific set of variables-- 
-#' the only stipulation is that the data elements represent many different
-#' physiological systems..The Rockwood Index is the number of data elements (e.g.
-#' diagnosis codes or out-of-reference lab-values) indicating deficiencies 
-#' divided by the total number of data elements available for a given 
-#' patient. For this reason the Rockwood index is robust against missing data 
-#' and different variables being available from different data sources. We 
-#' wanted to validate RAI-A against the Rockwood index because it is more 
-#' broadly used in the medical field and in order to determine the leve of 
-#' agreement between these two frameworks for frailty assessment.
+#' RAI-A uses 11 variables corresponding to those used by the American College of 
+#' Surgeons National Surgical Quality Improvement Program (NSQIP) registry, including 
+#' medical co-morbidities and functional status [@MelinPreoperativefrailtyRisk2015]. 
+#' If one variable is missing, however, the RAI-A could lead to an underestimate 
+#' of a patient’s frailty. Moreover, RAI-A was adapted to surgical outcomes from 
+#' an earlier frailty score [@PorockMDSMortalityRisk2010] that was trained on a 
+#' completely different dataset and population without re-fitting nor 
+#' re-validating the regression model on which it was based against the new data.
+#' 
+
+#' On the other hand the RI [@MitnitskiAccumulationDeficitsProxy2001] does not 
+#' depend on one specific set of variables–
+#' it is simply an unweighted fraction of variables with abnormal values
+#' relative to the total number of variables under consideration. The only
+#' stipulation is that the variables should be chosen to represent a diverse set
+#' of different systems. RI is robust against missing data and comparison of
+#' different data sources, though until now it has not been applied to NSQIP
+#' data nor surgical outcomes. If RI can be shown to be non-inferior to RAI-A,
+#' then RI may facilitate many new decision-support and quality-improvement 
+#' applications on large EHR-derived datasets because of its acceptance in the 
+#' frailty field and the fact that it is not dependent on a curated dataset like 
+#' RAI-A is nor on patient questionnaires like RAI-C
 #' 
 #' 
 #' # Methods
@@ -139,7 +150,7 @@ plot(0,type='n',ylab='',xlab='',axes=F);
 # 140 variables were extracted from the local copy of the data reported to
 # NSQIP, and supplemented with address data (for purposes of linking
 # socioeconomic variables) from the UHS and UTMedicine electronic medical
-# record (EMR) systems. In order to determine a median income approximation for
+# record (EHR) systems. In order to determine a median income approximation for
 # each case, we linked the census block group level data from the 2015 American
 # Community Survey Median Income table to each cases’ address. To calculate the
 # the RAI-A frailty score for each case, we used the calculation described in
@@ -157,18 +168,18 @@ plot(0,type='n',ylab='',xlab='',axes=F);
 #' ## Patient Demographics
 #' 
 
-#' The UTHSCSA data warehouse contains EHR and billing data from our faculty
-#' practice plan and from University Hospital System (UHS) linked into one
-#' coherent dataset in an i2b2 data warehouse [@MurphyInstrumentinghealthcare2009]. 
+#' The UTHSCSA i2b2 data warehouse [@MurphyInstrumentinghealthcare2009] contains 
+#' EHR and billing data from our faculty
+#' practice plan and from University Hospital System (UHS). 
 #' UHS is a nationally recognized academic medical center, network of outpatient clinics
 #' strategically located in at-risk communities, and a Level I trauma center.
-#' UHS is the largest safety net hospital in South Texas and treats a predominately Hispanic
+#' It is the largest safety net hospital in South Texas and treats a predominately Hispanic
 #' population. 
 #' 
-#' Surgeries vary greatly by their level of invasiveness, risk, and urgency. At
-#' this time we are focusing on emergency surgeries as a means to test the
+#' Surgeries vary greatly by their level of invasiveness, risk, and urgency. 
+#' Initially we are focusing on emergency surgeries to test the
 #' accuracy of the RAI-A in a group that has a higher death and complication rate
-#' secondary to frailty and also factors unrelated to frailty..
+#' secondary to frailty and also factors unrelated to frailty.
 #' 
 #' In the 2013-2017 ACS NSQIP data there were 541 emergency cases. These
 #' were randomly assigned to one of three subsets: a training set 
@@ -199,7 +210,7 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
   kable(format='markdown');
 #'
 #' RAI-A is measured on a continuous scale from 0-81 with higher scores being 
-#' associated with frailty. Rockwood is measured on a scale of 0 to 1, with 0
+#' associated with frailty. RI is measured on a scale of 0 to 1, with 0
 #' meaning that there are no functional defecits at all and 1 meaning that 
 #' a functional deficit was reported by every data element capable of doing so.
 #' 
@@ -209,7 +220,7 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 #' 
 #' For the `r sum(sbs0$all$all_emergency$idn_mrn %in% pat_samples$train)` 
 #' surgery cases in the training set we fit
-#' Cox proportional hazard models using either RAI-A  or the Rockwood Index as
+#' Cox proportional hazard models using either RAI-A  or the RI as
 #' predictors. The outcome being measured was time until readmission _or_ all-cause
 #' mortality. The survival plots in Figure 1 show the time elapsed until either
 #' event, whichever happened first during the 30 days after the date of 
@@ -218,7 +229,7 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 #' 
 #' # Results
 #' 
-#' ## RAI-A and Rockwood both are reasonable predictors of 30-day mortality and readmission
+#' ## RAI-A and RI both are reasonable predictors of 30-day mortality and readmission
 #' 
 #' #### Figure 1. Predicting post-surgical outcomes (all cause mortality and readmission)
 #+ plot_survfits, fig.width=10, fig.height=8
@@ -227,9 +238,9 @@ fit_srvs <- list(`RAI-A`=survfit(Surv(a_trdm,a_c) ~ I(a_rai>median(a_rai))
                 ,Rockwood=survfit(Surv(a_trdm,a_c) ~ I(a_rockwood>median(a_rockwood))
                             , data = sbs0$all$all_emergency,subset=a_t>0));
 # what if we cut them along their optimal thresholds?
-fit_srvs_optcut <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>9.5)
+fit_srvs_optcut <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>9.5) # 9.5 # 2
                                  , data = sbs0$all$all_emergency,subset=a_t>0)
-                 ,Rockwood=survfit(Surv(a_t,a_c) ~ I(a_rockwood>0.264245)
+                 ,Rockwood=survfit(Surv(a_t,a_c) ~ I(a_rockwood>0.264245) #0.264245 # 0.137
                                    , data = sbs0$all$all_emergency,subset=a_t>0));
 pl_srvs <- mapply(function(aa,bb) autoplot(aa) +
                                            #,ylim=c(0.5,1),xlim=c(0,30),asp=1.45) + 
@@ -252,12 +263,12 @@ pl_srvs_optcut <- mapply(function(aa,bb) autoplot(aa,ylim=c(0.5,1),xlim=c(0,30))
 
 multiplot(plotlist=pl_srvs,cols=1);
 #' 
-#' Shaded areas represent 95% confidence intervals. On the x-axis day
-#' 0 represents the respective dates of surgeries for the patients, and continues
-#' out to 30 days. In each plot, the patients are grouped according to whether the
-#' corresponding frailty score is above the median (blue) or below the median 
-#' (pink). For both RAI-A and Rockwood, patients scores in the upper half for
-#' the cohort experience mortality or readmission earlier and at higher rates.
+#' The lines are Kaplan-Meier curves with the x-axis representing time from
+#' surgery until first readmission (30-day follow-up).and the y-axis represents
+#' percent of patients who have not yet had their first re-admission. The shaded
+#' areas represent 95% confidence intervals. The 'High' and 'Low' lines
+#' represent patients binned into the upper and lower halves of RAI-A and RI in
+#' the respective plots.
 #'   
 #' #### Table 2. Results of Cox survival model fits
 #'
@@ -288,7 +299,7 @@ mapnames(t_coxresults,thecolnames1) %>% t %>% kable(format = 'markdown',digits=4
 
 #' 
 #' Tables 3a and 3b show patient 30-day mortality and readmissions increases with 
-#' increasing RAI-A and Rockwood scores. In the highest risk brackets there are too few patients
+#' increasing RAI-A and RI. In the highest risk brackets there are too few patients
 #' reliably measure a rate.
 #' 
 
@@ -298,13 +309,13 @@ mapnames(t_coxresults,thecolnames1) %>% t %>% kable(format = 'markdown',digits=4
 countfrac(sbs0$all$all_emergency,groupcols = 'rai_range') %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);
 
-#' #### Table 3b. Event frequencies broken down by Rockwood range
+#' #### Table 3b. Event frequencies broken down by RI range
 #' 
 #+ table_rockcounts, results='asis'
 countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);
 #' 
-#' ## RAI-A and Rockwood have equivalent concordances and AUCs
+#' ## RAI-A and RI have equivalent concordances and AUCs
 #' 
 # As can be seen from Tables 2, the concordances are 
 # `r do.call(sprintf,c('%0.2f
@@ -319,30 +330,42 @@ countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>%
 #' along with their areas under the curve (AUCs).
 #' 
 #' 
-#' #### Figure 2. ROC curves for RAI-A and Rockwood
+binomnull <- glm(a_any_cd4~1,data=sbs0$train$all_emergency,family='binomial');
+l_binomfits <- sapply(c('a_rai','a_rockwood')
+                     ,function(xx) update(binomnull,paste0('.~',xx)),simplify=F);
+l_binomrocs <- with(sbs0$test,lapply(l_binomfits
+                                     ,function(xx) roc(response=all_emergency$a_any_cd4,predictor=predict(xx,all_emergency,type='response'))));
+#' #### Figure 2. ROC curves for RAI-A and RI
 #' 
 #+ plot_roc, fig.width=10, fig.height=8
 l_rocs <- with(sbs0$train,lapply(all_emergency[,c('a_rai','a_rockwood')]
                                  ,function(xx) roc(response=all_emergency$a_c
-                                                   ,predictor=xx)));
-plot(l_rocs$a_rai,col='orange');
-lines(l_rocs$a_rockwood,col='darkgreen');
+                                                   ,predictor=xx
+                                                   ,of='thresholds')));
+plot(smooth(l_rocs$a_rai,method='density'),col='orange'
+     #,print.thres=T,print.thres.col='orange'
+     #,print.auc=T,print.auc.col='orange'
+     ,ci=F);
+plot(smooth(l_rocs$a_rockwood,method='density'),col='darkgreen'
+     #,print.thres=T,print.thres.col='darkgreen'
+     #,print.auc=T,print.auc.col='darkgreen'
+     ,ci=F,add=T);
 legend('topleft',bty ='n',col=c('orange','darkgreen'),lwd=3
        ,legend=sprintf('%s (AUC=%0.3f)',c('RAI-A','Rockwood'),sapply(l_rocs,auc)));
 #' 
-#' ## Optimal threshold values for RAI-A and Rockwood
+#' ## Optimal threshold values for RAI-A and RI
 #' 
 
 #' 
 #' For a fair comparison between the two frailty scores, we used Youden's
 #' Index [@YoudenIndexratingdiagnostic1950] to determine the
 #' threshold values that maximized sensitivity and specificity. The thresholds,
-#' sensitivities and specificities are shown in Table 4. Rockwood has a small
+#' sensitivities and specificities are shown in Table 4. RI has a small
 #' advantage in sensitivity and RAI-A in specificity.
 #' 
 
 #' 
-#' #### Table 4. Optimal threshold scores for RAI-A and Rockwood
+#' #### Table 4. Optimal threshold scores for RAI-A and RI
 #+ tab_snsp, results='asis'
 lapply(l_rocs,coords,'b',ret=c('threshold','sensitivity','specificity','accuracy'
                                ,'npv','ppv','precision','recall')) %>% 
@@ -387,8 +410,16 @@ auc_coxs <- sapply(names(fit_coxs),function(xx) {
 t_auccox <- sapply(auc_coxs,sapply,function(xx) 
   if(length(xx)>1&&'iauc' %in% names(xx)) xx[['iauc']] else 
     if(length(xx)==1 && is.numeric(xx)) xx else NaN);
+#' Survival analysis models, such as Cox, incorporate information not only about
+#' whether or not a death or readmission has occurred but also when it occurred.
+#' So AUC calculation is more complex than for logistic models and several
+#' alternative methods exist. In Table 6 is a panel with results from seven
+#' AUC/C-statistic estimators (Chambless and Diao, Song and Zhou, Hung and
+#' Chiang, Uno, Begg, and Gonen and Heller) and three statiscial measures
+#' similar to R^2 (OXS,Nagel-k, and XO). In table 7 are detailed results of 
+#' Harrel's C [ref]
 #' 
-#' #### Table 6. RAI-A and Rockwood compared on their ability to predict death or readmission in the out-of-sample validation set using a panel of predictive accuracy metrics.
+#' #### Table 6. RAI-A and RI compared on their ability to predict death or readmission in the out-of-sample validation set using a panel of predictive accuracy metrics.
 #+ tab_coxauc, results='asis'
 kable(t_auccox,format='markdown',digits=3);
 #' #### Table 7. Harrel's C for RAI-A and RI
@@ -397,39 +428,38 @@ with(sbs0$train$all_emergency
      ,cbind(`RAI-A`=rcorr.cens(a_rai,Surv(a_trdm,a_crdm))
             ,RI=rcorr.cens(a_rockwood,Surv(a_trdm,a_crdm)))) %>% pander;
 
-#' 
-# Survival analysis models, such as Cox, incorporate information not only about
-# whether or not a death or readmission has occurred but also when it occurred.
-# So AUC calculation is more complex than for logistic models and several
-# alternative methods exist. In Table 6 is a panel with results from seven
-# AUC/C-statistic estimators (Chambless and Diao, Song and Zhou, Hung and
-# Chiang, Uno, Begg, and Gonen and Heller) and three statiscial measures
-# similar to R^2 (OXS,Nagel-k, and XO).
 #
 #'
 #' # Conclusions
 #' 
-#' 1. RAI-A and Rockwood both are reasonable predictors of 30-day mortality and readmission
-#' 2. RAI-A and Rockwood have equivalent concordances and AUCs. 
-#' 3. Even a sample size of 194 was sufficient to find a significant effect for both RAI-A and Rockwood
-#' 4. The threshold value that maximizes the sum of sensitivity and specificity was, in this population, 9.5 for RAI-A and and 0.264 for Rockwood
+#' RAI-A and Rockwood both are reasonable predictors of 30-day readmission, with
+#' RI having a slightly higher Harrell's C (0.369) than did RAI-A (0.349).   .
+#' Even a sample size of 194 was sufficient to find a significant effect for
+#' both RAI-A and Rockwood. The threshold value that maximizes the sum of
+#' sensitivity and specificity was, in this population, 9.5 for RAI-A and and
+#' 0.264 for Rockwood
+#' 
+#' 1. RAI-A and RI both are reasonable predictors of 30-day mortality and readmission
+#' 2. RAI-A and RI have equivalent concordances and AUCs. 
+#' 3. Even a sample size of 194 was sufficient to find a significant effect for both RAI-A and RI
+#' 4. The threshold value that maximizes the sum of sensitivity and specificity was, in this population, 9.5 for RAI-A and and 0.264 for RI
 #' 
 # In the population demographic table, approximately 22% of the 541 cases
 # resulted in death or hospital readmission within 30 days after surgery.
 # There appears to be a significant difference between “No Event” vs “Event” 
-# RAI-A and Rockwood scores. The RAI-A and Rockwood scores are higher in the
+# RAI-A and RI scores. The RAI-A and RI scores are higher in the
 # “Event” cases compared to “No Event.” Additionally, age is higher in the
 # “Event” population in comparison. Interestingly, it appears that the Rockwood 
 # has a higher standard error margin compared to RAI-A. 
 #
-# Both the RAI-A and Rockwood survival curves depict a significant difference
-# between the upper 50% RAI-A and Rockwood scores compared to the lower 50%.
+# Both the RAI-A and RI survival curves depict a significant difference
+# between the upper 50% RAI-A and RI compared to the lower 50%.
 # Unlike the confidence intervals (the shaded regions) of the RAI-A survival
-# curves, the Rockwood survival curves overlap slightly. This seems to
+# curves, the RI survival curves overlap slightly. This seems to
 # corroborate the earlier observation of a slightly larger standard error margin
-# with the Rockwood metric compared to RAI-A. The subsequent survival curve
+# with the RI compared to RAI-A. The subsequent survival curve
 # model summary table also depicts the same story. Even on the training set,
-# the RAI-A model performs slightly better than Rockwood, as evidenced by the
+# the RAI-A model performs slightly better than RI, as evidenced by the
 # standard error and AIC score.
 #
 # A visible trend that can be seen in the Event Frequencies tables. Generally
@@ -441,9 +471,9 @@ with(sbs0$train$all_emergency
 # post-operative complications, the subsequent table reveals that the RAI-A is
 # more specific in detecting true post-operative complication events. 
 #
-# Both Rockwood and the RAI-A frailty metrics are powerful frailty metrics that
+# Both RI and the RAI-A frailty metrics are powerful frailty metrics that
 # can be implemented using EHR data. Based on our results, it appears that the
-# RAI-A slightly outperforms the Rockwood however due to a low event rate (~22%),
+# RAI-A slightly outperforms the RI however due to a low event rate (~22%),
 # more data points need to be added and therefore more validation is needed.
 # Nevertheless, we are the first to demonstrate the predictive power both frailty
 # metrics have in detecting post-operative complications. Based on the results
