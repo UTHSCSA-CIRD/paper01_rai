@@ -442,7 +442,9 @@ with(sbs0$train$all_emergency
 #' 1. RAI-A and RI both are reasonable predictors of 30-day mortality and readmission
 #' 2. RAI-A and RI have equivalent concordances and AUCs. 
 #' 3. Even a sample size of 194 was sufficient to find a significant effect for both RAI-A and RI
-#' 4. The threshold value that maximizes the sum of sensitivity and specificity was, in this population, 9.5 for RAI-A and and 0.264 for RI
+#' 4. The threshold value that maximizes the sum of sensitivity and specificity 
+#' was, in this population, `r coords(l_rocs$a_rai,'b',ret='th')` for RAI-A and and 
+#' `r coords(l_rocs$a_rockwood,'b',ret='th')` for RI
 #' 
 # In the population demographic table, approximately 22% of the 541 cases
 # resulted in death or hospital readmission within 30 days after surgery.
