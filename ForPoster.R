@@ -1,5 +1,5 @@
 #' ---
-#' title: "Side by Side Comparison of Rockwood Index and Risk Analysis Index as Predictors of Surgical Readmissions at a Texas Safety Net Hospital Serving a Large Hispanic Population"
+#' title: "Side by Side Comparison of Rockwood Index (RI) and Risk Analysis Index (RAI-A) as Predictors of Surgical Readmissions at a Texas Safety Net Hospital"
 #' author: "Alex F. Bokov *, PhD, MS, Desiree S. Wilson, PhD, Sara E. Espinoza, MD, Paula K. Shireman, MD"
 #' date: "02/23/2018"
 #' bibliography: Frailty.bib
@@ -26,9 +26,9 @@ source('run.R');
 source('global.R');
 #+ poster_variables
 thecolnames1 <- c("RAI-A Score"='rai_range'
-                  ,"Rockwood Score"='a_rockwood_range'
+                  ,"RI Score"='a_rockwood_range'
                   ,"RAI-A"='a_rai'
-                  ,"Rockwood"='a_rockwood'
+                  ,"RI"='a_rockwood'
                   ,"Income"='income_final'
                   ,"Gender"='gender'
                   ,"Hispanic"='hispanic_ethnicity'
@@ -221,26 +221,25 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
 #' For the `r sum(sbs0$all$all_emergency$idn_mrn %in% pat_samples$train)` 
 #' surgery cases in the training set we fit
 #' Cox proportional hazard models using either RAI-A  or the RI as
-#' predictors. The outcome being measured was time until readmission _or_ all-cause
-#' mortality. The survival plots in Figure 1 show the time elapsed until either
-#' event, whichever happened first during the 30 days after the date of 
-#' surgery.
+#' predictors. The outcome being measured was time until readmission. 
+#' The survival plots in Figure 1 show the time elapsed until readmission 
+#' during the 30 days after surgery.
 #' 
 #' 
 #' # Results
 #' 
-#' ## RAI-A and RI both are reasonable predictors of 30-day mortality and readmission
+#' ## RAI-A and RI both are predictors of 30-day readmission
 #' 
-#' #### Figure 1. Predicting post-surgical outcomes (all cause mortality and readmission)
+#' #### Figure 1. Predicting post-surgery readmission
 #+ plot_survfits, fig.width=10, fig.height=8
 fit_srvs <- list(`RAI-A`=survfit(Surv(a_trdm,a_c) ~ I(a_rai>median(a_rai))
                             , data = sbs0$all$all_emergency,subset=a_t>0)
-                ,Rockwood=survfit(Surv(a_trdm,a_c) ~ I(a_rockwood>median(a_rockwood))
+                ,RI=survfit(Surv(a_trdm,a_c) ~ I(a_rockwood>median(a_rockwood))
                             , data = sbs0$all$all_emergency,subset=a_t>0));
 # what if we cut them along their optimal thresholds?
 fit_srvs_optcut <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>9.5) # 9.5 # 2
                                  , data = sbs0$all$all_emergency,subset=a_t>0)
-                 ,Rockwood=survfit(Surv(a_t,a_c) ~ I(a_rockwood>0.264245) #0.264245 # 0.137
+                 ,RI=survfit(Surv(a_t,a_c) ~ I(a_rockwood>0.264245) #0.264245 # 0.137
                                    , data = sbs0$all$all_emergency,subset=a_t>0));
 pl_srvs <- mapply(function(aa,bb) autoplot(aa) +
                                            #,ylim=c(0.5,1),xlim=c(0,30),asp=1.45) + 
@@ -273,7 +272,7 @@ multiplot(plotlist=pl_srvs,cols=1);
 #' #### Table 2. Results of Cox survival model fits
 #'
 #+ results='asis'
-t_coxresults <- sapply(fit_coxs<-list(`RAI-A`=cox.rai.train,`Rockwood`=cox.rock.train)
+t_coxresults <- sapply(fit_coxs<-list(`RAI-A`=cox.rai.train,`RI`=cox.rock.train)
                        ,function(xx) cbind(tidy(xx),glance(xx)),simplify=F) %>% 
   do.call('rbind',.) %>% `[`(,c('n','nevent','estimate','std.error','statistic'
                                 ,'p.value','r.squared','concordance'
@@ -282,9 +281,9 @@ mapnames(t_coxresults,thecolnames1) %>% t %>% kable(format = 'markdown',digits=4
 #' 
 #' Table 2 shows that even on this relatively small sample size, both 
 #' measures of frailty are significantly (RAI-A `r sprintf('p = 
-#' %0.4f',t_coxresults['RAI-A','p.value'])`, Rockwood `r sprintf('p = 
-#' %0.4f',t_coxresults['Rockwood','p.value'])`) associated with risk of 
-#' mortality or readmission. The 'Events' row represents the number of cases
+#' %0.4f',t_coxresults['RAI-A','p.value'])`, RI `r sprintf('p = 
+#' %0.4f',t_coxresults['RI','p.value'])`) associated with risk of 
+#' readmission. The 'Events' row represents the number of cases
 #' of the 193 where the patient either died or was readmitted.
 #' 
 # In both cases the 'Effect' row represents the 
@@ -315,26 +314,30 @@ countfrac(sbs0$all$all_emergency,groupcols = 'rai_range') %>%
 countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>% 
   mapnames(thecolnames1) %>% kable(format='markdown',digits = 2);
 #' 
-#' ## RAI-A and RI have equivalent concordances and AUCs
+#' ## RAI-A and RI have similar concordances and AUCs
 #' 
 # As can be seen from Tables 2, the concordances are 
 # `r do.call(sprintf,c('%0.2f
 # (SE=%0.2f)',t_coxresults['RAI-A',c('concordance','std.error.concordance')]))`
 # and `r do.call(sprintf,c('%0.2f
-# (SE=%0.2f)',t_coxresults['Rockwood',c('concordance','std.error.concordance')]))`
+# (SE=%0.2f)',t_coxresults['RI',c('concordance','std.error.concordance')]))`
 # for the Cox models whose predictors are RAI-A and Rockwood, respectively. Both
 # concordances pass the traditional threshold because the lower bounds of both
 # their 95%$ confidence intervals are greater than 0.5
 #' 
-#' Their Receiver-Operator Characteristic (ROC) curves can be seen in Figure 2,
-#' along with their areas under the curve (AUCs).
-#' 
+#' For RAI-A the concordance was `r round(concordance(fit_coxs$`RAI-A`)$conc,3)`
+#' (SE `r round(sqrt(concordance(fit_coxs$`RAI-A`)$var),3)`) and for RI it was
+#' `r round(concordance(fit_coxs$`RI`)$conc,3)`
+#' (SE `r round(sqrt(concordance(fit_coxs$`RI`)$var),3)`). The Receiver-Operator 
+#' Characteristic (ROC) curves can be seen in Figure 2, along with their 
+#' respective areas under the curve (AUCs).
 #' 
 binomnull <- glm(a_any_cd4~1,data=sbs0$train$all_emergency,family='binomial');
 l_binomfits <- sapply(c('a_rai','a_rockwood')
                      ,function(xx) update(binomnull,paste0('.~',xx)),simplify=F);
 l_binomrocs <- with(sbs0$test,lapply(l_binomfits
                                      ,function(xx) roc(response=all_emergency$a_any_cd4,predictor=predict(xx,all_emergency,type='response'))));
+#'
 #' #### Figure 2. ROC curves for RAI-A and RI
 #' 
 #+ plot_roc, fig.width=10, fig.height=8
@@ -351,7 +354,7 @@ plot(smooth(l_rocs$a_rockwood,method='density'),col='darkgreen'
      #,print.auc=T,print.auc.col='darkgreen'
      ,ci=F,add=T);
 legend('topleft',bty ='n',col=c('orange','darkgreen'),lwd=3
-       ,legend=sprintf('%s (AUC=%0.3f)',c('RAI-A','Rockwood'),sapply(l_rocs,auc)));
+       ,legend=sprintf('%s (AUC=%0.3f)',c('RAI-A','RI'),sapply(l_rocs,auc)));
 #' 
 #' ## Optimal threshold values for RAI-A and RI
 #' 
@@ -406,7 +409,7 @@ auc_coxs <- sapply(names(fit_coxs),function(xx) {
                 ,lp=eval(train[[xx]]),lpnew = eval(test[[xx]])
                 ,times=1:30,FUNS=c_auclist))
   },simplify=F);
-# Now tabulate the results;
+# Now tabulate the results; as well as concordances
 t_auccox <- sapply(auc_coxs,sapply,function(xx) 
   if(length(xx)>1&&'iauc' %in% names(xx)) xx[['iauc']] else 
     if(length(xx)==1 && is.numeric(xx)) xx else NaN);
@@ -417,7 +420,7 @@ t_auccox <- sapply(auc_coxs,sapply,function(xx)
 #' AUC/C-statistic estimators (Chambless and Diao, Song and Zhou, Hung and
 #' Chiang, Uno, Begg, and Gonen and Heller) and three statiscial measures
 #' similar to R^2 (OXS,Nagel-k, and XO). In table 7 are detailed results of 
-#' Harrel's C [ref]
+#' Harrel's C [newson2006confidence].
 #' 
 #' #### Table 6. RAI-A and RI compared on their ability to predict death or readmission in the out-of-sample validation set using a panel of predictive accuracy metrics.
 #+ tab_coxauc, results='asis'
@@ -432,14 +435,14 @@ with(sbs0$train$all_emergency
 #'
 #' # Conclusions
 #' 
-#' RAI-A and Rockwood both are reasonable predictors of 30-day readmission, with
+#' RAI-A and RI both are reasonable predictors of 30-day readmission, with
 #' RI having a slightly higher Harrell's C (0.369) than did RAI-A (0.349).   .
 #' Even a sample size of 194 was sufficient to find a significant effect for
-#' both RAI-A and Rockwood. The threshold value that maximizes the sum of
+#' both RAI-A and RI. The threshold value that maximizes the sum of
 #' sensitivity and specificity was, in this population, 9.5 for RAI-A and and
-#' 0.264 for Rockwood
+#' 0.264 for RI
 #' 
-#' 1. RAI-A and RI both are reasonable predictors of 30-day mortality and readmission
+#' 1. RAI-A and RI both are reasonable predictors of 30-day readmission
 #' 2. RAI-A and RI have equivalent concordances and AUCs. 
 #' 3. Even a sample size of 194 was sufficient to find a significant effect for both RAI-A and RI
 #' 4. The threshold value that maximizes the sum of sensitivity and specificity 
