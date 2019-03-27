@@ -123,7 +123,8 @@ plot(0,type='n',ylab='',xlab='',axes=F);
 #' Surgeons National Surgical Quality Improvement Program (NSQIP) registry, including 
 #' medical co-morbidities and functional status [@MelinPreoperativefrailtyRisk2015]. 
 #' If one variable is missing, however, the RAI-A could lead to an underestimate 
-#' of a patient’s frailty. Moreover, RAI-A was adapted to surgical outcomes from 
+#' of a patient’s frailty. In our data, one such variable-- mental impairment--
+#' was not available. Moreover, RAI-A was adapted to surgical outcomes from 
 #' an earlier frailty score [@PorockMDSMortalityRisk2010] that was trained on a 
 #' completely different dataset and population without re-fitting nor 
 #' re-validating the regression model on which it was based against the new data.
@@ -193,7 +194,7 @@ plot(0,type='n',ylab='',xlab='',axes=F);
 #' (N=`r sum(sbs0$all$all_emergency$idn_mrn %in% pat_samples$val)`) is being
 #' held out for future analysis and was not used in the work reported here.
 #' 
-#' However, all `nrow(sbs0$all$all_emergency)` cases were used for plotting 
+#' However, all `r nrow(sbs0$all$all_emergency)` cases were used for plotting 
 #' survival in Figure 1, the 
 #' demographic summary in Table 1, and the event frequencies in Tables 3a and 3b
 #' since the purpose of all these is cohort characterization rather prediction 
@@ -294,10 +295,6 @@ mapnames(t_coxresults,thecolnames1) %>% t %>% kable(format = 'markdown',digits=4
 # dividing them by their standard errors ('Effect/SE', also known as the Wald
 # statistic).and these standardized values are close to each other. 
 #' 
-#' Akaike Information Criteria and Bayes Information Criteria are also close to
-#' each other..
-#' 
-
 #' 
 #' Tables 3a and 3b show patient 30-day mortality and readmissions increases with 
 #' increasing RAI-A and RI. In the highest risk brackets there are too few patients
@@ -327,10 +324,10 @@ countfrac(sbs0$all$all_emergency,groupcols = 'a_rockwood_range') %>%
 # concordances pass the traditional threshold because the lower bounds of both
 # their 95%$ confidence intervals are greater than 0.5
 #' 
-#' For RAI-A the concordance was `r round(concordance(fit_coxs$`RAI-A`)$conc,3)`
-#' (SE `r round(sqrt(concordance(fit_coxs$`RAI-A`)$var),3)`) and for RI it was
-#' `r round(concordance(fit_coxs$`RI`)$conc,3)`
-#' (SE `r round(sqrt(concordance(fit_coxs$`RI`)$var),3)`). The Receiver-Operator 
+#' For RAI-A the concordance was `r round(concordance(fit_coxs[['RAI-A']])$conc,3)`
+#' (SE `r round(sqrt(concordance(fit_coxs[['RAI-A']])$var),3)`) and for RI it was
+#' `r round(concordance(fit_coxs$RI)$conc,3)`
+#' (SE `r round(sqrt(concordance(fit_coxs$RI)$var),3)`). The Receiver-Operator 
 #' Characteristic (ROC) curves can be seen in Figure 2, along with their 
 #' respective areas under the curve (AUCs).
 #' 
@@ -422,7 +419,7 @@ t_auccox <- sapply(auc_coxs,sapply,function(xx)
 #' AUC/C-statistic estimators (Chambless and Diao, Song and Zhou, Hung and
 #' Chiang, Uno, Begg, and Gonen and Heller) and three statiscial measures
 #' similar to R^2 (OXS,Nagel-k, and XO). In table 7 are detailed results of 
-#' Harrel's C [newson2006confidence].
+#' Harrel's C [@newson2006confidence].
 #' 
 #' #### Table 6. RAI-A and RI compared on their ability to predict death or readmission in the out-of-sample validation set using a panel of predictive accuracy metrics.
 #+ tab_coxauc, results='asis'
@@ -444,7 +441,7 @@ with(sbs0$train$all_emergency
 #' a significant effect for both RAI-A and RI. The threshold value that 
 #' maximizes the sum of sensitivity and specificity was, in this population, 
 #' `r coords(l_rocs$a_rai,'b',ret='threshold')` for RAI-A and and
-#' `r coords(l_rocs$a_rockwood,'b',ret='threshold')` for RI.
+#' `r round(coords(l_rocs$a_rockwood,'b',ret='threshold'),3)` for RI.
 #' 
 # In the population demographic table, approximately 22% of the 541 cases
 # resulted in death or hospital readmission within 30 days after surgery.
