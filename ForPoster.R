@@ -193,7 +193,8 @@ plot(0,type='n',ylab='',xlab='',axes=F);
 #' (N=`r sum(sbs0$all$all_emergency$idn_mrn %in% pat_samples$val)`) is being
 #' held out for future analysis and was not used in the work reported here.
 #' 
-#' However, all 541 cases were used for plotting survival in Figure 1, the 
+#' However, all `nrow(sbs0$all$all_emergency)` cases were used for plotting 
+#' survival in Figure 1, the 
 #' demographic summary in Table 1, and the event frequencies in Tables 3a and 3b
 #' since the purpose of all these is cohort characterization rather prediction 
 #' or hypothesis testing.
@@ -206,6 +207,7 @@ mutate(sbs0$all$all_emergency,t_strata=factor(a_c==1
                                              ,labels=c('Event-Free','Death/Readmission'))) %>% 
   mapnames(thecolnames1) %>% 
   CreateTableOne(names(thecolnames1)[3:9],'t_strata',.) %>% 
+  assign('t_demog',.,envir=.GlobalEnv) %>% 
   print(printToggle=F,noSpaces=T) %>% `[`(,-4) %>% 
   kable(format='markdown');
 #'
@@ -237,9 +239,9 @@ fit_srvs <- list(`RAI-A`=survfit(Surv(a_trdm,a_c) ~ I(a_rai>median(a_rai))
                 ,RI=survfit(Surv(a_trdm,a_c) ~ I(a_rockwood>median(a_rockwood))
                             , data = sbs0$all$all_emergency,subset=a_t>0));
 # what if we cut them along their optimal thresholds?
-fit_srvs_optcut <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>9.5) # 9.5 # 2
+fit_srvs_optcut <- list(`RAI-A`=survfit(Surv(a_t,a_c) ~ I(a_rai>2) # 9.5 # 2
                                  , data = sbs0$all$all_emergency,subset=a_t>0)
-                 ,RI=survfit(Surv(a_t,a_c) ~ I(a_rockwood>0.264245) #0.264245 # 0.137
+                 ,RI=survfit(Surv(a_t,a_c) ~ I(a_rockwood>0.137) #0.264245 # 0.137
                                    , data = sbs0$all$all_emergency,subset=a_t>0));
 pl_srvs <- mapply(function(aa,bb) autoplot(aa) +
                                            #,ylim=c(0.5,1),xlim=c(0,30),asp=1.45) + 
@@ -284,7 +286,7 @@ mapnames(t_coxresults,thecolnames1) %>% t %>% kable(format = 'markdown',digits=4
 #' %0.4f',t_coxresults['RAI-A','p.value'])`, RI `r sprintf('p = 
 #' %0.4f',t_coxresults['RI','p.value'])`) associated with risk of 
 #' readmission. The 'Events' row represents the number of cases
-#' of the 193 where the patient either died or was readmitted.
+#' of the `r with(fit_coxs[[1]],n+nevent)` where the patient was readmitted.
 #' 
 # In both cases the 'Effect' row represents the 
 # natural logarithm of the increase in risk per unit change in the frailty 
@@ -436,18 +438,13 @@ with(sbs0$train$all_emergency
 #' # Conclusions
 #' 
 #' RAI-A and RI both are reasonable predictors of 30-day readmission, with
-#' RI having a slightly higher Harrell's C (0.369) than did RAI-A (0.349).   .
-#' Even a sample size of 194 was sufficient to find a significant effect for
-#' both RAI-A and RI. The threshold value that maximizes the sum of
-#' sensitivity and specificity was, in this population, 9.5 for RAI-A and and
-#' 0.264 for RI
-#' 
-#' 1. RAI-A and RI both are reasonable predictors of 30-day readmission
-#' 2. RAI-A and RI have equivalent concordances and AUCs. 
-#' 3. Even a sample size of 194 was sufficient to find a significant effect for both RAI-A and RI
-#' 4. The threshold value that maximizes the sum of sensitivity and specificity 
-#' was, in this population, `r coords(l_rocs$a_rai,'b',ret='th')` for RAI-A and and 
-#' `r coords(l_rocs$a_rockwood,'b',ret='th')` for RI
+#' RI having a slightly higher Harrell's C (0.369) than did RAI-A (0.349). The 
+#' two scores have similar concordances and AUCs.
+#' Even a sample size of `r with(fit_coxs[[1]],n+nevent)` was sufficient to find 
+#' a significant effect for both RAI-A and RI. The threshold value that 
+#' maximizes the sum of sensitivity and specificity was, in this population, 
+#' `r coords(l_rocs$a_rai,'b',ret='threshold')` for RAI-A and and
+#' `r coords(l_rocs$a_rockwood,'b',ret='threshold')` for RI.
 #' 
 # In the population demographic table, approximately 22% of the 541 cases
 # resulted in death or hospital readmission within 30 days after surgery.
@@ -488,6 +485,8 @@ with(sbs0$train$all_emergency
 # so will lead to optimized patient care as we strive for precision medicine.
 #' 
 #' # Acknowledgments
+#' This study was supported in part by the San Antonio Pepper Center 
+#' P30AG044271, U01TR002393 and 1UL1TR002645
 #' 
 #' # References
 #' 
