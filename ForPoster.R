@@ -435,13 +435,60 @@ with(sbs0$train$all_emergency
 #' # Conclusions
 #' 
 #' RAI-A and RI both are reasonable predictors of 30-day readmission, with
-#' RI having a slightly higher Harrell's C (0.369) than did RAI-A (0.349). The 
-#' two scores have similar concordances and AUCs.
+#' RI having a slightly higher Harrell's C (0.369) than did RAI-A (0.349). 
+#'  
 #' Even a sample size of `r with(fit_coxs[[1]],n+nevent)` was sufficient to find 
-#' a significant effect for both RAI-A and RI. The threshold value that 
-#' maximizes the sum of sensitivity and specificity was, in this population, 
-#' `r coords(l_rocs$a_rai,'b',ret='threshold')` for RAI-A and and
-#' `r round(coords(l_rocs$a_rockwood,'b',ret='threshold'),3)` for RI.
+#' a significant effect for both RAI-A and RI. 
+#' 
+#' The two scores have similar concordances and AUCs. The 
+#' correlation (Spearman) of ranked RAI-A and RI scores with each other is 
+#' `r round(with(dat1,cor(a_rai,a_rockwood,method='spearman')),3)` 
+#' and the correlation of their **predictions** is 
+#' `r round(cor(predict(fit_coxs[['RAI-A']]),predict(fit_coxs$RI),method='spearman'),3)`
+#' in both cases with p<0.001. These values fall between the correlation of 
+#' RAI-A with RAI-C and that of RAI-A with mFI as reported by 
+#' Hall et al. [@HallDevelopmentInitialValidation2017] 
+#' 
+#' Hall et al. also used an RAI-A score of 10 as the cutoff between low risk and
+#' and high-risk individuals. Few patients in this set met that criterion for
+#' frailty. Whether or not some particular threshold value is exceeded is less 
+#' important than how well a model predicts increased risk for the patient.
+#' 
+#' In the same paper Hall et al. cautioned: 
+#' 
+#' *"As with any imperfect test, the cut point to rule frailty in
+#' or out involves a tradeoff between sensitivity and specificity.
+#' The advantage of a granular scale, such as the RAI, is that cut-offs could be 
+#' chosen based on the health care setting, level of
+#' precision required, and planned interventions for frail patients."*
+#' 
+#' Indeed, we found a very different optimal threshold value that 
+#' maximizes the sum of sensitivity and specificity in this population--
+#' `r coords(l_rocs$a_rai,'b',ret='threshold')` for RAI-A. For RI the threshold
+#' was `r round(coords(l_rocs$a_rockwood,'b',ret='threshold'),3)`. 
+#' 
+#' This is the first attempt at establishing concurrent validity betweeen the 
+#' RAI-A and RI frailty metrics as well preliminary evidence that RI has 
+#' predictive validity for postoperative complications.
+#' 
+#' # Future directions
+#' 
+#' The process described here need to be scaled up to a larger dataset-- e.g.
+#' direclty from NSQIP rather than our site's contribution, and to other
+#' surgical cohorts.
+#' 
+#' The NSQIP data elements also include a number of post-surgical complications
+#' and short-term mortality. We are interested in extending our analysis to 
+#' these outcomes as well.
+#' 
+#' RI will then need to be adapted to equivalent variables in raw EMR data 
+#' (e.g. diagnosis codes and out-of-reference flags for lab results). There 
+#' are thousands more diagnoses and labs available in the EMR than in the
+#' NSQIP registry and that should greatly improve the performance of the model. 
+#' If RI is found to be an accurate predictor of readmissions and other 
+#' clinically important outcomes, it can be the basis of decision support 
+#' algorithms that are portable between EMR systems without the need to align
+#' their coding systems with each other.
 #' 
 # In the population demographic table, approximately 22% of the 541 cases
 # resulted in death or hospital readmission within 30 days after surgery.
