@@ -473,7 +473,7 @@ with(sbs0$train$all_emergency
 #' 
 #' # Future directions
 #' 
-#' The process described here need to be scaled up to a larger dataset-- e.g.
+#' The process described here needs to be scaled up to a larger dataset-- e.g.
 #' direclty from NSQIP rather than our site's contribution, and to other
 #' surgical cohorts.
 #' 
